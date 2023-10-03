@@ -1,29 +1,23 @@
-# HTTP Server Project
+# HTTPサーバープロジェクト
 
-## Overview
-This project revolves around the creation of a custom HTTP server from scratch. The server has been meticulously crafted using the C++ 98 standard, shedding light on the intricacies and details of the HTTP protocol.
+## 概要
+本プロジェクトでは、独自のHTTPサーバーを一から作成しています。C++ 98標準を基に、HTTPプロトコルの奥深さや複雑性を詳細に取り扱っています。
 
-## Inspiration
-Our server is inspired by the widely acclaimed web server software: `nginx`. Like `nginx`, our server handles HTTP requests and responses, showcasing a deep-rooted understanding of the HTTP protocol.
+## インスピレーション
+私たちのサーバーは、幅広く評価されているウェブサーバーソフトウェア、`nginx`からのインスピレーションを受けています。私たちのサーバーも、`nginx`同様にHTTPリクエストとレスポンスを処理することで、HTTPプロトコルへの深い理解を示しています。
 
-## Key Features
-- Developed using the C++ 98 standard.
-- Comprehensive interpretation of HTTP requests and responses.
-- Capability to serve both static and dynamic web pages.
-- Robust error handling based on HTTP status codes.
+## 主要な特長
+- C++ 98標準での開発
+- HTTPリクエストとレスポンスの詳細な解析
+- 静的・動的なウェブページのサービス提供
+- HTTPステータスコードを基にした確実なエラー処理
 
-## Resources
-During the development of this server, the following resources were indispensable for a comprehensive understanding of the HTTP protocol:
+## 参考リソース
+サーバーの開発過程で、以下の資料はHTTPプロトコルを深く理解する上で非常に有用でした：
+- [Mozilla Developer NetworkのHTTPガイド](https://developer.mozilla.org/ja/docs/Web/HTTP)
+- [HTTPWGによるHTTP仕様](https://httpwg.org/specs/)
 
-- [Mozilla Developer Network's HTTP Guide](https://developer.mozilla.org/en-US/docs/Web/HTTP)
-- [HTTP Specifications by HTTPWG](https://httpwg.org/specs/)
-
-## Usage
-1. Clone this repository.
-2. Compile the C++ code using a C++ 98 compliant compiler.
-3. Run the server and access it using any HTTP client or web browser.
-
-## Contribution
-We're open to feedback and suggestions. If you find any issues or have recommendations, please don't hesitate to raise them. Contributions in the form of forks, pull requests, or issues are always welcomed!
-
-Thank you for exploring our HTTP server project!
+## 使い方
+1. このリポジトリをクローンしてください。
+2. C++ 98に準拠したコンパイラを使ってC++コードをコンパイルしてください。
+3. サーバーを起動し、HTTPクライアントやウェブブラウザを使ってアクセスしてください。
