@@ -6,9 +6,25 @@
 
 class SocketTest : public ::testing::Test {
 protected:
-    static const int MAX_SERVERS = 1024;
-    server::Socket* servers[MAX_SERVERS];
+    int getMaxFileDescriptors() const {
+        struct rlimit limit;
+        if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+            std::cerr << "Failed to get file descriptor limit." << std::endl;
+            return -1;
+        }
+        if (static_cast<int>(limit.rlim_cur) < 255)
+            return static_cast<int>(limit.rlim_cur) - 2;
+        // MAXFD = 255 - stdin 1 - stdout 0 = 253;
+        return 253;
+    }
+
+    const int MAX_SERVERS;
+    server::Socket** servers;
     int port = SERVER_PORT;
+
+    SocketTest() : MAX_SERVERS(getMaxFileDescriptors()) {
+        servers = new server::Socket*[MAX_SERVERS];
+    }
 
     virtual void SetUp() {
         for (int i = 0; i < MAX_SERVERS; ++i) {
@@ -20,8 +36,10 @@ protected:
         for (int i = 0; i < MAX_SERVERS; ++i) {
             delete servers[i];
         }
+        delete[] servers;
     }
 };
+
 
 TEST_F(SocketTest, InitializeServers) {
     for (int i = 0; i < MAX_SERVERS; ++i) {
