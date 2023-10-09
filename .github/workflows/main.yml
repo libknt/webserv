@@ -34,12 +34,12 @@ jobs:
         sudo cp lib/*.a /usr/lib 
         sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a 
         sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
-
+    
     - name: configure
       run: |
         mkdir build 
         cd build 
-        cmake -DCMAKE_BUILD_TYPE=Release
+        cmake .. -DCMAKE_BUILD_TYPE=Release
 
     - name: make
       run: |
