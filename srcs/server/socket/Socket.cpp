@@ -17,12 +17,12 @@ Socket::Socket(const char* server_addr, int port, int backlog)
 	memset(&addr_, 0, sizeof(addr_));
 }
 
-Socket::Socket(const Socket& r)
-	: server_addr_(r.server_addr_)
-	, port_(r.port_)
-	, listen_sd_(r.listen_sd_)
-	, backlog_(r.backlog_) {
-	memcpy(&addr_, &r.addr_, sizeof(r.addr_));
+Socket::Socket(const Socket& other)
+	: server_addr_(other.server_addr_)
+	, port_(other.port_)
+	, listen_sd_(other.listen_sd_)
+	, backlog_(other.backlog_) {
+	memcpy(&addr_, &other.addr_, sizeof(other.addr_));
 }
 
 Socket& Socket::operator=(const Socket& other) {

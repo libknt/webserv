@@ -33,7 +33,7 @@ private:
 public:
 	Socket(const char* server_addr, int port);
 	Socket(const char* server_addr, int port, int backlog);
-	Socket(const Socket& r);
+	Socket(const Socket& other);
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();
 	int initialize();
