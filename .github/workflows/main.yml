@@ -18,7 +18,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Cache Clang Tools
+      uses: actions/cache@v2
+      with:
+        path: /usr/bin/clang-tidy
+        key: clang-tidy-${{ runner.os }}
+
     - name: Install Clang Tools
+      if: steps.cache.outputs.cache-hit != 'true'
       run: sudo apt-get install clang-tidy
 
     - name: Run clang-tidy
@@ -34,7 +41,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Cache cppcheck
+      uses: actions/cache@v2
+      with:
+        path: /usr/bin/cppcheck
+        key: cppcheck-${{ runner.os }}
+
     - name: Install cppcheck
+      if: steps.cache.outputs.cache-hit != 'true'
       run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
@@ -53,15 +67,40 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build and run Google Test
+    - name: Cache Google Test Build
+      uses: actions/cache@v2
+      with:
+        path: /usr/lib/libgtest*
+        key: gtest-${{ runner.os }}
+
+    - name: Install Google Test
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtest-dev
+        sudo apt-get install -y cmake
+        cd /usr/src/gtest
+        sudo cmake CMakeLists.txt
+        sudo make
+        sudo cp *.a /usr/lib
+
+    - name: Cache Build Artifacts
+      uses: actions/cache@v2
+      with:
+        path: path/to/your/build/artifacts
+        key: build-${{ runner.os }}-${{ github.sha }}
+        restore-keys: |
+          build-${{ runner.os }}-
+
+    - name: Build and Test
       run: |
         cd test
         make
 
-    # オプション: テスト結果を保存
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v2
       with:
         name: test-results
         path: test/log/results.log
+
