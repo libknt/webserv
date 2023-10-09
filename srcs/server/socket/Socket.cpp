@@ -116,7 +116,7 @@ bool Socket::isValid() {
 	if (result <= 0)
 		return false;
 
-	return backlog_ > 0 && backlog_ <= 128;
+	return backlog_ > 0 && backlog_ <= SOMAXCONN;
 }
 
 int Socket::initialize() {
@@ -138,11 +138,11 @@ int Socket::initialize() {
 	return 0;
 }
 
-const char* Socket::getServerAddr_() const {
+const char* Socket::getServerAddr() const {
 	return this->server_addr_;
 }
 
-int Socket::getPort_() const {
+int Socket::getPort() const {
 	return this->port_;
 }
 

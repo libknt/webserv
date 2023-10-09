@@ -11,7 +11,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define SOMAXCONN 128
 namespace server {
 
 class Socket {
@@ -38,8 +37,8 @@ public:
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();
 	int initialize();
-	const char* getServerAddr_() const;
-	int getPort_() const;
+	const char* getServerAddr() const;
+	int getPort() const;
 	int getListenSd() const;
 };
 }
