@@ -8,15 +8,15 @@
 class SocketTest : public ::testing::Test {
 protected:
     int getMaxFileDescriptors() const {
-        // MAXFD = 255 - stdin 1 - stdout 0 = 253;
-        int max_fd = 253;
+        // MAXFD = 255 - stdin 1 - stdout 0  - 23= 230; testで使用する分を開けておく
+        int max_fd = 230;
         struct rlimit limit;
         if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
             std::cerr << "Failed to get file descriptor limit." << std::endl;
             return -1;
         }
         if (static_cast<int>(limit.rlim_cur) < 255)
-            return static_cast<int>(limit.rlim_cur) - 2;
+            return static_cast<int>(limit.rlim_cur) - 20;
         return max_fd;
     }
 
@@ -106,7 +106,6 @@ TEST(SocketParamsTest, ZeroPort) {
     int result = getsockname(server.getListenSd(), (struct sockaddr *)&sin, &len);
     
     ASSERT_NE(result, -1) << "Failed to get socket name.";
-    
     EXPECT_GT(ntohs(sin.sin_port), 0) << "Expected a valid port number after initialization";
 }
 
