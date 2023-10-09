@@ -1,30 +1,16 @@
 #include "Socket.hpp"
 #include <gtest/gtest.h>
-#include <sys/resource.h>
 
 #define SERVER_ADDR "127.0.0.1"
 #define SERVER_PORT 8080
 
 class SocketTest : public ::testing::Test {
 protected:
-    int getMaxFileDescriptors() const {
-        // MAXFD = 255 - stdin 1 - stdout 0  - 23= 230; testで使用する分を開けておく
-        int max_fd = 230;
-        struct rlimit limit;
-        if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
-            std::cerr << "Failed to get file descriptor limit." << std::endl;
-            return -1;
-        }
-        if (static_cast<int>(limit.rlim_cur) < 255)
-            return static_cast<int>(limit.rlim_cur) - 20;
-        return max_fd;
-    }
-
-    const int MAX_SERVERS;
+    const int MAX_SERVERS = 50;
     server::Socket** servers;
     int port = SERVER_PORT;
 
-    SocketTest() : MAX_SERVERS(getMaxFileDescriptors()) {
+    SocketTest() {
         servers = new server::Socket*[MAX_SERVERS];
     }
 
