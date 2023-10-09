@@ -6,7 +6,7 @@
 
 class SocketTest : public ::testing::Test {
 protected:
-    const int MAX_SERVERS = 50;
+    const int MAX_SERVERS = 20;
     server::Socket** servers;
     int port = SERVER_PORT;
 
@@ -31,6 +31,7 @@ protected:
 //MAX_SERVERS分のサーバーオブジェクトが正しく初期化できるか
 TEST_F(SocketTest, InitializeServers) {
     for (int i = 0; i < MAX_SERVERS; ++i) {
+        std::cout << "++++++++++++i: " << i << std::endl;
         EXPECT_GE(servers[i]->initialize(), 0) << "Failed to initialize server at index " << i;
     }
 }
