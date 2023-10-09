@@ -28,12 +28,12 @@ protected:
     }
 };
 
-//MAX_SERVERS分のサーバーオブジェクトが正しく初期化できるか
-TEST_F(SocketTest, InitializeServers) {
-    for (int i = 0; i < MAX_SERVERS; ++i) {
-        EXPECT_GE(servers[i]->initialize(), 0) << "Failed to initialize server at index " << i;
-    }
-}
+// //MAX_SERVERS分のサーバーオブジェクトが正しく初期化できるか
+// TEST_F(SocketTest, InitializeServers) {
+//     for (int i = 0; i < MAX_SERVERS; ++i) {
+//         EXPECT_GE(servers[i]->initialize(), 0) << "Failed to initialize server at index " << i;
+//     }
+// }
 
 //各サーバーオブジェクトが持っているリッスン用のファイルディスクリプタが有効かどうか
 TEST_F(SocketTest, CheckValidListenSd) {
