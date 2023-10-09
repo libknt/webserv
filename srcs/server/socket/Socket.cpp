@@ -108,7 +108,7 @@ int Socket::listen() {
 }
 
 bool Socket::isValid() {
-	if (port_ <= min_port_ || port_ > max_port_)
+	if (port_ < min_port_ || port_ > max_port_)
 		return false;
 
 	struct sockaddr_in sa;
@@ -121,7 +121,7 @@ bool Socket::isValid() {
 
 int Socket::initialize() {
 	if (!this->isValid())
-		return -1;
+			return -1;
 	if (this->socket() < 0)
 		return -1;
 	if (this->setsockopt() < 0)
