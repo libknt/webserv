@@ -53,8 +53,8 @@ int Socket::socket() {
 }
 
 int Socket::setsockopt() {
-	int on = 1;
-	int rc = ::setsockopt(this->listen_sd_, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
+	int is_on = 1;
+	int rc = ::setsockopt(this->listen_sd_, SOL_SOCKET, SO_REUSEADDR, (char*)&is_on, sizeof(is_on));
 	if (rc < 0) {
 		std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
 		return -1;
