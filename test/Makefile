@@ -1,19 +1,17 @@
 CXX = c++
 
-# kyoda mac
-# CXXFLAGS = -std=c++14 -I/sgoinfre/kyoda/googletest/include -Wall -Werror -Wextra
-# LDFLAGS = -L/sgoinfre/kyoda/googletest/lib -lgtest -lgtest_main
+GPWD=$(shell pwd)
+CXXFLAGS = -std=c++14 -Wall -Werror -Wextra -I$(GPWD)/third_party/gtest/include
+LDFLAGS = -L$(GPWD)/third_party/gtest/lib -lgtest -lgtest_main
 
-# kyoda ubuntu
-# CXXFLAGS = -std=c++14 -I/usr/local/include
-# LDFLAGS = -L/usr/local/lib -lgtest -lgtest_main
+all: check_third_party socket
 
-
-CXXFLAGS = -std=c++14 -I/usr/local/include -Wall -Werror -Wextra
-LDFLAGS = -L/usr/local/lib -lgtest -lgtest_main
-
-all:socket
+check_third_party:
+	@if [ ! -d "./third_party" ]; then $(MAKE) gpath; fi
 
 socket:
 	make -C UnitTest/SocketTest CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
 	make clean -C UnitTest/SocketTest
+
+gpath:
+	bash build.sh

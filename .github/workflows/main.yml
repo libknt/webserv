@@ -18,47 +18,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Cache Google Test Build
-      uses: actions/cache@v2
-      with:
-        path: /usr/lib/libgtest*
-        key: gtest-${{ runner.os }}
+    - name: Install required packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget cmake
 
-    - name: Install gtest manually
-      if: steps.cache.outputs.cache-hit != 'true'
+    - name: Run build.sh script
       run: |
-        sudo apt-get install libgtest-dev 
-        cd /usr/src/gtest 
-        sudo cmake CMakeLists.txt 
-        sudo make 
-        sudo cp lib/*.a /usr/lib 
-        sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a 
-        sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
-    
-    - name: configure
-      run: |
-        mkdir build 
-        cd build 
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-
-    - name: make
-      run: |
-        cd build 
+        cd test
+        bash build.sh
         make
-
-    - name: Cache Build Artifacts
-      uses: actions/cache@v2
-      with:
-        path: path/to/your/build/artifacts
-        key: build-${{ runner.os }}-${{ github.sha }}
-        restore-keys: |
-          build-${{ runner.os }}-
-
-    - name: Build and Test
-      run: |
-        cd test 
-        make
-
 
     - name: Upload test results
       if: always()
