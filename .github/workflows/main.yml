@@ -11,6 +11,55 @@ on:
       - develop
 
 jobs:
+  clang-tools:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Cache Clang Tools
+      uses: actions/cache@v2
+      with:
+        path: /usr/bin/clang-tidy
+        key: clang-tidy-${{ runner.os }}
+
+    - name: Install Clang Tools
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: sudo apt-get install clang-tidy
+
+    - name: Run clang-tidy
+      run: |
+        find ./srcs -name '*.cpp' -or -name '*.hpp' | while read file; do
+            clang-tidy $file -- -Wall -Wextra -Werror -std=c++98
+        done
+
+  cppcheck-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Cache cppcheck
+      uses: actions/cache@v2
+      with:
+        path: /usr/bin/cppcheck
+        key: cppcheck-${{ runner.os }}
+
+    - name: Install cppcheck
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: sudo apt-get install cppcheck
+
+    - name: Run cppcheck
+      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force  --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 ./
+
+    - name: Upload cppcheck report
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck-report
+        path: cppcheck.txt
+
   google-test:
     runs-on: ubuntu-latest
 
