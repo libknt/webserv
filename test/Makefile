@@ -4,7 +4,7 @@ CXX = c++
 CXXFLAGS = -std=c++14 -I/sgoinfre/kyoda/googletest/include
 LDFLAGS = -L/sgoinfre/kyoda/googletest/lib -lgtest -lgtest_main
 
-SRCS = ../srcs/server/socket/Socket.cpp ./SocketTest/socket_test.cc
+SRCS = ../srcs/server/socket/Socket.cpp ./UnitTest/SocketTest/socket_test.cc
 
 OUTPUT = test
 
