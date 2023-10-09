@@ -105,7 +105,7 @@ jobs:
     - name: Run Google Test
       run: |
         cd test
-        make
+        make action
 
     - name: Upload test results
       if: always()

@@ -15,3 +15,5 @@ socket:
 
 gpath:
 	bash build.sh
+
+action: socket
