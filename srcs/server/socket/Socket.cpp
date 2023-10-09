@@ -9,11 +9,11 @@ Socket::Socket(const char* server_addr, int port)
 	memset(&addr_, 0, sizeof(addr_));
 }
 
-Socket::Socket(const char* server_addr, int port, int back_log)
+Socket::Socket(const char* server_addr, int port, int backlog)
 	: server_addr_(server_addr)
 	, port_(port)
 	, listen_sd_(-1)
-	, backlog_(back_log) {
+	, backlog_(backlog) {
 	memset(&addr_, 0, sizeof(addr_));
 }
 
