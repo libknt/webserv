@@ -9,16 +9,16 @@ LDFLAGS = -L/usr/local/lib -lgtest -lgtest_main
 
 SRCS = ../srcs/server/socket/Socket.cpp ./UnitTest/SocketTest/socket_test.cc
 
-OUTPUT = test
+SOCKETOUTPUT = socket_test
 
 all: socket
-	./test
+	./socket_test
 
 socket: $(SRCS)
-	$(CXX) $(CXXFLAGS) -I ../srcs/server/socket/. $(SRCS) -o $(OUTPUT) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -I ../srcs/server/socket/. $(SRCS) -o $(SOCKETOUTPUT) $(LDFLAGS)
 
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(SOCKETOUTPUT)
 
 .PHONY: socket clean
 
