@@ -21,11 +21,15 @@ private:
 	int backlog_; // macOs sysctl kern.ipc.somaxconn
 	struct sockaddr_in addr_;
 
+
+	static const int min_port_ = 0;
+	static const int max_port_ = 65535;
+
 	Socket();
 	int socket();
 	int setsockopt();
 	int nonBlock();
-	int setSockaddr();
+	int setSocketAddress();
 	int bind();
 	int listen();
 	bool isValid();

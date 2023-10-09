@@ -79,7 +79,7 @@ int Socket::nonBlock() {
 	return 0;
 }
 
-int Socket::setSockaddr() {
+int Socket::setSocketAddress() {
 	this->addr_.sin_family = AF_INET;
 	if (inet_pton(AF_INET, this->server_addr_, &(addr_.sin_addr)) <= 0) {
 		std::cerr << "inet_pton() failed" << strerror(errno) << std::endl;
@@ -108,7 +108,7 @@ int Socket::listen() {
 }
 
 bool Socket::isValid() {
-	if (port_ <= 0 || port_ > 65535)
+	if (port_ <= min_port_ || port_ > max_port_)
 		return false;
 
 	struct sockaddr_in sa;
@@ -128,7 +128,7 @@ int Socket::initialize() {
 		return -1;
 	if (this->nonBlock() < 0)
 		return -1;
-	if (this->setSockaddr() < 0)
+	if (this->setSocketAddress() < 0)
 		return -1;
 	if (this->bind() < 0)
 		return -1;
