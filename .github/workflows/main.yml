@@ -84,7 +84,7 @@ jobs:
       if: steps.gtest-cache.outputs.cache-hit != 'true'
       run: |
         cd test
-        make actions-build
+        make action-build
         make action
 
     - name: Upload test results
