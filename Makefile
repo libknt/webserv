@@ -1,7 +1,9 @@
+.PHONY: test tidy format cppcheck
+
 SHELL := /bin/bash
 
 format:
-	find . -name '*.cpp' -or -name '*.hpp' -or "*.cc" | xargs clang-format -i
+	find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | xargs clang-format -i
 
 test:
 	make -C test
