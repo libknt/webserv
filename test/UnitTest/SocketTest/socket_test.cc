@@ -1,16 +1,30 @@
 #include "Socket.hpp"
 #include <gtest/gtest.h>
+#include <sys/resource.h>
 
 #define SERVER_ADDR "127.0.0.1"
 #define SERVER_PORT 8080
 
 class SocketTest : public ::testing::Test {
 protected:
-    const int MAX_SERVERS = 5;
+    int getMaxFileDescriptors() const {
+        // MAXFD = 255 - stdin 1 - stdout 0  - 23= 230; testで使用する分を開けておく
+        int max_fd = 230;
+        struct rlimit limit;
+        if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+            std::cerr << "Failed to get file descriptor limit." << std::endl;
+            return -1;
+        }
+        if (static_cast<int>(limit.rlim_cur) < 255)
+            return static_cast<int>(limit.rlim_cur) - 20;
+        return max_fd;
+    }
+
+    const int MAX_SERVERS;
     server::Socket** servers;
     int port = SERVER_PORT;
 
-    SocketTest() {
+    SocketTest() : MAX_SERVERS(getMaxFileDescriptors()) {
         servers = new server::Socket*[MAX_SERVERS];
     }
 
@@ -28,17 +42,11 @@ protected:
     }
 };
 
-// //MAX_SERVERS分のサーバーオブジェクトが正しく初期化できるか
-// TEST_F(SocketTest, InitializeServers) {
-//     for (int i = 0; i < MAX_SERVERS; ++i) {
-//         EXPECT_GE(servers[i]->initialize(), 0) << "Failed to initialize server at index " << i;
-//     }
-// }
-
+//MAX_SERVERS分のサーバーオブジェクトが正しく初期化できるか
 //各サーバーオブジェクトが持っているリッスン用のファイルディスクリプタが有効かどうか
 TEST_F(SocketTest, CheckValidListenSd) {
     for (int i = 0; i < MAX_SERVERS; ++i) {
-        servers[i]->initialize();
+        EXPECT_GE(servers[i]->initialize(), 0) << "Failed to initialize server at index " << i;
         EXPECT_GE(servers[i]->getListenSd(), 0) << "Server at index " << i << " has invalid listen_sd_";
     }
 }
