@@ -121,7 +121,7 @@ bool Socket::isValid() {
 
 int Socket::initialize() {
 	if (!this->isValid())
-			return -1;
+		return -1;
 	if (this->socket() < 0)
 		return -1;
 	if (this->setsockopt() < 0)
