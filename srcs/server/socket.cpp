@@ -1,4 +1,4 @@
-#include "Socket.hpp"
+#include "socket.hpp"
 
 namespace server {
 Socket::Socket(const char* server_addr, int port)
