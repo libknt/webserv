@@ -1,4 +1,4 @@
-SRCS = ../../../srcs/server/socket/Socket.cpp ./socket_test.cc
+SRCS = ../../../srcs/server/socket/socket.cpp ./socket_test.cc
 SOCKETOUTPUT = socket_test
 
 INCLUDE =  -I ../../../srcs/server/socket/.

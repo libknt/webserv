@@ -20,8 +20,8 @@ check_third_party:
 
 
 socket:
-	make -C UnitTest/SocketTest CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
-	make clean -C UnitTest/SocketTest
+	make -C unit_test/socket_test CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
+	make clean -C unit_test/socket_test
 
 gpath:
 	bash build.sh
