@@ -7,7 +7,7 @@ LDFLAGS = -L$(GPWD)/third_party/gtest/lib -lgtest -lgtest_main
 all: check_third_party socket
 
 check_third_party:
-	@if [ ! -d "./third_party" ]; then $(MAKE) gpath; fi
+	@if [ ! -d "./third_party/gtest" ]; then $(MAKE) gpath; fi
 
 socket:
 	make -C UnitTest/SocketTest CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
