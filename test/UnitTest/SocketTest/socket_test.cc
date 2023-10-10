@@ -62,6 +62,7 @@ TEST(SocketInvalidParamsTest, InvalidAddress) {
 
 // 無効なポートによる初期化
 TEST(SocketInvalidParamsTest, InvalidPort) {
+	// port 16bit min 0 max 65535
 	server::Socket server(SERVER_ADDR, 65536);
 	EXPECT_EQ(server.initialize(), -1) << "Expected failure when using an invalid port number";
 }
