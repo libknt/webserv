@@ -80,15 +80,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y wget cmake
 
-    - name: Build Google Test
+    - name: Build and Rnu Google Test
       if: steps.gtest-cache.outputs.cache-hit != 'true'
       run: |
         cd test
         make actions-build
-
-    - name: Run Google Test
-      run: |
-        cd test
         make action
 
     - name: Upload test results
