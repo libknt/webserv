@@ -52,7 +52,7 @@ jobs:
       run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force  --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 ./
+      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force  --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 ./srcs/
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v2
