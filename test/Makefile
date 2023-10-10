@@ -26,4 +26,5 @@ socket:
 gpath:
 	bash build.sh
 
+action-build:check_third_party
 action: socket
