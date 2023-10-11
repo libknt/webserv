@@ -1,11 +1,26 @@
 #include "io_multiplexing.hpp"
 
 namespace server {
-IoMultiplexing::IoMultiplexing() {}
+IoMultiplexing::IoMultiplexing()
+	: socket_conf_(std::vector<socket_conf>())
+	, socket_(std::vector<server::Socket>())
+	, max_sd_(-1)
+	, max_clients_(-1)
+	, end_server_(FALSE) {
+	FD_ZERO(&master_set_);
+	FD_ZERO(&working_set_);
+	timeout_.tv_sec = 3 * 60;
+	timeout_.tv_usec = 0;
+}
 
 IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	: socket_conf_(conf)
+	, socket_(std::vector<server::Socket>())
+	, max_sd_(-1)
+	, max_clients_(-1)
 	, end_server_(FALSE) {
+	FD_ZERO(&master_set_);
+	FD_ZERO(&working_set_);
 	timeout_.tv_sec = 3 * 60;
 	timeout_.tv_usec = 0;
 }
@@ -13,23 +28,26 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 IoMultiplexing::~IoMultiplexing() {}
 
 IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
-	: socket_(other.socket_)
+	: socket_conf_(other.socket_conf_)
+	, socket_(other.socket_)
 	, max_sd_(other.max_sd_)
 	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
 	, master_set_(other.master_set_)
 	, working_set_(other.working_set_)
-	, end_server_(FALSE) {}
+	, end_server_(other.end_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 
 	if (this != &other) {
+		socket_conf_ = other.socket_conf_;
 		socket_ = other.socket_;
 		max_sd_ = other.max_sd_;
 		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
 		master_set_ = other.master_set_;
 		working_set_ = other.working_set_;
+		end_server_ = other.end_server_;
 	}
 	return *this;
 }
@@ -60,7 +78,7 @@ int IoMultiplexing::accept(int listen_sd) {
 		new_sd = ::accept(listen_sd, NULL, NULL);
 		if (new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
-				perror("  accept() failed");
+				std::cerr << "accept() failed: " << strerror(errno) << std::endl;
 				end_server_ = TRUE;
 			}
 			break;
@@ -82,22 +100,20 @@ int IoMultiplexing::disconnection(int i) {
 		while (FD_ISSET(max_sd_, &master_set_) == FALSE)
 			max_sd_ -= 1;
 	}
-	return -1;
+	return 0;
 }
 
 int IoMultiplexing::request(int i) {
 	int close_conn;
-	int result;
 	char buffer[1024];
-	int len;
 
 	std::cout << "  Descriptor " << i << " is readable" << std::endl;
 	close_conn = FALSE;
 	while (TRUE) {
-		result = recv(i, buffer, sizeof(buffer), 0);
+		int result = recv(i, buffer, sizeof(buffer), 0);
 		if (result < 0) {
 			if (errno != EWOULDBLOCK) {
-				perror("  recv() failed");
+				std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 				close_conn = TRUE;
 			}
 			break;
@@ -109,48 +125,42 @@ int IoMultiplexing::request(int i) {
 			break;
 		}
 
-		len = result;
+		int len = result;
 		std::cout << "  " << len << " bytes received\n" << std::endl;
 
 		result = send(i, buffer, len, 0);
 		if (result < 0) {
-			perror("  send() failed");
+			std::cerr << "send() failed: " << strerror(errno) << std::endl;
 			close_conn = TRUE;
 			break;
 		}
 	};
 
 	if (close_conn) {
-		close(i);
-		FD_CLR(i, &this->master_set_);
-		if (i == max_sd_) {
-			while (FD_ISSET(max_sd_, &this->master_set_) == FALSE)
-				max_sd_ -= 1;
-		}
+		disconnection(i);
 	}
+
 	return 0;
 }
 
 int IoMultiplexing::select() {
-	int result;
-	int desc_ready;
 	while (end_server_ == FALSE) {
 		memcpy(&this->working_set_, &this->master_set_, sizeof(this->master_set_));
 
 		std::cout << "Waiting on select()..." << std::endl;
-		result = ::select(max_sd_ + 1, &this->working_set_, NULL, NULL, &this->timeout_);
+		int result = ::select(max_sd_ + 1, &this->working_set_, NULL, NULL, &this->timeout_);
 
 		if (result < 0) {
-			perror("  select() failed");
+			std::cerr << "select() failed: " << strerror(errno) << std::endl;
 			break;
 		}
 
 		if (result == 0) {
-			std::cout << "  select() timed out.  End program." << std::endl;
+			std::cout << "select() timed out.  End program." << std::endl;
 			break;
 		}
 
-		desc_ready = result;
+		int desc_ready = result;
 		for (int i = 0; i <= max_sd_ && desc_ready > 0; ++i) {
 			if (FD_ISSET(i, &this->working_set_)) {
 				desc_ready -= 1;
@@ -165,8 +175,7 @@ int IoMultiplexing::select() {
 				}
 				if (listen_sd != -1) {
 					accept(listen_sd);
-				}
-				else {
+				} else {
 					request(i);
 				}
 			}

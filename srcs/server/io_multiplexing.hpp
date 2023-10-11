@@ -24,9 +24,9 @@ private:
 	IoMultiplexing();
 
 public:
-	IoMultiplexing(std::vector<socket_conf>& conf);
+	explicit IoMultiplexing(std::vector<socket_conf>& conf);
 	virtual ~IoMultiplexing();
-	IoMultiplexing(const IoMultiplexing& other);
+	explicit IoMultiplexing(const IoMultiplexing& other);
 	IoMultiplexing& operator=(const IoMultiplexing& other);
 	int initialize();
 	int server_start();

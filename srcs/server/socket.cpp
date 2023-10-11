@@ -54,7 +54,8 @@ int Socket::socket() {
 
 int Socket::setsockopt() {
 	int is_on = 1;
-	int rc = ::setsockopt(this->listen_sd_, SOL_SOCKET, SO_REUSEADDR, (char*)&is_on, sizeof(is_on));
+	int rc = ::setsockopt(
+		this->listen_sd_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&is_on), sizeof(is_on));
 	if (rc < 0) {
 		std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
 		return -1;
@@ -90,7 +91,7 @@ int Socket::setSocketAddress() {
 }
 
 int Socket::bind() {
-	int rc = ::bind(this->listen_sd_, (struct sockaddr*)&addr_, sizeof(addr_));
+	int rc = ::bind(this->listen_sd_, reinterpret_cast<struct sockaddr*>(&addr_), sizeof(addr_));
 	if (rc < 0) {
 		std::cerr << "bind() failed" << strerror(errno) << std::endl;
 		return -1;
