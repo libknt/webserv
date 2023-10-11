@@ -47,39 +47,31 @@ int IoMultiplexing::initialize() {
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->initialize() < 0)
 			return -1;
-		// std::cout << it->getServerAddr() << " : " << it->getPort() << " : " << it->getListenSd()
-		// << std::endl;
 	}
 
 	return 0;
 }
 
-int IoMultiplexing::accept(int i) {
-	int listen_sd = -1;
+int IoMultiplexing::accept(int listen_sd) {
+
 	int new_sd;
-	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
-		if (it->getListenSd() == i) {
-			listen_sd = i;
+	std::cout << "  Listening socket is readable" << std::endl;
+	do {
+		new_sd = ::accept(listen_sd, NULL, NULL);
+		if (new_sd < 0) {
+			if (errno != EWOULDBLOCK) {
+				perror("  accept() failed");
+				end_server_ = TRUE;
+			}
 			break;
 		}
-	}
-	if (listen_sd != -1) {
-		do {
-			new_sd = ::accept(listen_sd, NULL, NULL);
-			if (new_sd < 0) {
-				if (errno != EWOULDBLOCK) {
-					std::cerr << "accept() failed: " << strerror(errno) << std::endl;
-					end_server_ = TRUE;
-				}
-				return -1;
-			}
 
-			std::cout << "New incoming connection -" << new_sd << std::endl;
-			FD_SET(new_sd, &master_set_);
-			if (new_sd > max_sd_)
-				max_sd_ = new_sd;
-		} while (new_sd != -1);
-	}
+		std::cout << "  New incoming connection -  " << new_sd << std::endl;
+		FD_SET(new_sd, &this->master_set_);
+		if (new_sd > max_sd_)
+			max_sd_ = new_sd;
+
+	} while (new_sd != -1);
 	return 0;
 }
 
@@ -94,38 +86,46 @@ int IoMultiplexing::disconnection(int i) {
 }
 
 int IoMultiplexing::request(int i) {
+	int close_conn;
 	int result;
-	int len;
 	char buffer[1024];
+	int len;
 
-	while (true) {
-		std::cout << "  Descriptor " << i << " is readable" << std::endl;
+	std::cout << "  Descriptor " << i << " is readable" << std::endl;
+	close_conn = FALSE;
+	while (TRUE) {
 		result = recv(i, buffer, sizeof(buffer), 0);
 		if (result < 0) {
 			if (errno != EWOULDBLOCK) {
-				std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-
-				disconnection(i);
+				perror("  recv() failed");
+				close_conn = TRUE;
 			}
 			break;
 		}
 
 		if (result == 0) {
-			std::cout << "Connection closed: " << std::endl;
-			disconnection(i);
+			std::cout << "  Connection closed" << std::endl;
+			close_conn = TRUE;
 			break;
 		}
 
-		std::cout << buffer << std::endl;
-
 		len = result;
-		std::cout << " " << len << " bytes received" << std::endl;
+		std::cout << "  " << len << " bytes received\n" << std::endl;
 
 		result = send(i, buffer, len, 0);
 		if (result < 0) {
-			std::cerr << "send() failed(): " << strerror(errno) << std::endl;
-			disconnection(i);
+			perror("  send() failed");
+			close_conn = TRUE;
 			break;
+		}
+	};
+
+	if (close_conn) {
+		close(i);
+		FD_CLR(i, &this->master_set_);
+		if (i == max_sd_) {
+			while (FD_ISSET(max_sd_, &this->master_set_) == FALSE)
+				max_sd_ -= 1;
 		}
 	}
 	return 0;
@@ -134,10 +134,6 @@ int IoMultiplexing::request(int i) {
 int IoMultiplexing::select() {
 	int result;
 	int desc_ready;
-	int new_sd;
-	int close_conn;
-	char buffer[1024];
-	int len;
 	while (end_server_ == FALSE) {
 		memcpy(&this->working_set_, &this->master_set_, sizeof(this->master_set_));
 
@@ -155,111 +151,27 @@ int IoMultiplexing::select() {
 		}
 
 		desc_ready = result;
-		// max_fdになるまで &&  データが読み取り可能なソケットディスクリプタが無くなるまで
 		for (int i = 0; i <= max_sd_ && desc_ready > 0; ++i) {
-			// データが読み取り可能なソケットディスクリプタかどうか
 			if (FD_ISSET(i, &this->working_set_)) {
 				desc_ready -= 1;
 				int listen_sd = -1;
-				for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
+				for (std::vector<server::Socket>::iterator it = socket_.begin();
+					 it != socket_.end();
+					 ++it) {
 					if (it->getListenSd() == i) {
 						listen_sd = i;
 						break;
 					}
 				}
 				if (listen_sd != -1) {
-					std::cout << "  Listening socket is readable" << std::endl;
-					do {
-						// 接続は確認された時新しい接続は確認された時, acceptする.
-						new_sd = ::accept(listen_sd, NULL, NULL);
-						if (new_sd < 0) {
-							if (errno != EWOULDBLOCK) {
-								perror("  accept() failed");
-								end_server_ = TRUE;
-							}
-							break;
-						}
-
-						std::cout << "  New incoming connection -  " << new_sd << std::endl;
-						// 新しい接続をmasterにセットするx
-						FD_SET(new_sd, &this->master_set_);
-						if (new_sd > max_sd_)
-							max_sd_ = new_sd;
-
-					} while (new_sd != -1);
+					accept(listen_sd);
 				}
-				// 既存のclient接続に関する
 				else {
-					std::cout << "  Descriptor " << i << " is readable" << std::endl;
-					close_conn = FALSE;
-					while (TRUE) {
-						// データの受信 return_value[size]
-						result = recv(i, buffer, sizeof(buffer), 0);
-						if (result < 0) {
-							if (errno != EWOULDBLOCK) {
-								perror("  recv() failed");
-								close_conn = TRUE;
-							}
-							break;
-						}
-
-						if (result == 0) {
-							std::cout << "  Connection closed" << std::endl;
-							close_conn = TRUE;
-							break;
-						}
-
-						len = result;
-						std::cout << "  " << len << " bytes received\n" << std::endl;
-
-						result = send(i, buffer, len, 0);
-						if (result < 0) {
-							perror("  send() failed");
-							close_conn = TRUE;
-							break;
-						}
-					};
-
-					if (close_conn) {
-						close(i);
-						FD_CLR(i, &this->master_set_);
-						if (i == max_sd_) {
-							while (FD_ISSET(max_sd_, &this->master_set_) == FALSE)
-								max_sd_ -= 1;
-						}
-					}
+					request(i);
 				}
 			}
 		}
 	}
-	// while (end_server_ == FALSE) {
-	// 	memcpy(&working_set_, &master_set_, sizeof(master_set_));
-
-	// 	std::cout << "Waitng on select()" << std::endl;
-	// 	result = ::select(max_sd_ + 1, &working_set_, NULL, NULL, &timeout_);
-	// 	// result = ::select(max_sd_ + 1, &working_set_, NULL, NULL, NULL);
-	// 	if (result < 0) {
-	// 		std::cerr << "select() failed: " << strerror(errno) << std::endl;
-	// 		return -1;
-	// 	}
-
-	// 	if (result == 0) {
-	// 		std::cout << "  select() timed out.  End program." << std::endl;
-	// 		break;
-	// 	}
-
-	// 	desc_ready = result;
-	// 	for (int i = 0; i <= max_sd_ && desc_ready > 0; ++i) {
-	// 		if (FD_ISSET(i, &working_set_)) {
-	// 			--desc_ready;
-	// 			if (accept(i) < 0)
-	// 				break;
-	// 		} else {
-	// 			if (request(i) < 0)
-	// 				break;
-	// 		}
-	// 	}
-	// }
 	return 0;
 }
 

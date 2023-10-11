@@ -31,7 +31,7 @@ public:
 	int initialize();
 	int server_start();
 	int select();
-	int accept(int i);
+	int accept(int listen_sd);
 	int request(int i);
 	int disconnection(int i);
 };

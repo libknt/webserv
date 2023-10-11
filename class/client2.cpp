@@ -1,4 +1,5 @@
 #include "ClientSocket.hpp"
+#include "TcpServer.hpp"
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -7,7 +8,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "TcpServer.hpp"
 
 int main(int argc, char* argv[]) {
 	int rc;
