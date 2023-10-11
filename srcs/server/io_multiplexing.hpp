@@ -5,6 +5,8 @@
 #include "socket.hpp"
 #include <map>
 #include <vector>
+#define TRUE 1
+#define FALSE 0
 
 namespace server {
 
@@ -18,6 +20,7 @@ private:
 	struct timeval timeout_;
 	fd_set master_set_;
 	fd_set working_set_;
+	int end_server_;
 	IoMultiplexing();
 
 public:
@@ -27,6 +30,10 @@ public:
 	IoMultiplexing& operator=(const IoMultiplexing& other);
 	int initialize();
 	int server_start();
+	int select();
+	int accept(int i);
+	int request(int i);
+	int disconnection(int i);
 };
 
 } // namespace server

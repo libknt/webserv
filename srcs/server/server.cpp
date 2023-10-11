@@ -1,7 +1,6 @@
 #include "server.hpp"
 
 int start() {
-	std::cout << "start server" << std::endl;
 	std::vector<socket_conf> c;
 	socket_conf sconf;
 	sconf.addr = "127.0.0.1";
