@@ -1,8 +1,9 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-#include "socket.hpp"
+#include <iostream>
 
+int server();
 
 
 #endif
