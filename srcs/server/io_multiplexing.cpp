@@ -4,24 +4,26 @@ namespace server {
 IoMultiplexing::IoMultiplexing()
 	: socket_conf_(std::vector<socket_conf>())
 	, socket_(std::vector<server::Socket>())
+	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, end_server_(FALSE) {
 	FD_ZERO(&master_set_);
 	FD_ZERO(&working_set_);
-	timeout_.tv_sec = 3 * 60;
+	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
 
 IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	: socket_conf_(conf)
 	, socket_(std::vector<server::Socket>())
+	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, end_server_(FALSE) {
 	FD_ZERO(&master_set_);
 	FD_ZERO(&working_set_);
-	timeout_.tv_sec = 3 * 60;
+	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
 
@@ -30,6 +32,7 @@ IoMultiplexing::~IoMultiplexing() {}
 IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	: socket_conf_(other.socket_conf_)
 	, socket_(other.socket_)
+	, activity_times_(other.activity_times_)
 	, max_sd_(other.max_sd_)
 	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
@@ -42,6 +45,7 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 	if (this != &other) {
 		socket_conf_ = other.socket_conf_;
 		socket_ = other.socket_;
+		activity_times_ = other.activity_times_;
 		max_sd_ = other.max_sd_;
 		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
@@ -143,12 +147,17 @@ int IoMultiplexing::request(int i) {
 	return 0;
 }
 
+bool IoMultiplexing::isListeningSocket(int sd) {
+	return std::find_if(socket_.begin(), socket_.end(), IsListeningSocketPredicate(sd)) !=
+		   socket_.end();
+}
+
 int IoMultiplexing::select() {
 	while (end_server_ == FALSE) {
 		memcpy(&this->working_set_, &this->master_set_, sizeof(this->master_set_));
 
-		std::cout << "Waiting on select()..." << std::endl;
-		int result = ::select(max_sd_ + 1, &this->working_set_, NULL, NULL, &this->timeout_);
+		std::cout << "Waiting on select()!" << std::endl;
+		int result = ::select(max_sd_ + 1, &this->working_set_, NULL, NULL, &timeout_);
 
 		if (result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -157,24 +166,16 @@ int IoMultiplexing::select() {
 
 		if (result == 0) {
 			std::cout << "select() timed out.  End program." << std::endl;
-			break;
+			continue;
 		}
 
 		int desc_ready = result;
 		for (int i = 0; i <= max_sd_ && desc_ready > 0; ++i) {
 			if (FD_ISSET(i, &this->working_set_)) {
 				desc_ready -= 1;
-				int listen_sd = -1;
-				for (std::vector<server::Socket>::iterator it = socket_.begin();
-					 it != socket_.end();
-					 ++it) {
-					if (it->getListenSd() == i) {
-						listen_sd = i;
-						break;
-					}
-				}
-				if (listen_sd != -1) {
-					accept(listen_sd);
+
+				if (isListeningSocket(i)) {
+					accept(i);
 				} else {
 					request(i);
 				}
