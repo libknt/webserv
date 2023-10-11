@@ -2,6 +2,37 @@
 
 SHELL := /bin/bash
 
+NAME = server
+
+CXX		= c++
+
+CXXFLAGS	= -Wall -Wextra -Werror -std=c++98
+
+SRC =	$(shell find ./srcs -name "*.cpp")
+
+
+OBJ = $(SRC:.cpp=.o)
+
+all: $(NAME)
+
+$(NAME): $(OBJ)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+clean:
+	$(RM) $(OBJ)
+
+fclean: clean
+	$(RM) $(NAME)
+
+re: fclean all
+
+
+
+
+
+
+
+
 format:
 	find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | xargs clang-format -i
 
