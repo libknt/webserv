@@ -1,7 +1,7 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
-#include "../struct.hpp"
+#include "struct.hpp"
 #include "socket.hpp"
 #include <algorithm>
 #include <map>

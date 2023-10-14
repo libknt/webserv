@@ -1,25 +1,32 @@
-.PHONY: test tidy format cppcheck
-
 SHELL := /bin/bash
 
-NAME = server
+NAME		=	server
 
-CXX		= c++
+CXX			=	c++
 
-CXXFLAGS	= -Wall -Wextra -Werror -std=c++98
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98
 
-SRC =	$(shell find ./srcs -name "*.cpp")
+SRCS_DIR	=	srcs
 
+OBJS_DIR	=	objs
 
-OBJ = $(SRC:.cpp=.o)
+INCLUDE_DIR	=	./includes
+
+SRCS		=	$(shell find $(SRCS_DIR) -name "*.cpp")
+
+OBJS		=	$(subst $(SRCS_DIR), $(OBJS_DIR), $(SRCS:.cpp=.o))
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -I $(INCLUDE_DIR) -o $@ -c $<
+	
 clean:
-	$(RM) $(OBJ)
+	rm -rf $(OBJS_DIR)
 
 fclean: clean
 	$(RM) $(NAME)
@@ -27,17 +34,13 @@ fclean: clean
 re: fclean all
 
 
-
-
-
-
-
-
 format:
 	find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | xargs clang-format -i
 
 test:
 	make -C test
+
+.PHONY: test tidy format cppcheck
 
 cppcheck:
 	mkdir -p log

@@ -1,4 +1,4 @@
-#include "./server/server.hpp"
+#include "server.hpp"
 
 int conf_setting() {
 	return false;
