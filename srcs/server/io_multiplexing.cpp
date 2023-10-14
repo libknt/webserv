@@ -57,18 +57,16 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 }
 
 int IoMultiplexing::initialize() {
-	for (std::vector<socket_conf>::iterator it = socket_conf_.begin(); it != socket_conf_.end();
-		 ++it) {
-		socket_conf conf = *it;
-		const char* addr = conf.addr;
-		int port = conf.port;
-		server::Socket socket(addr, port);
-		socket_.push_back(socket);
+	for (std::vector<socket_conf>::iterator conf_it = socket_conf_.begin(); conf_it != socket_conf_.end(); ++conf_it) {
+		socket_.push_back(server::Socket(conf_it->addr, conf_it->port));
 	}
 
-	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
-		if (it->initialize() < 0)
-			return -1;
+	for (std::vector<server::Socket>::iterator socket_it = socket_.begin(); socket_it != socket_.end();) {
+		if (socket_it->initialize() < 0) {
+			socket_it = socket_.erase(socket_it);
+		} else {
+			++socket_it;
+		}
 	}
 
 	return 0;
