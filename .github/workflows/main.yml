@@ -78,6 +78,7 @@ jobs:
         make action-build
         
     - name: Run Google Test
+      run: |
         make action
 
     - name: Upload test results
