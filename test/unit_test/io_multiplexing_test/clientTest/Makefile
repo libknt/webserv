@@ -1,9 +1,8 @@
 all:
 	c++ client.cpp ClientSocket.cpp -o client 
-	c++ client2.cpp ClientSocket.cpp -o client2 
 
 clean:
-	rm -f server client client2
+	rm -f server client
 
 SRC =	$(shell find . -name '*.cpp' -or -name '*.hpp')
 

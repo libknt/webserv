@@ -135,7 +135,8 @@ int Socket::initialize() {
 		return -1;
 	if (this->listen() < 0)
 		return -1;
-
+	std::cout << "Socket initialization succeeded!! address: " << this->server_addr_
+			  << " port: " << this->port_ << std::endl;
 	return 0;
 }
 
