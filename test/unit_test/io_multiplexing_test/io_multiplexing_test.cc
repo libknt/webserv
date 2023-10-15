@@ -84,6 +84,102 @@ TEST_F(ServerClientTest, ClientEchoTest4) {
 	EXPECT_EQ(WEXITSTATUS(result), 0);
 }
 
+// 複数のclientからの同時接続
+TEST_F(ServerClientTest, MultipleClientsConnectSimultaneously) {
+	const int CLIENT_COUNT = 100;
+	pid_t pids[CLIENT_COUNT];
+
+	for (int i = 0; i < CLIENT_COUNT; i++) {
+		pids[i] = fork();
+		if (pids[i] == 0) {
+			// port が異なる
+			if (i % 3 == 0) {
+				int result = system(
+					"echo "
+					"\"p6tl58YRv07m4RvQmUY3bg2XiNzKr0emerRte01OtCnBqW7sXbraIVwYxNvcs+"
+					"7I1nt9IfOBGrHwc32jN9wBIJmAxf7oPdoWPSXWU4ftxA8d5ZB/k9LVT455PJZnSX8Bb6ub7tnNy/"
+					"OpTwCJdl4mTLNFDH6G+Uk8J+NbPxeH/"
+					"rzHxWLDmj2ORhEtblKrLof0xW4k0YBBm7YDWdH6Fqaq9tuRfiQTQtSLJCG3IN3D3ZvvYZoJImcNyVx"
+					"IMPcq"
+					"tw1aUabS5G+v7Z6RSiaDDFQQRhhKbB/YVXEmaUmGb8bYf2/XcgXW0zrjF/mdNBIbNap3ppMr/"
+					"NqRjbbwf8BqSoB1DFKtOIsy91tR/"
+					"74cG62MXvD6sVXwjzWenQqyeL0gj2nEFzJLkbEBUJMuDD1DNxQi8ycZ5zY1wrwhWbYEqNXUpdtlzbV"
+					"xZGtV"
+					"13rqRxyau4psA5Aa8tQ5krnt/"
+					"tVRR+2phuAeUa+kL4VK6WtPIRI7cpY7+"
+					"B5Qu50tbnUX5qBbcQTHY1sR89NszmMHyQKSVzvsGISeoLs95Mp0qItMNkkQo75/luxcBLrX5ElHRd/"
+					"jKGu+d2KipRCnOyv0qYyHQi03AJoqPhYjWK773+QqCjMBdLGvwK98Sm8YEQi2mX+"
+					"NWHWlpJ8kgDEC0HEZ8aatmwkHrDHxuiLU8ifWEIXaz/+hrYo7G3yu2lZnCv6XUFYqE/9OVgA/"
+					"56xKFYo4buFvDkJjIogSMGjBJ8AjgNxKRAVpABSXY1WJ+"
+					"kQYJXozEnngv2SLjgrAEcaxwfMxkajZVHKUOYWTweSaAYDcyZpKR0XM6uqqf+"
+					"NtdMn1FUVj2UdZUxJ25rki0fGfmuMD2sk4/we8uGNuMGOVdx/"
+					"G6q0hXsBf6sdXE6VoQ7YLvJ5Il91fNF6TISNDggDniUftYoPMyKfryPf1HJahbjkuRNWJH6Sd6SQpg"
+					"ipc8W"
+					"v4/8dJ9bR//6/xYp3JkftkVrE9iJg9UwWzXlzlO4zEqn60eZ1xaK6OUvSbeGjDD/"
+					"IQHiJgmPVfO2n\" | "
+					"./client 127.0.0.1 8080 --echo-test");
+				exit(result);
+			} else if (i % 3 == 1) {
+				int result = system(
+					"echo "
+					"\"p6tl58YRv07m4RvQmUY3bg2XiNzKr0emerRte01OtCnBqW7sXbraIVwYxNvcs+"
+					"7I1nt9IfOBGrHwc32jN9wBIJmAxf7oPdoWPSXWU4ftxA8d5ZB/k9LVT455PJZnSX8Bb6ub7tnNy/"
+					"OpTwCJdl4mTLNFDH6G+Uk8J+NbPxeH/"
+					"rzHxWLDmj2ORhEtblKrLof0xW4k0YBBm7YDWdH6Fqaq9tuRfiQTQtSLJCG3IN3D3ZvvYZoJImcNyVx"
+					"IMPcq"
+					"tw1aUabS5G+v7Z6RSiaDDFQQRhhKbB/YVXEmaUmGb8bYf2/XcgXW0zrjF/mdNBIbNap3ppMr/"
+					"NqRjbbwf8BqSoB1DFKtOIsy91tR/"
+					"74cG62MXvD6sVXwjzWenQqyeL0gj2nEFzJLkbEBUJMuDD1DNxQi8ycZ5zY1wrwhWbYEqNXUpdtlzbV"
+					"xZGtV"
+					"13rqRxyau4psA5Aa8tQ5krnt/"
+					"tVRR+2phuAeUa+kL4VK6WtPIRI7cpY7+"
+					"B5Qu50tbnUX5qBbcQTHY1sR89NszmMHyQKSVzvsGISeoLs95Mp0qItMNkkQo75/luxcBLrX5ElHRd/"
+					"jKGu+d2KipRCnOyv0qYyHQi03AJoqPhYjWK773+QqCjMBdLGvwK98Sm8YEQi2mX+"
+					"NWHWlpJ8kgDEC0HEZ8aatmwkHrDHxuiLU8ifWEIXaz/+hrYo7G3yu2lZnCv6XUFYqE/9OVgA/"
+					"56xKFYo4buFvDkJjIogSMGjBJ8AjgNxKRAVpABSXY1WJ+"
+					"kQYJXozEnngv2SLjgrAEcaxwfMxkajZVHKUOYWTweSaAYDcyZpKR0XM6uqqf+"
+					"NtdMn1FUVj2UdZUxJ25rki0fGfmuMD2sk4/we8uGNuMGOVdx/"
+					"G6q0hXsBf6sdXE6VoQ7YLvJ5Il91fNF6TISNDggDniUftYoPMyKfryPf1HJahbjkuRNWJH6Sd6SQpg"
+					"ipc8W"
+					"v4/8dJ9bR//6/xYp3JkftkVrE9iJg9UwWzXlzlO4zEqn60eZ1xaK6OUvSbeGjDD/"
+					"IQHiJgmPVfO2n\" | "
+					"./client 127.0.0.1 8081 --echo-test");
+				exit(result);
+			}
+			int result = system(
+				"echo "
+				"\"p6tl58YRv07m4RvQmUY3bg2XiNzKr0emerRte01OtCnBqW7sXbraIVwYxNvcs+"
+				"7I1nt9IfOBGrHwc32jN9wBIJmAxf7oPdoWPSXWU4ftxA8d5ZB/k9LVT455PJZnSX8Bb6ub7tnNy/"
+				"OpTwCJdl4mTLNFDH6G+Uk8J+NbPxeH/"
+				"rzHxWLDmj2ORhEtblKrLof0xW4k0YBBm7YDWdH6Fqaq9tuRfiQTQtSLJCG3IN3D3ZvvYZoJImcNyVxIMPc"
+				"q"
+				"tw1aUabS5G+v7Z6RSiaDDFQQRhhKbB/YVXEmaUmGb8bYf2/XcgXW0zrjF/mdNBIbNap3ppMr/"
+				"NqRjbbwf8BqSoB1DFKtOIsy91tR/"
+				"74cG62MXvD6sVXwjzWenQqyeL0gj2nEFzJLkbEBUJMuDD1DNxQi8ycZ5zY1wrwhWbYEqNXUpdtlzbVxZGt"
+				"V"
+				"13rqRxyau4psA5Aa8tQ5krnt/"
+				"tVRR+2phuAeUa+kL4VK6WtPIRI7cpY7+"
+				"B5Qu50tbnUX5qBbcQTHY1sR89NszmMHyQKSVzvsGISeoLs95Mp0qItMNkkQo75/luxcBLrX5ElHRd/"
+				"jKGu+d2KipRCnOyv0qYyHQi03AJoqPhYjWK773+QqCjMBdLGvwK98Sm8YEQi2mX+"
+				"NWHWlpJ8kgDEC0HEZ8aatmwkHrDHxuiLU8ifWEIXaz/+hrYo7G3yu2lZnCv6XUFYqE/9OVgA/"
+				"56xKFYo4buFvDkJjIogSMGjBJ8AjgNxKRAVpABSXY1WJ+"
+				"kQYJXozEnngv2SLjgrAEcaxwfMxkajZVHKUOYWTweSaAYDcyZpKR0XM6uqqf+"
+				"NtdMn1FUVj2UdZUxJ25rki0fGfmuMD2sk4/we8uGNuMGOVdx/"
+				"G6q0hXsBf6sdXE6VoQ7YLvJ5Il91fNF6TISNDggDniUftYoPMyKfryPf1HJahbjkuRNWJH6Sd6SQpgipc8"
+				"W"
+				"v4/8dJ9bR//6/xYp3JkftkVrE9iJg9UwWzXlzlO4zEqn60eZ1xaK6OUvSbeGjDD/IQHiJgmPVfO2n\" | "
+				"./client 127.0.0. 8082 --echo-test");
+			exit(result);
+		}
+	}
+
+	for (int i = 0; i < CLIENT_COUNT; i++) {
+		int status;
+		waitpid(pids[i], &status, 0);
+		EXPECT_EQ(WEXITSTATUS(status), 0);
+	}
+}
+
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

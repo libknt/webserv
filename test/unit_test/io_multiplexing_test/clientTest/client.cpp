@@ -49,11 +49,11 @@ int main(int argc, char* argv[]) {
 			}
 
 			recvBuffer[rc] = '\0';
-			printf("Received from server: %s", recvBuffer);
+			printf("\033[34mReceived from server: %s\033[0m", recvBuffer);
 			fflush(stdout);
 			if (flag == 1) {
 				if (strcmp(sendBuffer, recvBuffer) == 0) {
-					std::cout << "echo suc" << std::endl;
+					std::cout << "echo success!!!!!!!!!" << std::endl;
 					return 0;
 				}
 			}
