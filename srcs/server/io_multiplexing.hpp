@@ -6,8 +6,6 @@
 #include <algorithm>
 #include <map>
 #include <vector>
-#define TRUE 1
-#define FALSE 0
 
 namespace server {
 

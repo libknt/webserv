@@ -45,5 +45,5 @@ cppcheck:
 
 tidy:
 	@find ./srcs/. -name '*.cpp' -or -name '*.hpp' | while read file; do \
-		clang-tidy $$file -- -Wall -Wextra -Werror -std=c++98; \
+		clang-tidy $$file -- -Wall -Wextra -Werror -std=c++98 >> ./log/tidy.log; \
 	done
