@@ -1,24 +1,7 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <string>
+#include "parse_sentense.hpp"
+static	void	format_tokenize(std::string format, std::queue<Token> &token_queue);
 
-enum TokenKind
-{
-	STRING,
-	KEYWORD,
-	SPACE,
-};
-
-struct Token
-{
-	TokenKind	token_kind;
-	std::string	str;
-};
-
-void	format_tokenize(std::string format, std::queue<Token> &token_queue);
-
-ssize_t	parseSentense(std::string line, std::string format, std::vector<std::string> &ans)
+ssize_t	parse_sentense(std::string line, std::string format, std::vector<std::string> &ans)
 {
 	std::queue<Token>	token_queue;
 	size_t				index = 0;
@@ -80,7 +63,7 @@ ssize_t	parseSentense(std::string line, std::string format, std::vector<std::str
 	
 }
 
-void	format_tokenize(std::string format, std::queue<Token> &token_queue)
+static void	format_tokenize(std::string format, std::queue<Token> &token_queue)
 {
 	for (size_t i = 0; i < format.size(); i++)
 	{
@@ -114,11 +97,3 @@ void	format_tokenize(std::string format, std::queue<Token> &token_queue)
 	}
 }
 				
-int main()
-{
-	std::vector<std::string> vec;
-
-	parseSentense(" thisismylife = shit", " %s = %s", vec);
-	for (size_t i = 0; i < vec.size(); i++)
-		std::cout << vec[i] << std::endl;
-}
