@@ -139,6 +139,7 @@ int IoMultiplexing::request(int i) {
 			close_conn = 1;
 			break;
 		}
+		memset(buffer,'\0', sizeof(buffer));
 	};
 
 	if (close_conn) {
