@@ -56,10 +56,10 @@ int		HttpRequest::parseHttpRequest(std::string const &line)
 		parseHttpMethod(line);
 	else if (this->status_ == HEADER)
 		parseHttpHeader(line);
-//	else if (this->status == BODY)
-//		parseHttpBody(line);
-//	if (this->status == ERROR)
-//		return (1);
+	else if (this->status_ == BODY)
+		parseHttpBody(line);
+	if (this->status_ == ERROR)
+		return (1);
 	return (0);
 }
 
@@ -91,7 +91,8 @@ int		HttpRequest::parseHttpHeader(std::string const &line)
 	{	
 		setStatus(BODY);
 		return (0);
-	}
+	} \cr\lf
+	//Later: http request compromise 0 space between : and value!
 	else if (parse_sentense(line, "%s: %s", header_vector) < 0 || header_vector.size() != 2)
 	{
 		setStatus(ERROR);
@@ -111,5 +112,36 @@ int		HttpRequest::setHeaderValue(std::string const &key, std::string const &valu
 {
 	this->header_[key] = value;
 	return (0);
+}
+
+std::string	HttpRequest::getHeaderValue(std::string const &key)
+{
+	if (this->header_.count(key) == 0)
+		return (std::string(""));
+	else
+		return (this->header_[key]);
+}
+
+int		HttpRequest::parseHttpBody(std::string const &line)
+{
+	if (this->method_ == GET)
+	{
+		setStatus(FINISHED);
+		return (0);
+	}
+	//transfer-encoding
+	//content-length
+	std::cout << line << std::endl;
+	return (0);
+}
+
+void	HttpRequest::getInfo(void)
+{
+	std::cout << "method: " << method_ << std::endl;
+	std::cout << "status: " << status_ << std::endl;
+	std::cout << "version: " << version_ << std::endl;
+	std::cout << "header" << std::endl;
+	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end(); iter++)
+		std::cout << "first: " << iter->first << "second: " << iter->second << std::endl;
 }
 

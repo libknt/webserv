@@ -15,9 +15,9 @@ int main()
 	std::cout << "------ Http Request Parse Test------" << std::endl;
 	{
 		std::string line;
+		HttpRequest http_request;
 		while (std::getline(std::cin, line))
 		{
-			HttpRequest http_request;
 			http_request.parseHttpRequest(line);
 		}
 	}

@@ -1,4 +1,5 @@
 #include "io_multiplexing.hpp"
+#include "http_request_parse.hpp"
 
 namespace server {
 IoMultiplexing::IoMultiplexing()
@@ -109,6 +110,7 @@ int IoMultiplexing::request(int i) {
 	int close_conn;
 	char buffer[1024];
 
+	memset(buffer, '\0', BUFFER_SIZE);
 	std::cout << "  Descriptor " << i << " is readable" << std::endl;
 	close_conn = FALSE;
 	while (TRUE) {
@@ -120,7 +122,7 @@ int IoMultiplexing::request(int i) {
 			}
 			break;
 		}
-
+		http_request_parse_.parse_http_request(i, buffer);
 		if (result == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			close_conn = TRUE;
