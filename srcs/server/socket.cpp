@@ -44,13 +44,22 @@ Socket::~Socket() {
 }
 
 int Socket::socket() {
-	this->listen_sd_ = ::socket(AF_INET, SOCK_STREAM, 0);
-	if (this->listen_sd_ < 0) {
-		std::cerr << "socket() failed: " << strerror(errno) << std::endl;
-		return -1;
-	}
-	return 0;
+    struct protoent *protoinfo = getprotobyname("tcp");
+    if (!protoinfo) {
+        std::cerr << "getprotobyname() failed: " << strerror(errno) << std::endl;
+        return -1;
+    }
+
+    int protocol = protoinfo->p_proto;
+
+    this->listen_sd_ = ::socket(AF_INET, SOCK_STREAM, protocol);
+    if (this->listen_sd_ < 0) {
+        std::cerr << "socket() failed: " << strerror(errno) << std::endl;
+        return -1;
+    }
+    return 0;
 }
+
 
 int Socket::setsockopt() {
 	int is_on = 1;
@@ -81,14 +90,49 @@ int Socket::nonBlock() {
 }
 
 int Socket::setSocketAddress() {
-	this->addr_.sin_family = AF_INET;
-	if (inet_pton(AF_INET, this->server_addr_, &(addr_.sin_addr)) <= 0) {
-		std::cerr << "inet_pton() failed" << strerror(errno) << std::endl;
+	struct addrinfo hints, *res, *p;
+	int status;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	std::ostringstream oss;
+	oss << this->port_;
+	std::string port_str = oss.str();
+
+	if ((status = getaddrinfo(this->server_addr_, port_str.c_str(), &hints, &res)) != 0) {
+		std::cerr << "getaddrinfo() failed: " << gai_strerror(status) << std::endl;
 		return -1;
 	}
-	addr_.sin_port = htons(this->port_);
+
+	for (p = res; p != NULL; p = p->ai_next) {
+		if (p->ai_family == AF_INET || p->ai_family == AF_INET6) {
+			memcpy(&addr_, p->ai_addr, p->ai_addrlen);
+			break;
+		}
+	}
+
+	freeaddrinfo(res);
+
+	if (p == NULL) {
+		std::cerr << "Failed to set socket address." << std::endl;
+		return -1;
+	}
+
 	return 0;
 }
+
+// int Socket::setSocketAddress() {
+// 	this->addr_.sin_family = AF_INET;
+// 	if (inet_pton(AF_INET, this->server_addr_, &(addr_.sin_addr)) <= 0) {
+// 		std::cerr << "inet_pton() failed" << strerror(errno) << std::endl;
+// 		return -1;
+// 	}
+// 	addr_.sin_port = htons(this->port_);
+// 	return 0;
+// }
 
 int Socket::bind() {
 	int rc = ::bind(this->listen_sd_, reinterpret_cast<struct sockaddr*>(&addr_), sizeof(addr_));
