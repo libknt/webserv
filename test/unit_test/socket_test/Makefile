@@ -3,8 +3,8 @@ SRCS= $(shell find ../../../srcs -name "socket.cpp")
 SRCS+= ./socket_test.cc
 OUTPUT = socket_test
 
-# INCLUDE = -I $(dir $(shell find ../../../srcs -name "socket.hpp"))
-INCLUDE = -I ../../../includes
+INCLUDE = -I $(dir $(shell find ../../../srcs -name "socket.hpp"))
+INCLUDE += -I ../../../includes
 all: socket
 	./socket_test
 

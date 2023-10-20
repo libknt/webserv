@@ -5,7 +5,7 @@ CXXFLAGS = -std=c++14 -Wall -Werror -Wextra -I$(GPWD)/third_party/gtest/include
 LDFLAGS = -L$(GPWD)/third_party/gtest/lib -lgtest -lgtest_main
 
 # all: check_wget check_third_party socket 
-all: check_wget check_third_party io_multiplexing
+all: check_wget check_third_party socket io_multiplexing
 
 check_wget:
 	@if ! command -v wget &> /dev/null; then $(MAKE) install_wget; exit 1; fi
