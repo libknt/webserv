@@ -5,7 +5,9 @@ SRCSSERVER+= $(shell find ../../../srcs -name "io_multiplexing.cpp")
 
 SRCS=io_multiplexing_test.cc
 
-INCLUDE = -I $(dir $(shell find ../../../srcs -name "socket.hpp"))
+# INCLUDE = -I $(dir $(shell find ../../../srcs -name "socket.hpp"))
+INCLUDE = -I ../../../includes
+INCLUDE += -I $(dir $(shell find ../../../srcs -name "io_multiplexing.hpp"))
 
 re: fclean all
 
