@@ -1,6 +1,18 @@
 .PHONY: test tidy format cppcheck
 
 SHELL := /bin/bash
+# SRCS = $(shell find srcs -name "*.cpp")
+SRCS = $(shell find srcs -name "main.cpp")
+
+NAME = a.out
+
+all:
+	cc  $(SRCS) -o $(NAME)
+
+clean:
+	rm -f a.out
+
+re: clean all
 
 format:
 	find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | xargs clang-format -i
