@@ -124,16 +124,6 @@ int Socket::setSocketAddress() {
 	return 0;
 }
 
-// int Socket::setSocketAddress() {
-// 	this->addr_.sin_family = AF_INET;
-// 	if (inet_pton(AF_INET, this->server_addr_, &(addr_.sin_addr)) <= 0) {
-// 		std::cerr << "inet_pton() failed" << strerror(errno) << std::endl;
-// 		return -1;
-// 	}
-// 	addr_.sin_port = htons(this->port_);
-// 	return 0;
-// }
-
 int Socket::bind() {
 	int rc = ::bind(this->listen_sd_, reinterpret_cast<struct sockaddr*>(&addr_), sizeof(addr_));
 	if (rc < 0) {
