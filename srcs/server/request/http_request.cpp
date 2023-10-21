@@ -6,7 +6,6 @@ HttpRequest::HttpRequest() : status_(METHOD)
 }
 
 //Getter and Setter
-
 void	HttpRequest::setStatus(int const &status)
 {
 	this->status_ = status;
@@ -89,9 +88,10 @@ int		HttpRequest::parseHttpHeader(std::string const &line)
 	std::vector<std::string>	header_vector;
 	if (line == "\0")
 	{	
+		getInfo();
 		setStatus(BODY);
 		return (0);
-	} \cr\lf
+	}
 	//Later: http request compromise 0 space between : and value!
 	else if (parse_sentense(line, "%s: %s", header_vector) < 0 || header_vector.size() != 2)
 	{
@@ -124,11 +124,6 @@ std::string	HttpRequest::getHeaderValue(std::string const &key)
 
 int		HttpRequest::parseHttpBody(std::string const &line)
 {
-	if (this->method_ == GET)
-	{
-		setStatus(FINISHED);
-		return (0);
-	}
 	//transfer-encoding
 	//content-length
 	std::cout << line << std::endl;
