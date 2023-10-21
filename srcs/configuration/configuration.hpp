@@ -12,7 +12,10 @@ private:
 	std::string server_name_;
 	Location location_;
 public:
-	
+	Configuration();
+	~Configuration();
+	Configuration(const Configuration& other);
+	Configuration& operator=(const Configuration& other);
 };
 
 #endif
