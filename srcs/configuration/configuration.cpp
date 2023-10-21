@@ -1,6 +1,5 @@
 #include "configuration.hpp"
 
-
 Configuration::Configuration() {}
 
 Configuration::~Configuration() {}
@@ -20,4 +19,8 @@ Configuration& Configuration::operator=(const Configuration& other) {
 		location_ = other.location_;
 	}
 	return *this;
+}
+
+Configuration& parseConfiguration(std::string path) {
+	
 }

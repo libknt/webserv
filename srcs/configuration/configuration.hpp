@@ -3,6 +3,7 @@
 
 # include <string>
 # include <iostream>
+# include <fstream>
 # include "location.hpp"
 
 class Configuration {
@@ -17,5 +18,7 @@ public:
 	Configuration(const Configuration& other);
 	Configuration& operator=(const Configuration& other);
 };
+
+Configuration& parseConfiguration(std::string path);
 
 #endif
