@@ -1,7 +1,7 @@
 #include "parse_sentense.hpp"
 static	void	format_tokenize(std::string format, std::queue<Token> &token_queue);
 
-ssize_t	parse_sentense(std::string line, std::string format, std::vector<std::string> &ans)
+int		parse_sentense(std::string line, std::string format, std::vector<std::string> &ans)
 {
 	std::queue<Token>	token_queue;
 	size_t				index = 0;
@@ -59,8 +59,7 @@ ssize_t	parse_sentense(std::string line, std::string format, std::vector<std::st
 				index++;
 		}
 	}
-	return (line.size());
-	
+	return (0);
 }
 
 static void	format_tokenize(std::string format, std::queue<Token> &token_queue)

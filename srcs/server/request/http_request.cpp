@@ -1,7 +1,7 @@
 #include "http_request.hpp"
 #include "parse_sentense.hpp"
 
-HttpRequest::HttpRequest() : status_(METHOD), body_length_(0)
+HttpRequest::HttpRequest() : status_(METHOD)
 {
 }
 
@@ -14,8 +14,7 @@ void	HttpRequest::setStatus(int const &status)
 void	HttpRequest::setErrorStatus(int const &error_status)
 {
 	this->error_status_ = error_status;
-}
-
+} 
 int		HttpRequest::setMethod(std::string const &method)
 {
 	if (method == "GET")
@@ -25,14 +24,20 @@ int		HttpRequest::setMethod(std::string const &method)
 	else if (method == "DELETE")
 		this->method_ = DELETE;
 	else
+	{
+		setStatus(ERROR);
 		return (-1);
+	}
 	return (0);
 }
 
 int		HttpRequest::setRequestPath(std::string const &request_path)
 {
 	if (request_path == "\0")
+	{
+		setStatus(ERROR);
 		return (-1);
+	}
 	this->request_path_ = request_path;
 	return (0);
 }
@@ -44,7 +49,10 @@ int		HttpRequest::setVersion(std::string const &version)
 	else if (version == "HTTP/1.1")
 		this->version_ = HTTP_1_1;
 	else
+	{
+		setStatus(ERROR);
 		return (-1);
+	}
 	return (0);
 }
 
@@ -58,7 +66,7 @@ int		HttpRequest::parseHttpRequest(std::string const &line)
 	else if (this->status_ == BODY)
 		parseHttpBody(line);
 	if (this->status_ == ERROR)
-		return (1);
+		return (-1);
 	return (0);
 }
 
@@ -129,21 +137,39 @@ int		HttpRequest::parseHttpBody(std::string const &line)
 {
 	//transfer-encoding
 	if (getHeaderValue("Transfer-Encoding") == "chunked")
-		return (getChunkedBody(line));
+		return (parseChunkedBody(line));
 	//content-length
-	else if (getHeaderValue("Context-Length") != "")
-		return (getContextLengthBody(line));
+	else if (getHeaderValue("Content-Length") != "")
+		return (parseContentLengthBody(line));
 	setStatus(ERROR);
 	setErrorStatus(BAD_REQUEST);
 	return (-1);
 }
 
 #include <stdlib.h>
-int		HttpRequest::getContextLengthBody(std::string const &line)
+int		HttpRequest::parseChunkedBody(std::string const &line)
+{
+	if (chunked_status_ == CHUNKED_SIZE)
+	{
+		// no error handling
+		//Caution ! strtol is C++ 11 function.
+		chunked_size_ = std::strtol(line.c_str(), NULL, 16);
+		chunked_status_ = CHUNKED_MESSAGE;
+		if (chunked_size_ == 0)
+			setStatus(FINISHED);
+	}
+	else if (line == "")
+		chunked_status_ = CHUNKED_SIZE;
+	else
+		body_ += line; 
+	return (0);
+}
+		
+int		HttpRequest::parseContentLengthBody(std::string const &line)
 {
 	//no error handling
 	body_ += line;
-	if (body_.size() == atol(getHeaderValue("Context-Length").c_str()))
+	if (body_.size() == static_cast<size_t>(std::atoi(getHeaderValue("Content-Length").c_str())))
 		setStatus(FINISHED);
 	return (0);
 }

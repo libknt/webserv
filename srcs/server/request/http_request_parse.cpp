@@ -15,6 +15,7 @@ int		HttpRequestParse::parse_http_request(int socketfd, char *buf)
 			std::string		line = http_line_stream_[socketfd].substr(0, index);
 			http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
 			http_request_map_[socketfd].parseHttpRequest(line);
+			//if error occured, you parseHttpRequest(line) must return -1. So handle it.
 	}
 	return (0);
 }

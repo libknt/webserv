@@ -18,6 +18,12 @@ enum    http_method
 	DELETE,
 };
 
+enum chunked_status
+{
+	CHUNKED_SIZE,
+	CHUNKED_MESSAGE,
+};
+
 enum http_version
 {
 	HTTP_1_0,
@@ -42,19 +48,21 @@ class   HttpRequest
 		int									status_;
 		int									version_;
 		int									error_status_;
-		int									body_length_;
+		int									chunked_status_;
+		long								chunked_size_;
 		std::string							request_path_;
 		std::map<std::string, std::string>	header_;
 		std::string							body_;
 		int									parseHttpMethod(std::string const &line);
 		int									parseHttpHeader(std::string const &line);
 		int									parseHttpBody(std::string const &line);
+		int									parseContentLengthBody(std::string const &line);
+		int									parseChunkedBody(std::string const &line);
 		int									setMethod(std::string const &method);
 		int									setRequestPath(std::string const &request_path);
 		int									setVersion(std::string const &version);
 		int									setHeaderValue(std::string const &key, std::string const &value);
 		void								setStatus(int const &status);
 		void								setErrorStatus(int const &error_status);
-int											getContextLengthBody(std::string const &line);
 };
 #endif
