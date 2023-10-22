@@ -1,6 +1,6 @@
 #include "parse_http_request.hpp"
 
-int HttpRequestParse::parse_http_request(int socketfd, char* buf) {
+int ParseHttpRequest::parse_http_request(int socketfd, char* buf) {
 
 	std::string buffer(buf);
 	HttpRequest request;
@@ -11,7 +11,7 @@ int HttpRequestParse::parse_http_request(int socketfd, char* buf) {
 	}
 	http_line_stream_[socketfd] += buffer;
 	while (
-		(index = http_line_stream_[socketfd].find("\r\n")) < http_line_stream_[socketfd].size()) {
+		(index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
 		std::string line = http_line_stream_[socketfd].substr(0, index);
 		http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
 		http_request_map_[socketfd].parseHttpRequest(line);
