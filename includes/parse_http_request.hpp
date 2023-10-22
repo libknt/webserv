@@ -12,12 +12,12 @@
 #endif
 
 class ParseHttpRequest {
-public:
-	int parse_http_request(int socketfd, char* buf);
-
 private:
 	std::map<int, HttpRequest> http_request_map_;
 	std::map<int, std::string> http_line_stream_;
+
+public:
+	int parse_http_request(int socketfd, char* buf);
 };
 
 #endif

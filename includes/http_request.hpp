@@ -33,12 +33,6 @@ enum HTTP_ERROR {
 };
 
 class HttpRequest {
-public:
-	HttpRequest();
-	int parseHttpRequest(std::string const& line);
-	std::string getHeaderValue(std::string const& key);
-	void getInfo(void);
-
 private:
 	HTTP_METHOD method_;
 	HTTP_REQUEST_STATUS status_;
@@ -60,5 +54,11 @@ private:
 	int setHeaderValue(std::string const& key, std::string const& value);
 	void setStatus(HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(HTTP_ERROR const& error_status);
+
+public:
+	HttpRequest();
+	int parseHttpRequest(std::string const& line);
+	std::string getHeaderValue(std::string const& key);
+	void getInfo(void);
 };
 #endif
