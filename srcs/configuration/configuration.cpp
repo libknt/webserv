@@ -21,6 +21,12 @@ Configuration& Configuration::operator=(const Configuration& other) {
 	return *this;
 }
 
+
+int Configuration::setConfiguration(const std::string& path) {
+	parseConfiguration()
+	return 0;
+}
+
 std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     std::stringstream ss(s);
@@ -32,6 +38,8 @@ std::vector<std::string> split(const std::string &s, char delim) {
     }
     return elems;
 }
+
+
 
 // tokenize, parseに分けても良さそうな気がしてきた
 Configuration& parseConfiguration(Configuration& configuration, std::string path) {
