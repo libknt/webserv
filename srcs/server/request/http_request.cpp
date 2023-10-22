@@ -1,5 +1,6 @@
 #include "http_request.hpp"
 #include "parse_sentense.hpp"
+#include <cstdlib>
 
 HttpRequest::HttpRequest() : status_(METHOD)
 {
@@ -146,7 +147,6 @@ int		HttpRequest::parseHttpBody(std::string const &line)
 	return (-1);
 }
 
-#include <stdlib.h>
 int		HttpRequest::parseChunkedBody(std::string const &line)
 {
 	if (chunked_status_ == CHUNKED_SIZE)
