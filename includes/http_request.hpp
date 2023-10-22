@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <map>
-enum    http_status
+enum    HTTP_REQUEST
 {
 	METHOD,
 	HEADER, BODY,
@@ -11,27 +11,27 @@ enum    http_status
 	ERROR,
 };
 
-enum    http_method
+enum    HTTP_METHOD
 {
 	GET,
 	POST,
 	DELETE,
 };
 
-enum chunked_status
+enum CHUNKED_STATUS
 {
 	CHUNKED_SIZE,
 	CHUNKED_MESSAGE,
 };
 
-enum http_version
+enum HTTP_VERSION
 {
 	HTTP_1_0,
 	HTTP_1_1,
 	HTTP_2_0,
 };
 
-enum http_error
+enum HTTP_ERROR
 {
 	BAD_REQUEST = 400,	
 };
