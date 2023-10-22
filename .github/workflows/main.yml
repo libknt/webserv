@@ -18,14 +18,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Cache Clang Tools
-      uses: actions/cache@v2
-      with:
-        path: /usr/bin/clang-tidy
-        key: clang-tidy-${{ runner.os }}
-
     - name: Install Clang Tools
-      if: steps.cache.outputs.cache-hit != 'true'
       run: sudo apt-get install clang-tidy
 
     - name: Run clang-tidy
@@ -40,16 +33,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Cache cppcheck
-      uses: actions/cache@v2
-      with:
-        path: /usr/bin/cppcheck
-        key: cppcheck-${{ runner.os }}
-
-    - name: Install cppcheck
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
       run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force  --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 ./srcs/
@@ -71,12 +54,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y wget cmake
-
-    - name: Cache Google Test Build
-      uses: actions/cache@v2
-      with:
-        path: test/build_directory
-        key: gtest-${{ runner.os }}-${{ hashFiles('test/**') }}
 
     - name: Build Google Test
       run: |
