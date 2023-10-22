@@ -20,7 +20,7 @@ private:
 	struct timeval timeout_;
 	fd_set master_set_;
 	fd_set working_set_;
-	int end_server_;
+	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
 

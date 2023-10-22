@@ -7,7 +7,7 @@ IoMultiplexing::IoMultiplexing()
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
 	, max_clients_(-1)
-	, end_server_(0) {
+	, should_stop_server_(false) {
 	FD_ZERO(&master_set_);
 	FD_ZERO(&working_set_);
 	timeout_.tv_sec = 10;
@@ -20,7 +20,7 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
 	, max_clients_(-1)
-	, end_server_(0) {
+	, should_stop_server_(false) {
 	FD_ZERO(&master_set_);
 	FD_ZERO(&working_set_);
 	timeout_.tv_sec = 10;
@@ -38,7 +38,7 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, timeout_(other.timeout_)
 	, master_set_(other.master_set_)
 	, working_set_(other.working_set_)
-	, end_server_(other.end_server_) {}
+	, should_stop_server_(other.should_stop_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 
@@ -51,7 +51,7 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 		timeout_ = other.timeout_;
 		master_set_ = other.master_set_;
 		working_set_ = other.working_set_;
-		end_server_ = other.end_server_;
+		should_stop_server_ = other.should_stop_server_;
 	}
 	return *this;
 }
@@ -159,7 +159,7 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 }
 
 int IoMultiplexing::select() {
-	while (end_server_ == 0) {
+	while (should_stop_server_ == false) {
 		std::memcpy(&working_set_, &master_set_, sizeof(master_set_));
 
 		std::cout << "Waiting on select()!" << std::endl;
@@ -181,7 +181,7 @@ int IoMultiplexing::select() {
 			if (FD_ISSET(sd, &working_set_)) {
 				if (isListeningSocket(sd)) {
 					if (accept(sd) < 0)
-						end_server_ = 1;
+						should_stop_server_ = true;
 				} else {
 					request(sd);
 				}
