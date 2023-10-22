@@ -11,7 +11,7 @@
 #define BUFFER_SIZE 1024
 #endif
 
-class ParseHttpRequest	{
+class ParseHttpRequest {
 public:
 	int parse_http_request(int socketfd, char* buf);
 

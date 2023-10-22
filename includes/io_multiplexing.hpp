@@ -26,7 +26,7 @@ private:
 	int end_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
-	ParseHttpRequest	http_request_parse_;
+	ParseHttpRequest http_request_parse_;
 
 public:
 	explicit IoMultiplexing(std::vector<socket_conf>& conf);
