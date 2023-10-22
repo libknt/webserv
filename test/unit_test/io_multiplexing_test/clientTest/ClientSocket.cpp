@@ -4,7 +4,7 @@ http::ClientSocket::ClientSocket(const char* server_addr, int port)
 	: server_addr_(server_addr)
 	, port_(port)
 	, client_socket_(-1) {
-	memset(&addr_, 0, sizeof(addr_));
+	std::memset(&addr_, 0, sizeof(addr_));
 }
 
 http::ClientSocket::~ClientSocket() {
@@ -57,11 +57,11 @@ int http::ClientSocket::initialize() {
 }
 
 const char* http::ClientSocket::getServerAddr_() const {
-	return this->server_addr_;
+	return server_addr_;
 }
 int http::ClientSocket::getPort_() const {
-	return this->port_;
+	return port_;
 }
 int http::ClientSocket::getClientSocket() const {
-	return this->client_socket_;
+	return client_socket_;
 }

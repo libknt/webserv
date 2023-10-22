@@ -72,7 +72,7 @@ int IoMultiplexing::initialize() {
 		}
 	}
 
-	if( socket_.empty() ) {
+	if (socket_.empty()) {
 		std::cerr << "Initialization of all addresses failed" << std::endl;
 		return -1;
 	}
@@ -94,7 +94,7 @@ int IoMultiplexing::accept(int listen_sd) {
 		}
 
 		std::cout << "  New incoming connection -  " << new_sd << std::endl;
-		FD_SET(new_sd, &this->master_set_);
+		FD_SET(new_sd, &master_set_);
 		if (new_sd > max_sd_)
 			max_sd_ = new_sd;
 
@@ -102,52 +102,52 @@ int IoMultiplexing::accept(int listen_sd) {
 	return 0;
 }
 
-int IoMultiplexing::disconnection(int i) {
-	close(i);
-	FD_CLR(i, &master_set_);
-	if (i == max_sd_) {
-		while (FD_ISSET(max_sd_, &master_set_) == 0)
-			max_sd_ -= 1;
+int IoMultiplexing::disconnect(int sd) {
+	close(sd);
+	FD_CLR(sd, &master_set_);
+	if (sd == max_sd_) {
+		while (!FD_ISSET(max_sd_, &master_set_))
+			--max_sd_;
 	}
 	return 0;
 }
 
-int IoMultiplexing::request(int i) {
-	int close_conn;
+int IoMultiplexing::request(int sd) {
+	bool should_close_connection;
 	char buffer[1024];
 
-	std::cout << "  Descriptor " << i << " is readable" << std::endl;
-	close_conn = 0;
+	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
+	should_close_connection = false;
 	while (1) {
-		int result = recv(i, buffer, sizeof(buffer), 0);
+		int result = recv(sd, buffer, sizeof(buffer), 0);
 		if (result < 0) {
 			if (errno != EWOULDBLOCK) {
 				std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-				close_conn = 1;
+				should_close_connection = true;
 			}
 			break;
 		}
 
 		if (result == 0) {
 			std::cout << "  Connection closed" << std::endl;
-			close_conn = 1;
+			should_close_connection = true;
 			break;
 		}
 
 		int len = result;
 		std::cout << "  " << len << " bytes received\n" << std::endl;
 
-		result = send(i, buffer, len, 0);
+		result = send(sd, buffer, len, 0);
 		if (result < 0) {
 			std::cerr << "send() failed: " << strerror(errno) << std::endl;
-			close_conn = 1;
+			should_close_connection = true;
 			break;
 		}
-		memset(buffer,'\0', sizeof(buffer));
+		std::memset(buffer, '\0', sizeof(buffer));
 	};
 
-	if (close_conn) {
-		disconnection(i);
+	if (should_close_connection) {
+		disconnect(sd);
 	}
 
 	return 0;
@@ -160,10 +160,10 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 
 int IoMultiplexing::select() {
 	while (end_server_ == 0) {
-		memcpy(&this->working_set_, &this->master_set_, sizeof(this->master_set_));
+		std::memcpy(&working_set_, &master_set_, sizeof(master_set_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int result = ::select(max_sd_ + 1, &this->working_set_, NULL, NULL, &timeout_);
+		int result = ::select(max_sd_ + 1, &working_set_, NULL, NULL, &timeout_);
 
 		if (result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -176,16 +176,17 @@ int IoMultiplexing::select() {
 		}
 
 		int desc_ready = result;
-		for (int i = 0; i <= max_sd_ && desc_ready > 0; ++i) {
-			if (FD_ISSET(i, &this->working_set_)) {
-				desc_ready -= 1;
 
-				if (isListeningSocket(i)) {
-					if (accept(i) < 0)
+		for (int sd = 0; sd <= max_sd_ && desc_ready > 0; ++sd) {
+			if (FD_ISSET(sd, &working_set_)) {
+				if (isListeningSocket(sd)) {
+					if (accept(sd) < 0)
 						end_server_ = 1;
 				} else {
-					request(i);
+					request(sd);
 				}
+
+				--desc_ready;
 			}
 		}
 	}

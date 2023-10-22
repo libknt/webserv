@@ -1,8 +1,8 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
-#include "struct.hpp"
 #include "socket.hpp"
+#include "struct.hpp"
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -33,8 +33,8 @@ public:
 	int server_start();
 	int select();
 	int accept(int listen_sd);
-	int request(int i);
-	int disconnection(int i);
+	int request(int sd);
+	int disconnect(int sd);
 	bool isListeningSocket(int sd);
 };
 
