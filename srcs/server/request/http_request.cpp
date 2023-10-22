@@ -1,7 +1,7 @@
 #include "http_request.hpp"
 #include "parse_sentense.hpp"
 
-HttpRequest::HttpRequest() : status_(METHOD)
+HttpRequest::HttpRequest() : status_(METHOD), body_length_(0)
 {
 }
 
@@ -88,8 +88,11 @@ int		HttpRequest::parseHttpHeader(std::string const &line)
 	std::vector<std::string>	header_vector;
 	if (line == "\0")
 	{	
+		if (method_ == GET || getHeaderValue("Content-Length") == "0")
+			setStatus(FINISHED);
+		else
+			setStatus(BODY);
 		getInfo();
-		setStatus(BODY);
 		return (0);
 	}
 	//Later: http request compromise 0 space between : and value!
@@ -125,8 +128,23 @@ std::string	HttpRequest::getHeaderValue(std::string const &key)
 int		HttpRequest::parseHttpBody(std::string const &line)
 {
 	//transfer-encoding
+	if (getHeaderValue("Transfer-Encoding") == "chunked")
+		return (getChunkedBody(line));
 	//content-length
-	std::cout << line << std::endl;
+	else if (getHeaderValue("Context-Length") != "")
+		return (getContextLengthBody(line));
+	setStatus(ERROR);
+	setErrorStatus(BAD_REQUEST);
+	return (-1);
+}
+
+#include <stdlib.h>
+int		HttpRequest::getContextLengthBody(std::string const &line)
+{
+	//no error handling
+	body_ += line;
+	if (body_.size() == atol(getHeaderValue("Context-Length").c_str()))
+		setStatus(FINISHED);
 	return (0);
 }
 

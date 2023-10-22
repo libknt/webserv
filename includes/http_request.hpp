@@ -6,8 +6,7 @@
 enum    http_status
 {
 	METHOD,
-	HEADER,
-	BODY,
+	HEADER, BODY,
 	FINISHED,
 	ERROR,
 };
@@ -43,6 +42,7 @@ class   HttpRequest
 		int									status_;
 		int									version_;
 		int									error_status_;
+		int									body_length_;
 		std::string							request_path_;
 		std::map<std::string, std::string>	header_;
 		std::string							body_;
@@ -55,5 +55,6 @@ class   HttpRequest
 		int									setHeaderValue(std::string const &key, std::string const &value);
 		void								setStatus(int const &status);
 		void								setErrorStatus(int const &error_status);
+int											getContextLengthBody(std::string const &line);
 };
 #endif
