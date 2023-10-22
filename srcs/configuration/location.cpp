@@ -24,4 +24,5 @@ Location& Location::operator=(const Location& other) {
 		allow_methods_ = other.allow_methods_;
 		chunked_transfer_encoding_ = other.chunked_transfer_encoding_;
 	}
+	return *this;
 }

@@ -19,6 +19,6 @@ public:
 	Configuration& operator=(const Configuration& other);
 };
 
-Configuration& parseConfiguration(std::string path);
+Configuration& parseConfiguration(Configuration& configuration, std::string path);
 
 #endif

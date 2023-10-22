@@ -21,6 +21,18 @@ Configuration& Configuration::operator=(const Configuration& other) {
 	return *this;
 }
 
-Configuration& parseConfiguration(std::string path) {
-	
+Configuration& parseConfiguration(Configuration& configuration, std::string path) {
+	std::ifstream conf_file(path);
+	std::string line;
+
+	while (getline(conf_file, line)) {
+		for (size_t i = 0; i < line.size(); i++) {
+			// スペースを読み飛ばす
+			while (isspace(line[i]))
+				i++;
+			// word単位に分ける
+			// 文法が正しいか判断する(directiveによって文法が違うから持っておく必要がある)
+		}
+	}
+	return configuration;
 }

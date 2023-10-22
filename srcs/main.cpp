@@ -1,11 +1,11 @@
-#include "configuration.hpp"
+#include "configuration/configuration.hpp"
 
-int setConfigration(int argc, char** argv, Configuration configuration) {
-
+int setConfigration(int argc, char** argv, Configuration& configuration) {
+	// resultができれば使いたい
 	if (argc == 1) {
-		configuration = parseConfiguration("configuration/default.conf");
+		parseConfiguration(configuration, "configuration/default.conf");
 	} else {
-		configuration = parseConfiguration(argv[1]);
+		parseConfiguration(configuration, argv[1]);
 	}
 	return 0;
 }
