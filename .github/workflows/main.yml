@@ -35,7 +35,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 -Iincludes ./srcs/. 2> ./log/resule.log
+      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 -Iincludes ./srcs/.
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v2
