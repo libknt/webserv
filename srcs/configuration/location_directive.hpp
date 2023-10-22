@@ -1,12 +1,12 @@
-#ifndef LOCATION_HPP
-# define LOCATION_HPP
+#ifndef LOCATION_DIRECTIVE_HPP
+# define LOCATION_DIRECTIVE_HPP
 
 # include <iostream>
 # include <string>
 # include <map>
 # include <vector>
 
-class Location {
+class LocationDirective {
 private:
 	std::map<int, std::string> error_pages_;
 	int client_max_body_size_;
@@ -16,10 +16,10 @@ private:
 	std::vector<std::string> allow_methods_;
 	bool chunked_transfer_encoding_;
 public:
-	Location();
-	~Location();
-	Location(const Location& other);
-	Location& operator=(const Location& other);
+	LocationDirective();
+	~LocationDirective();
+	LocationDirective(const LocationDirective& other);
+	LocationDirective& operator=(const LocationDirective& other);
 };
 
 #endif

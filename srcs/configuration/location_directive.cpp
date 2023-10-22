@@ -1,10 +1,10 @@
-#include "location.hpp"
+#include "location_directive.hpp"
 
-Location::Location() {}
+LocationDirective::LocationDirective() {}
 
-Location::~Location() {}
+LocationDirective::~LocationDirective() {}
 
-Location::Location(const Location& other) {
+LocationDirective::LocationDirective(const LocationDirective& other) {
 	error_pages_ = other.error_pages_;
 	client_max_body_size_ = other.client_max_body_size_;
 	root_ = other.root_;
@@ -14,7 +14,7 @@ Location::Location(const Location& other) {
 	chunked_transfer_encoding_ = other.chunked_transfer_encoding_;
 }
 
-Location& Location::operator=(const Location& other) {
+LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
 		error_pages_ = other.error_pages_;
 		client_max_body_size_ = other.client_max_body_size_;
