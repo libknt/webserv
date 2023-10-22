@@ -34,6 +34,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Install cppcheck
+      run: sudo apt-get install cppcheck
+
     - name: Run cppcheck
       run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 -Iincludes ./srcs/.
 
