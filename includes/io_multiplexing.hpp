@@ -1,9 +1,9 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
-#include "http_request_parse.hpp"
-#include "struct.hpp"
+#include "parse_http_request.hpp"
 #include "socket.hpp"
+#include "struct.hpp"
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -26,7 +26,7 @@ private:
 	int end_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
-	HttpRequestParse	http_request_parse_;
+	HttpRequestParse http_request_parse_;
 
 public:
 	explicit IoMultiplexing(std::vector<socket_conf>& conf);

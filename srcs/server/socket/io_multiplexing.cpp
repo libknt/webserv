@@ -1,5 +1,5 @@
 #include "io_multiplexing.hpp"
-#include "http_request_parse.hpp"
+#include "parse_http_request.hpp"
 
 namespace server {
 IoMultiplexing::IoMultiplexing()
@@ -58,11 +58,14 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 }
 
 int IoMultiplexing::initialize() {
-	for (std::vector<socket_conf>::iterator conf_it = socket_conf_.begin(); conf_it != socket_conf_.end(); ++conf_it) {
+	for (std::vector<socket_conf>::iterator conf_it = socket_conf_.begin();
+		 conf_it != socket_conf_.end();
+		 ++conf_it) {
 		socket_.push_back(server::Socket(conf_it->addr, conf_it->port));
 	}
 
-	for (std::vector<server::Socket>::iterator socket_it = socket_.begin(); socket_it != socket_.end();) {
+	for (std::vector<server::Socket>::iterator socket_it = socket_.begin();
+		 socket_it != socket_.end();) {
 		if (socket_it->initialize() < 0) {
 			socket_it = socket_.erase(socket_it);
 		} else {

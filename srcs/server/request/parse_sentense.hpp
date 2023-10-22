@@ -1,23 +1,21 @@
-#ifndef	PARSE_SENTENSE_HPP
-#define	PARSE_SENTENSE_HPP
+#ifndef PARSE_SENTENSE_HPP
+#define PARSE_SENTENSE_HPP
 
+#include <aio.h>
 #include <iostream>
-#include <vector>
 #include <queue>
 #include <string>
-#include <aio.h>
+#include <vector>
 
-enum TokenKind
-{
+enum TokenKind {
 	STRING,
 	KEYWORD,
 	SPACE,
 };
 
-struct Token
-{
-	TokenKind	token_kind;
-	std::string	str;
+struct Token {
+	TokenKind token_kind;
+	std::string str;
 };
-int		parse_sentense(std::string line, std::string const &format, std::vector<std::string> &ans);
+int parseSentense(std::string line, std::string const& format, std::vector<std::string>& ans);
 #endif
