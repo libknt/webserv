@@ -32,7 +32,7 @@ int HttpRequest::setRequestPath(std::string const& request_path) {
 		setStatus(ERROR);
 		return (-1);
 	}
-	this->request_path_ = request_path;
+	request_path_ = request_path;
 	return (0);
 }
 
@@ -72,14 +72,14 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 int HttpRequest::parseHttpMethod(std::string const& line) {
 	std::vector<std::string> method_vector;
 	if (parseSentense(line, "%s %s %s", method_vector) == -1 || method_vector.size() != 3) {
-		std::cout << "Http Method Parse Error" << std::endl;
+		std::cerr << "Http Method Parse Error" << std::endl;
 		setStatus(ERROR);
 		setErrorStatus(BAD_REQUEST);
 		return (-1);
 	}
 	if (setMethod(method_vector[0]) < 0 || setRequestPath(method_vector[1]) < 0 ||
 		setVersion(method_vector[2]) < 0) {
-		std::cout << "Http Method Parse Error" << std::endl;
+		std::cerr << "Http Method Parse Error" << std::endl;
 		setStatus(ERROR);
 		setErrorStatus(BAD_REQUEST);
 		return (-1);
@@ -112,15 +112,15 @@ int HttpRequest::parseHttpHeader(std::string const& line) {
 }
 
 int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
-	this->header_[key] = value;
+	header_[key] = value;
 	return (0);
 }
 
 std::string HttpRequest::getHeaderValue(std::string const& key) {
-	if (this->header_.count(key) == 0)
+	if (header_.count(key) == 0)
 		return (std::string(""));
 	else
-		return (this->header_[key]);
+		return (header_[key]);
 }
 
 int HttpRequest::parseHttpBody(std::string const& line) {

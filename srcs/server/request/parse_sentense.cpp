@@ -32,7 +32,7 @@ int parseSentense(std::string line, std::string const& format, std::vector<std::
 			std::string keyword = token.str;
 			if (line.size() <= index + keyword.size() ||
 				line.substr(index, keyword.size()) != keyword) {
-				std::cout << "Keyword Error" << std::endl;
+				std::cerr << "Keyword Error" << std::endl;
 				ans.clear();
 				return (-1);
 			}
@@ -41,7 +41,7 @@ int parseSentense(std::string line, std::string const& format, std::vector<std::
 
 		else if (token.token_kind == SPACE) {
 			if (!std::isspace(line[index])) {
-				std::cout << "Space Error" << std::endl;
+				std::cerr << "Space Error" << std::endl;
 				ans.clear();
 				return (-1);
 			}
