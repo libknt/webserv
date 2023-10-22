@@ -72,6 +72,10 @@ int IoMultiplexing::initialize() {
 		}
 	}
 
+	if( socket_.empty() ) {
+		std::cerr << "Initialization of all addresses failed" << std::endl;
+		return -1;
+	}
 	return 0;
 }
 
