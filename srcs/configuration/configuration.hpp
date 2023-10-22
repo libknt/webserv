@@ -10,6 +10,8 @@
 class Configuration {
 private:
 	ServerDirective server_;
+
+	std::vector<std::string> tokenize(const std::string& path);
 public:
 	Configuration();
 	~Configuration();
@@ -19,6 +21,5 @@ public:
 	int setConfiguration(const std::string& path);
 };
 
-Configuration& parseConfiguration(Configuration& configuration, std::string path);
 
 #endif
