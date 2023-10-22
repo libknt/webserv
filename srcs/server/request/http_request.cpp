@@ -180,7 +180,7 @@ void	HttpRequest::getInfo(void)
 	std::cout << "status: " << status_ << std::endl;
 	std::cout << "version: " << version_ << std::endl;
 	std::cout << "header" << std::endl;
-	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end(); iter++)
+	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end(); ++iter)
 		std::cout << "first: " << iter->first << "second: " << iter->second << std::endl;
 }
 

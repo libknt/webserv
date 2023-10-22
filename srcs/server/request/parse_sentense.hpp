@@ -19,5 +19,5 @@ struct Token
 	TokenKind	token_kind;
 	std::string	str;
 };
-int		parse_sentense(std::string line, std::string format, std::vector<std::string> &ans);
+int		parse_sentense(std::string line, std::string const &format, std::vector<std::string> &ans);
 #endif
