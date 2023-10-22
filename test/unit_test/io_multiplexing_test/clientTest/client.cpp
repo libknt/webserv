@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 		while (1) {
 			fgets(sendBuffer, sizeof(sendBuffer), stdin);
 
-			rc = send(client_socket.getClientSocket(), sendBuffer, strlen(sendBuffer), 0);
+			rc = send(client_socket.getClientSocket(), sendBuffer, std::strlen(sendBuffer), 0);
 			if (rc < 0) {
 				perror("send() failed");
 				exit(-1);
