@@ -11,7 +11,7 @@ SRCS_DIR	=	srcs
 
 OBJS_DIR	=	objs
 
-INCLUDE_DIR	=	./includes
+INCLUDE =	-Iincludes/.
 
 SRCS		=	$(shell find $(SRCS_DIR) -name "*.cpp")
 
@@ -24,7 +24,7 @@ $(NAME): $(OBJS)
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -I $(INCLUDE_DIR) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ -c $<
 	
 clean:
 	rm -rf $(OBJS_DIR)
@@ -43,7 +43,7 @@ test:
 
 cppcheck:
 	mkdir -p log
-	cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 ./srcs/. 2> ./log/resule.log
+	cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 -Iincludes ./srcs/. 2> ./log/resule.log
 
 tidy:
 	@find ./srcs/. -name '*.cpp' -or -name '*.hpp' | while read file; do \

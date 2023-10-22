@@ -44,7 +44,7 @@ Socket::~Socket() {
 }
 
 int Socket::socket() {
-	struct protoent* protoinfo = getprotobyname("tcp");
+	const struct protoent* protoinfo = getprotobyname("tcp");
 	if (!protoinfo) {
 		std::cerr << "getprotobyname() failed: " << strerror(errno) << std::endl;
 		return -1;
