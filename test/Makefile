@@ -4,7 +4,8 @@ GPWD=$(shell pwd)
 CXXFLAGS = -std=c++14 -Wall -Werror -Wextra -I$(GPWD)/third_party/gtest/include
 LDFLAGS = -L$(GPWD)/third_party/gtest/lib -lgtest -lgtest_main
 
-all: check_wget check_third_party socket
+# all: check_wget check_third_party socket 
+all: check_wget check_third_party socket io_multiplexing
 
 check_wget:
 	@if ! command -v wget &> /dev/null; then $(MAKE) install_wget; exit 1; fi
@@ -23,8 +24,12 @@ socket:
 	make -C unit_test/socket_test CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
 	make clean -C unit_test/socket_test
 
+io_multiplexing:
+	make -C unit_test/io_multiplexing_test CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)"
+	make clean -C unit_test/io_multiplexing_test
+
 gpath:
 	bash build.sh
 
 action-build:check_third_party
-action: socket
+action: socket io_multiplexing

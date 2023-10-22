@@ -6,7 +6,10 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <sstream>
+#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>

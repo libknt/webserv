@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <map>
 #include <vector>
-#define TRUE 1
-#define FALSE 0
 
 namespace server {
 
@@ -23,7 +21,7 @@ private:
 	struct timeval timeout_;
 	fd_set master_set_;
 	fd_set working_set_;
-	int end_server_;
+	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
 	ParseHttpRequest http_request_parse_;
@@ -37,8 +35,8 @@ public:
 	int server_start();
 	int select();
 	int accept(int listen_sd);
-	int request(int i);
-	int disconnection(int i);
+	int request(int sd);
+	int disconnect(int sd);
 	bool isListeningSocket(int sd);
 };
 

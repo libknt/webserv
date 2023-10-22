@@ -13,7 +13,8 @@ int start() {
 	sconf.port = 8081;
 	c.push_back(sconf);
 	server::IoMultiplexing server(c);
-	server.initialize();
+	if (server.initialize() < 0)
+		return -1;
 	server.server_start();
 	return 0;
 }
