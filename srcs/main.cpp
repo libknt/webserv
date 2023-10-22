@@ -1,7 +1,7 @@
 #include "configuration/configuration.hpp"
 
 int main(int argc, char** argv) {
-	Configuration configuration;
+	ServerDirective configuration;
 
 	switch (argc) {
 	case 1:

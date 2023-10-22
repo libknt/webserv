@@ -1,17 +1,17 @@
 #include "configuration.hpp"
 
-Configuration::Configuration() {}
+ServerDirective::ServerDirective() {}
 
-Configuration::~Configuration() {}
+ServerDirective::~ServerDirective() {}
 
-Configuration::Configuration(const Configuration& other) {
+ServerDirective::ServerDirective(const ServerDirective& other) {
 	port_ = other.port_;
 	ip_address_ = other.ip_address_;
 	server_name_ = other.server_name_;
 	location_ = other.location_;
 }
 
-Configuration& Configuration::operator=(const Configuration& other) {
+ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 	if (this != &other) {
 		port_ = other.port_;
 		ip_address_ = other.ip_address_;
@@ -22,27 +22,13 @@ Configuration& Configuration::operator=(const Configuration& other) {
 }
 
 
-int Configuration::setConfiguration(const std::string& path) {
+int ServerDirective::setConfiguration(const std::string& path) {
 	parseConfiguration()
 	return 0;
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    std::stringstream ss(s);
-    std::string item;
-    while (getline(ss, item, delim)) {
-    if (!item.empty()) {
-            elems.push_back(item);
-        }
-    }
-    return elems;
-}
-
-
-
 // tokenize, parseに分けても良さそうな気がしてきた
-Configuration& parseConfiguration(Configuration& configuration, std::string path) {
+ServerDirective& parseConfiguration(ServerDirective& configuration, std::string path) {
 	std::ifstream conf_file(path);
 	std::string line;
 	std::vector<std::string> words;
