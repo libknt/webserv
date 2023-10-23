@@ -1,7 +1,8 @@
 #include "io_multiplexing.hpp"
 
 namespace server {
-IoMultiplexing::IoMultiplexing(): socket_conf_(std::vector<socket_conf>())
+IoMultiplexing::IoMultiplexing()
+	: socket_conf_(std::vector<socket_conf>())
 	, socket_(std::vector<server::Socket>())
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
