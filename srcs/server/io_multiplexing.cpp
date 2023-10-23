@@ -121,11 +121,9 @@ int IoMultiplexing::request(int sd) {
 	while (1) {
 		int result = recv(sd, buffer, sizeof(buffer), 0);
 		if (result < 0) {
-			if (errno != EWOULDBLOCK) {
 				std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 				should_close_connection = true;
-			}
-			break;
+				break;
 		}
 
 		if (result == 0) {
