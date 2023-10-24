@@ -19,6 +19,8 @@ public:
 	~ServerDirective();
 	ServerDirective(const ServerDirective& other);
 	ServerDirective& operator=(const ServerDirective& other);
+
+	int parseServerDirective(const std::vector<std::string>& tokens);
 };
 
 #endif

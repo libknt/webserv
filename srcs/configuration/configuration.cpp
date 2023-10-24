@@ -5,12 +5,12 @@ Configuration::Configuration() {}
 Configuration::~Configuration() {}
 
 Configuration::Configuration(const Configuration& other) {
-	server_ = other.server_;
+	servers_ = other.servers_;
 }
 
 Configuration& Configuration::operator=(const Configuration& other) {
 	if (this != &other) {
-		server_ = other.server_;
+		servers_ = other.servers_;
 	}
 	return *this;
 }
@@ -18,9 +18,7 @@ Configuration& Configuration::operator=(const Configuration& other) {
 int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
 	tokens = tokenize_file_content(path);
-	for (size_t i = 0; i < tokens.size(); i++) {
-		std::cout << tokens[i] << std::endl;
-	}
+	parseConfiguration(tokens);
 	return 0;
 }
 
@@ -62,4 +60,21 @@ std::vector<std::string> Configuration::tokenize(std::string& line) {
     }
 
     return tokens;
+}
+
+int Configuration::parseConfiguration(const std::vector<std::string>& tokens) {
+	if (tokens.front() != "server") {
+		return -1;
+	}
+
+	for (size_t i = 0; i < tokens.size(); ++i) {
+		std::vector<std::string> server_tokens;
+		if (tokens[i] == "server") {
+			servers_.push_back(ServerDirective());
+			server_tokens.insert(server_tokens.end(), tokens.begin() + 1, tokens.end());
+			servers_[i].parseServerDirective(server_tokens);
+		}
+	}
+	std::cout << servers_.size() << std::endl;
+	return 0;
 }

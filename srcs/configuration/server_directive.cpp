@@ -20,3 +20,8 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 	}
 	return *this;
 }
+
+int ServerDirective::parseServerDirective(const std::vector<std::string>& tokens) {
+	std::cout << tokens.at(0) << std::endl;
+	return 0;
+}
