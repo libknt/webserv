@@ -28,15 +28,15 @@ int Configuration::setConfiguration(const std::string& path) {
 std::vector<std::string> Configuration::tokenize(const std::string& path) {
 	std::ifstream conf_file(path);
 	std::string line;
-	std::vector<std::string> words;
+	std::vector<std::string> tokens;
 
 	while (getline(conf_file, line)) {
 		// スペースを飛ばしながら単語に分ける
 		std::stringstream stringstream(line);
 		std::string word;
 		while (stringstream >> word) {
-			words.push_back(word);
+			tokens.push_back(word);
 		}
 	}
-	return words;
+	return tokens;
 }
