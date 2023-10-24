@@ -41,8 +41,9 @@ jobs:
 
     - name: Run clang-tidy
       run: |
+        INCLUDE="-Iincludes/. $(addprefix -I , $(dir $(shell find srcs/ -name "*.hpp")))"
         find ./srcs -name '*.cpp' -or -name '*.hpp' | while read file; do
-            clang-tidy $file -- -Wall -Wextra -Werror -std=c++98 -Iincludes -Isrcs/server
+            clang-tidy $file -- -Wall -Wextra -Werror -std=c++98 $INCLUDE
         done
 
   cppcheck-analysis:
@@ -56,7 +57,10 @@ jobs:
       run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 -Iincludes ./srcs/.
+      run: |
+        INCLUDE="-Iincludes/. $(addprefix -I , $(dir $(shell find srcs/ -name "*.hpp")))"
+        cppcheck --enable=all --error-exitcode=1 --inconclusive --force --std=c++11 $INCLUDE ./srcs/.
+
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v2
