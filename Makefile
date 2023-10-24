@@ -10,7 +10,7 @@ SRCS_DIR	=	srcs
 
 OBJS_DIR	=	objs
 
-INCLUDE =	-Iincludes/.
+INCLUDE =	-Iincludes/. -Isrcs/server/.
 
 SRCS		=	$(shell find $(SRCS_DIR) -name "*.cpp")
 
