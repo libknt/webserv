@@ -67,7 +67,7 @@ jobs:
         for dir in $dirs; do
           INCLUDE="$INCLUDE -I $dir"
         done
-        cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 $INCLUDE ./srcs/.
+        cppcheck --enable=all --check-config --error-exitcode=1 --inconclusive --force --suppress=missingIncludeSystem --std=c++11 $INCLUDE ./srcs/.
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v2
