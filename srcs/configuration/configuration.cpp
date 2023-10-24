@@ -16,7 +16,7 @@ Configuration& Configuration::operator=(const Configuration& other) {
 }
 
 
-int Configuration::setConfiguration(const std::string& path) {
+int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
 	tokens = tokenize(path);
 	for (size_t i = 0; i < tokens.size(); i++) {

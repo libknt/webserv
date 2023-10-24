@@ -18,7 +18,7 @@ public:
 	Configuration(const Configuration& other);
 	Configuration& operator=(const Configuration& other);
 
-	int setConfiguration(const std::string& path);
+	int init(const std::string& path);
 };
 
 
