@@ -1,4 +1,5 @@
 #include "io_multiplexing.hpp"
+#include "cgi.hpp"
 #include "parse_http_request.hpp"
 
 namespace server {
@@ -112,7 +113,7 @@ int IoMultiplexing::disconnect(int sd) {
 	}
 	return 0;
 }
-
+#include "debug.hpp"
 int IoMultiplexing::request(int sd) {
 	bool should_close_connection;
 	char buffer[BUFFER_SIZE];
@@ -126,11 +127,21 @@ int IoMultiplexing::request(int sd) {
 			should_close_connection = true;
 			break;
 		}
-		http_request_parse_.handleBuffer(sd, buffer);
-		if (result == 0) {
+		int status = http_request_parse_.handleBuffer(sd, buffer);
+
+		if (result == 0 || status == -1) {
 			std::cout << "  Connection closed" << std::endl;
 			should_close_connection = true;
 			break;
+		}
+		if (status == 1) {
+			std::cout << RED << "TEST" << std::endl;
+			Cgi cgi(http_request_parse_.get_http_request(sd));
+			if (cgi.cgi_request() < 0) {
+				std::cerr << "cgi-request() failed" << std::endl;
+				exit(-1);
+			}
+			std::cout << RESET << std::endl;
 		}
 
 		int len = result;
