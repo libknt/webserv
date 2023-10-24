@@ -7,10 +7,11 @@ int conf_setting() {
 int main(int argc, char** argv) {
 	(void)argc;
 	(void)argv;
+	Server s;
 
 	if (conf_setting()) {
 		return 1;
 	}
-	start();
+	s.start();
 	return 0;
 }

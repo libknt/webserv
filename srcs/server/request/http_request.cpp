@@ -1,4 +1,5 @@
 #include "http_request.hpp"
+#include "cgi.hpp"
 #include "parse_sentense.hpp"
 #include <cstdlib>
 
@@ -149,10 +150,11 @@ std::string HttpRequest::getHeaderValue(std::string const& key) {
 }
 
 int HttpRequest::parseHttpBody(std::string const& line) {
-	if (getHeaderValue("Transfer-Encoding") == "chunked")
+	if (getHeaderValue("Transfer-Encoding") == "chunked") {
 		return (parseChunkedBody(line));
-	else if (getHeaderValue("Content-Length") != "")
+	} else if (getHeaderValue("Content-Length") != "") {
 		return (parseContentLengthBody(line));
+	}
 	setStatus(http_request_status::ERROR);
 	setErrorStatus(http_error_status::BAD_REQUEST);
 	return (-1);
@@ -190,4 +192,9 @@ void HttpRequest::getInfo(void) {
 		 ++iter)
 		std::cout << "first: " << iter->first << "second: " << iter->second << std::endl;
 }
+
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::get_status() const {
+	return status_;
+}
+
 }

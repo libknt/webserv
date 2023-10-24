@@ -80,6 +80,7 @@ public:
 	int parseHttpRequest(std::string const& line);
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
+	http_request_status::HTTP_REQUEST_STATUS get_status() const;
 };
 }
 #endif
