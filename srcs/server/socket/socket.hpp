@@ -6,7 +6,10 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <netdb.h>
 #include <netinet/in.h>
+#include <sstream>
+#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -40,8 +43,6 @@ public:
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();
 	int initialize();
-	const char* getServerAddr() const;
-	int getPort() const;
 	int getListenSd() const;
 };
 }
