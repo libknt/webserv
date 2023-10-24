@@ -10,7 +10,7 @@ SRCS_DIR	=	srcs
 
 OBJS_DIR	=	objs
 
-INCLUDE =	-Iincludes/. $(addprefix -I , $(dir $(shell find srcs/ -name "*.hpp")))
+INCLUDE = -I includes/. $(addprefix -I , $(dir $(shell find srcs/ -name "*.hpp")))
 
 SRCS		=	$(shell find $(SRCS_DIR) -name "*.cpp")
 
@@ -44,9 +44,9 @@ test:
 
 cppcheck:
 	mkdir -p log
-	cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=unusedFunction --suppress=unmatchedSuppression --suppress=missingIncludeSystem --std=c++11 -Iincludes ./srcs/. 2> ./log/resule.log
+	cppcheck --enable=all --check-config --error-exitcode=1 --inconclusive --force --suppress=missingIncludeSystem --std=c++11 $(INCLUDE) $(SRCS). 2> ./log/resule.log
 
 tidy:
 	@find ./srcs/. -name '*.cpp' -or -name '*.hpp' | while read file; do \
-		clang-tidy $$file -- -Wall -Wextra -Werror -std=c++98 >> ./log/tidy.log; \
+		clang-tidy $$file -- -Wall -Wextra -Werror -std=c++98 $(INCLUDE) >> ./log/tidy.log; \
 	done
