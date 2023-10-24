@@ -24,20 +24,6 @@ int Configuration::init(const std::string& path) {
 	return 0;
 }
 
-bool hasSpecialCharacter(const std::string& str) {
-	std::vector<std::string> special_characters;
-	special_characters.push_back("{");
-	special_characters.push_back("}");
-	special_characters.push_back(";");
-
-	for (size_t i = 0; i < special_characters.size(); i++) {
-		if (str.find(special_characters[i]) != std::string::npos) {
-			return true;
-		}
-	}
-	return false;
-}
-
 bool isSpecialCharacter(const char& c) {
 	return (c == '{' || c == '}' || c == ';');
 }
