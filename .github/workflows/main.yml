@@ -42,7 +42,7 @@ jobs:
     - name: Run clang-tidy
       run: |
         dirs=$(find srcs/ -name "*.hpp" -exec dirname {} \; | sort -u)
-        INCLUDE=""
+        INCLUDE="-I includes"
         for dir in $dirs; do
           INCLUDE="$INCLUDE -I $dir"
         done
@@ -63,7 +63,7 @@ jobs:
     - name: Run cppcheck
       run: |
         dirs=$(find srcs/ -name "*.hpp" -exec dirname {} \; | sort -u)
-        INCLUDE=""
+        INCLUDE="-I includes"
         for dir in $dirs; do
           INCLUDE="$INCLUDE -I $dir"
         done
