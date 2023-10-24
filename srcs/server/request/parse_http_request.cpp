@@ -16,7 +16,6 @@ ParseHttpRequest& ParseHttpRequest::operator=(ParseHttpRequest& other) {
 	}
 	return (*this);
 }
-#include "debug.hpp"
 int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 
 	std::string buffer(buf);
@@ -31,9 +30,6 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		std::string line = http_line_stream_[socketfd].substr(0, index);
 		http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
 		http_request_map_[socketfd].parseHttpRequest(line);
-		// std::cout << RED << "line: " << RESET << GREEN << line << RESET  << std::endl;
-		// std::cout << RED << "http_line_stream: " << RESET << GREEN << http_line_stream_[socketfd]
-		// << RESET << std::endl;
 		// TODO if error occured, you parseHttpRequest(line) must return -1. So handle it.
 	}
 
