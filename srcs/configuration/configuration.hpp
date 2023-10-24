@@ -14,7 +14,7 @@ private:
 	std::vector<std::string> tokenize_file_content(const std::string& path);
 	std::vector<std::string> tokenize(std::string& line);
 	bool isSpecialCharacter(const char& c);
-	int parseConfiguration(const std::vector<std::string>& tokens);
+	int parseConfiguration(std::vector<std::string>& tokens);
 
 public:
 	Configuration();

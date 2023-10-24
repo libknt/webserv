@@ -62,19 +62,48 @@ std::vector<std::string> Configuration::tokenize(std::string& line) {
     return tokens;
 }
 
-int Configuration::parseConfiguration(const std::vector<std::string>& tokens) {
+std::vector<std::string> extractServerTokens(std::vector<std::string>& tokens) {
+	std::vector<std::string> server_tokens;
+	size_t i;
+	int num_of_left_brace = 1;
+	int num_of_right_brace = 0;
+
+	// TODO: エラー処理
+	if (tokens[0] != "server" || tokens[1] != "{") {
+		std::cerr << "non first brace error" << std::endl;
+	}
+	for (i = 2; i < tokens.size() && num_of_left_brace != num_of_right_brace; ++i) {
+		if (tokens[i] == "{") {
+			num_of_left_brace++;
+		} else if (tokens[i] == "}") {
+			num_of_right_brace++;
+		} else {
+			server_tokens.push_back(tokens[i]);
+		}
+	}
+	if (num_of_left_brace != num_of_right_brace) {
+		std::cerr << "non first brace error" << std::endl;
+	}
+	tokens.erase(tokens.begin(), tokens.begin() + i);
+	return server_tokens;
+}
+
+int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 	if (tokens.front() != "server") {
 		return -1;
 	}
 
-	for (size_t i = 0; i < tokens.size(); ++i) {
+	size_t i = 0;
+	while (tokens.size() >= 3) {
 		std::vector<std::string> server_tokens;
-		if (tokens[i] == "server") {
+		if (tokens.front() == "server") {
 			servers_.push_back(ServerDirective());
-			server_tokens.insert(server_tokens.end(), tokens.begin() + 1, tokens.end());
+			server_tokens = extractServerTokens(tokens);
 			servers_[i].parseServerDirective(server_tokens);
 		}
+		i++;
 	}
-	std::cout << servers_.size() << std::endl;
 	return 0;
 }
+
+// 先に閉じるまでチェックしてからインサート

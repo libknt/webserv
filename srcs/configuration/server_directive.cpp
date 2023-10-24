@@ -22,6 +22,9 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 }
 
 int ServerDirective::parseServerDirective(const std::vector<std::string>& tokens) {
-	std::cout << tokens.at(0) << std::endl;
+	std::cout << "=====================" << std::endl;
+	for (size_t i = 0; i < tokens.size(); ++i) {
+		std::cout << tokens[i] << std::endl;
+	}
 	return 0;
 }
