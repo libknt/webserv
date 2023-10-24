@@ -11,7 +11,7 @@ class Configuration {
 private:
 	ServerDirective server_;
 
-	std::vector<std::string> tokenize(const std::string& path);
+	std::vector<std::string> tokenize_file_content(const std::string& path);
 public:
 	Configuration();
 	~Configuration();
