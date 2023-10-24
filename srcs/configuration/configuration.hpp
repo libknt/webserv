@@ -12,6 +12,9 @@ private:
 	ServerDirective server_;
 
 	std::vector<std::string> tokenize_file_content(const std::string& path);
+	std::vector<std::string> tokenize(std::string& line);
+	bool isSpecialCharacter(const char& c);
+
 public:
 	Configuration();
 	~Configuration();

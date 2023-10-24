@@ -24,11 +24,11 @@ int Configuration::init(const std::string& path) {
 	return 0;
 }
 
-bool isSpecialCharacter(const char& c) {
+bool Configuration::isSpecialCharacter(const char& c) {
 	return (c == '{' || c == '}' || c == ';');
 }
 
-std::vector<std::string> tokenize(std::string& line) {
+std::vector<std::string> Configuration::tokenize(std::string& line) {
 	std::vector<std::string> tokens;
     std::string token;
 
