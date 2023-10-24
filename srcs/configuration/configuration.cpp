@@ -15,7 +15,6 @@ Configuration& Configuration::operator=(const Configuration& other) {
 	return *this;
 }
 
-
 int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
 	tokens = tokenize(path);
@@ -25,18 +24,22 @@ int Configuration::init(const std::string& path) {
 	return 0;
 }
 
+bool Configuration::isSpecialCharactor(const char& c) {
+	return (c == '{' || c == '}' || c == ';');
+}
+
 std::vector<std::string> Configuration::tokenize(const std::string& path) {
 	std::ifstream conf_file(path);
 	std::string line;
 	std::vector<std::string> tokens;
 
 	while (getline(conf_file, line)) {
-		// スペースを飛ばしながら単語に分ける
 		std::stringstream stringstream(line);
 		std::string word;
 		while (stringstream >> word) {
 			tokens.push_back(word);
 		}
+
 	}
 	return tokens;
 }

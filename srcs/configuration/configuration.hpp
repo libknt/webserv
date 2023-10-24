@@ -11,6 +11,7 @@ class Configuration {
 private:
 	ServerDirective server_;
 
+	bool isSpecialCharactor(const char& c);
 	std::vector<std::string> tokenize(const std::string& path);
 public:
 	Configuration();
