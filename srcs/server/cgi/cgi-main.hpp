@@ -1,5 +1,5 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef CGI_MAIN_HPP
+#define CGI_MAIN_HPP
 
 #include <fstream>
 #include <iostream>

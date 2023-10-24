@@ -1,5 +1,5 @@
 // script urlだけ送られてきて実行する
-#include "server.hpp"
+#include "cgi-main.hpp"
 #include <iostream>
 #include <string>
 #include <sys/wait.h>
@@ -13,7 +13,7 @@ int cgi(std::string url) {
 	extern char** environ;
 
 	std::string path;
-	script = "../" + script;
+	script = "../../../" + script;
 	shebang(script, path);
 	if (path.empty())
 		extension(script, path);
