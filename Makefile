@@ -1,16 +1,4 @@
 SHELL := /bin/bash
-# SRCS = $(shell find srcs -name "*.cpp")
-SRCS = $(shell find srcs -name "main.cpp")
-
-NAME = a.out
-
-all:
-	cc  $(SRCS) -o $(NAME)
-
-clean:
-	rm -f a.out
-
-re: clean all
 
 NAME		=	server
 
