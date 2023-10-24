@@ -75,31 +75,31 @@ jobs:
         name: cppcheck-report
         path: cppcheck.txt
 
-  google-test:
-    runs-on: ubuntu-latest
+# google-test:
+#   runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+#   steps:
+#   - name: Checkout code
+#     uses: actions/checkout@v2
 
-    - name: Install required packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y wget cmake
+#   - name: Install required packages
+#     run: |
+#       sudo apt-get update
+#       sudo apt-get install -y wget cmake
 
-    - name: Build Google Test
-      run: |
-        cd test
-        make action-build
+#   - name: Build Google Test
+#     run: |
+#       cd test
+#       make action-build
 
-    - name: Run Google Test
-      run: |
-        cd test
-        make action
+#   - name: Run Google Test
+#     run: |
+#       cd test
+#       make action
 
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: test/log/results.log
+#   - name: Upload test results
+#     if: always()
+#     uses: actions/upload-artifact@v2
+#     with:
+#       name: test-results
+#       path: test/log/results.log

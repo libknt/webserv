@@ -3,6 +3,8 @@
 #include <iostream>
 #include <map>
 #include <string>
+
+namespace server {
 namespace http_request_status {
 enum HTTP_REQUEST_STATUS {
 	METHOD,
@@ -72,8 +74,12 @@ private:
 
 public:
 	explicit HttpRequest();
+	explicit HttpRequest(HttpRequest const& request);
+	virtual ~HttpRequest();
+	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
 };
+}
 #endif

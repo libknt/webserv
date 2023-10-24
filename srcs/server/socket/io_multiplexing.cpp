@@ -115,7 +115,7 @@ int IoMultiplexing::disconnect(int sd) {
 
 int IoMultiplexing::request(int sd) {
 	bool should_close_connection;
-	char buffer[1024];
+	char buffer[BUFFER_SIZE];
 
 	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
 	should_close_connection = false;
@@ -126,7 +126,7 @@ int IoMultiplexing::request(int sd) {
 			should_close_connection = true;
 			break;
 		}
-		http_request_parse_.parse_http_request(sd, buffer);
+		http_request_parse_.handleBuffer(sd, buffer);
 		if (result == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			should_close_connection = true;

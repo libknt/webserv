@@ -5,7 +5,10 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <utility>
 #include <vector>
+
+namespace server {
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 1024
@@ -17,7 +20,12 @@ private:
 	std::map<int, std::string> http_line_stream_;
 
 public:
-	int parse_http_request(int socketfd, char* buf);
+	explicit ParseHttpRequest();
+	explicit ParseHttpRequest(ParseHttpRequest& other);
+	virtual ~ParseHttpRequest();
+	ParseHttpRequest& operator=(ParseHttpRequest& other);
+	int handleBuffer(int socketfd, char* buf);
 };
 
+}
 #endif

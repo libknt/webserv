@@ -1,7 +1,11 @@
 #include "parse_sentense.hpp"
+namespace server {
+
 static void formatTokenize(std::string const& format, std::queue<Token>& token_queue);
 
-int parseSentense(std::string line, std::string const& format, std::vector<std::string>& ans) {
+int parseSentense(std::string line,
+	std::string const& format,
+	std::vector<std::string>& parsed_line) {
 	std::queue<Token> token_queue;
 	size_t index = 0;
 
@@ -25,7 +29,7 @@ int parseSentense(std::string line, std::string const& format, std::vector<std::
 					index++;
 				}
 			}
-			ans.push_back(line.substr(past_index, index - past_index));
+			parsed_line.push_back(line.substr(past_index, index - past_index));
 		}
 
 		else if (token.token_kind == KEYWORD) {
@@ -33,7 +37,7 @@ int parseSentense(std::string line, std::string const& format, std::vector<std::
 			if (line.size() <= index + keyword.size() ||
 				line.substr(index, keyword.size()) != keyword) {
 				std::cerr << "Keyword Error" << std::endl;
-				ans.clear();
+				parsed_line.clear();
 				return (-1);
 			}
 			index += keyword.size();
@@ -42,7 +46,7 @@ int parseSentense(std::string line, std::string const& format, std::vector<std::
 		else if (token.token_kind == SPACE) {
 			if (!std::isspace(line[index])) {
 				std::cerr << "Space Error" << std::endl;
-				ans.clear();
+				parsed_line.clear();
 				return (-1);
 			}
 			while (std::isspace(line[index]))
@@ -74,4 +78,6 @@ static void formatTokenize(std::string const& format, std::queue<Token>& token_q
 			}
 		}
 	}
+}
+
 }

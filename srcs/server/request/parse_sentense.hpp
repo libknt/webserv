@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+namespace server {
+
 enum TokenKind {
 	STRING,
 	KEYWORD,
@@ -17,5 +19,8 @@ struct Token {
 	TokenKind token_kind;
 	std::string str;
 };
-int parseSentense(std::string line, std::string const& format, std::vector<std::string>& ans);
+int parseSentense(std::string line,
+	std::string const& format,
+	std::vector<std::string>& parsed_line);
+}
 #endif

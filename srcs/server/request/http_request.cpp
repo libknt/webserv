@@ -2,6 +2,7 @@
 #include "parse_sentense.hpp"
 #include <cstdlib>
 
+namespace server {
 HttpRequest::HttpRequest()
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
@@ -10,7 +11,27 @@ HttpRequest::HttpRequest()
 	, chunked_status_(chunked_status::UNDEFINED)
 	, chunked_size_(0) {}
 
-// Getter and Setter
+HttpRequest::~HttpRequest(){};
+
+HttpRequest::HttpRequest(HttpRequest const& request) {
+	*this = request;
+}
+
+HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
+	if (this != &request) {
+		status_ = request.status_;
+		method_ = request.method_;
+		version_ = request.version_;
+		error_status_ = request.error_status_;
+		chunked_status_ = request.chunked_status_;
+		chunked_size_ = request.chunked_size_;
+		request_path_ = request.request_path_;
+		header_ = request.header_;
+		body_ = request.body_;
+	}
+	return (*this);
+}
+
 void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
 	status_ = status;
 }
@@ -53,7 +74,6 @@ int HttpRequest::setVersion(std::string const& version) {
 	return (0);
 }
 
-// Parse
 int HttpRequest::parseHttpRequest(std::string const& line) {
 	switch (status_) {
 		case http_request_status::METHOD:
@@ -102,7 +122,7 @@ int HttpRequest::parseHttpHeader(std::string const& line) {
 			setStatus(http_request_status::BODY);
 		return (0);
 	}
-	// Later: http request compromise 0 space between : and value!
+	// TODO Later: http request compromise 0 space between : and value!
 	else if (parseSentense(line, "%s: %s", header_vector) < 0 || header_vector.size() != 2) {
 		setStatus(http_request_status::ERROR);
 		setErrorStatus(http_error_status::BAD_REQUEST);
@@ -129,10 +149,8 @@ std::string HttpRequest::getHeaderValue(std::string const& key) {
 }
 
 int HttpRequest::parseHttpBody(std::string const& line) {
-	// transfer-encoding
 	if (getHeaderValue("Transfer-Encoding") == "chunked")
 		return (parseChunkedBody(line));
-	// content-length
 	else if (getHeaderValue("Content-Length") != "")
 		return (parseContentLengthBody(line));
 	setStatus(http_request_status::ERROR);
@@ -142,8 +160,8 @@ int HttpRequest::parseHttpBody(std::string const& line) {
 
 int HttpRequest::parseChunkedBody(std::string const& line) {
 	if (chunked_status_ == chunked_status::CHUNKED_SIZE) {
-		// no error handling
-		// Caution ! strtol is C++ 11 function.
+		// TODO no error handling
+		// TODO Caution ! strtol is C++ 11 function.
 		chunked_size_ = std::strtol(line.c_str(), NULL, 16);
 		chunked_status_ = chunked_status::CHUNKED_MESSAGE;
 		if (chunked_size_ == 0)
@@ -156,7 +174,7 @@ int HttpRequest::parseChunkedBody(std::string const& line) {
 }
 
 int HttpRequest::parseContentLengthBody(std::string const& line) {
-	// no error handling
+	// TODO  no error handling
 	body_ += line;
 	if (body_.size() == static_cast<size_t>(std::atoi(getHeaderValue("Content-Length").c_str())))
 		setStatus(http_request_status::FINISHED);
@@ -171,4 +189,5 @@ void HttpRequest::getInfo(void) {
 	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
 		 ++iter)
 		std::cout << "first: " << iter->first << "second: " << iter->second << std::endl;
+}
 }
