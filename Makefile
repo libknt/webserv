@@ -1,4 +1,3 @@
-.PHONY: test tidy format cppcheck
 SHELL := /bin/bash
 
 NAME		=	server
@@ -11,7 +10,7 @@ SRCS_DIR	=	srcs
 
 OBJS_DIR	=	objs
 
-INCLUDE = -I includes/. $(addprefix -I , $(dir $(shell find srcs/ -name "*.hpp")))
+INCLUDE = -I includes/. $(addprefix -I , $(dir $(shell find srcs -name "*.hpp")))
 
 SRCS		=	$(shell find $(SRCS_DIR) -name "*.cpp")
 
@@ -40,6 +39,8 @@ format:
 
 test:
 	make -C test
+
+.PHONY: test tidy format cppcheck
 
 cppcheck:
 	mkdir -p log

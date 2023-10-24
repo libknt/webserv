@@ -5,7 +5,9 @@
 #include "struct.hpp"
 #include <iostream>
 #include <vector>
-
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 1024
+#endif
 int start();
 
 #endif
