@@ -173,14 +173,6 @@ int Socket::initialize() {
 	return 0;
 }
 
-const char* Socket::getServerAddr() const {
-	return server_addr_;
-}
-
-int Socket::getPort() const {
-	return port_;
-}
-
 int Socket::getListenSd() const {
 	return listen_sd_;
 }
