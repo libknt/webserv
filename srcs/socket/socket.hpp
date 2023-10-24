@@ -43,8 +43,6 @@ public:
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();
 	int initialize();
-	const char* getServerAddr() const;
-	int getPort() const;
 	int getListenSd() const;
 };
 }
