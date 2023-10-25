@@ -20,6 +20,8 @@ enum URL_META_VARIABLES {
 
 namespace server {
 
+//https://tex2e.github.io/rfc-translater/html/rfc3875.html#4-1--Request-Meta-Variables
+
 class CgiMetaVariables {
 private:
 	HttpRequest& request_;
