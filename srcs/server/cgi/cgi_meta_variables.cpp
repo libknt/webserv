@@ -83,17 +83,25 @@ int CgiMetaVariables::gateway_interface() {
 }
 
 int CgiMetaVariables::path_info() {
-	// meta_variables_.insert(std::make_pair("PATH_INFO", ""));
+	std::string path_info;
+	url_parse(request_.get_request_path(), path_info, PATH_INFO);
+	meta_variables_.insert(std::make_pair("PATH_INFO", path_info));
 	return 0;
 }
 
 int CgiMetaVariables::path_translated() {
-	// meta_variables_.insert(std::make_pair("PATH_TRANSLATED", ""));
+	std::string path_translated;
+	url_parse(request_.get_request_path(), path_translated, PATH_TRANSLATED);
+	// TODO serverのドキュメントルートに合わせる.
+	// /var/www/html/additional/path/info
+	meta_variables_.insert(std::make_pair("PATH_TRANSLATED", path_translated));
 	return 0;
 }
 
 int CgiMetaVariables::query_string() {
-	// meta_variables_.insert(std::make_pair("QUERY_STRING", ""));
+	std::string query;
+	url_parse(request_.get_request_path(), query, QUERY_STRING);
+	meta_variables_.insert(std::make_pair("QUERY_STRING", query));
 	return 0;
 }
 
@@ -185,7 +193,9 @@ int CgiMetaVariables::request_method() {
 }
 
 int CgiMetaVariables::script_name() {
-	// meta_variables_.insert(std::make_pair("SCRIPT_NAME", ""));
+	std::string script_name;
+	url_parse(request_.get_request_path(), script_name, SCRIPT_NAME);
+	meta_variables_.insert(std::make_pair("SCRIPT_NAME", script_name));
 	return 0;
 }
 
@@ -266,5 +276,61 @@ void CgiMetaVariables::get_meta() {
 			break;
 		std::cout << exec_environ_[i] << std::endl;
 	}
+}
+
+int CgiMetaVariables::url_parse(std::string request_path,
+	std::string& parsed_line,
+	URL_META_VARIABLES what) {
+	std::cout << "path++++++++++++++: " << request_path << std::endl;
+
+	std::string query;
+	std::string path_info;
+	size_t pos = request_path.find("/cgi-bin/");
+	if (pos == std::string::npos) {
+		std::cerr << "not found request_path[cgi-bin]" << std::endl;
+		return -1;
+	}
+	request_path = request_path.substr(pos);
+	pos = request_path.find('?');
+	if (pos == std::string::npos) {
+		query = std::string("");
+	} else {
+		query = request_path.substr(pos + 1);
+		request_path = request_path.substr(0, pos);
+	}
+
+	pos = request_path.find('.');
+	if (pos == std::string::npos) {
+		std::cerr << "not found [cgi-script]" << std::endl;
+		return -1;
+	} else {
+		size_t path_info_pos = request_path.find('/', pos);
+		if (path_info_pos != std::string::npos) {
+			path_info = request_path.substr(path_info_pos);
+			request_path = request_path.substr(0, path_info_pos);
+		} else {
+			path_info = std::string("");
+		}
+	}
+	std::string script(request_path);
+
+	switch (what) {
+		case SCRIPT_NAME:
+			parsed_line = script;
+			break;
+		case PATH_INFO:
+			parsed_line = path_info;
+			break;
+		case PATH_TRANSLATED:
+			parsed_line = path_info;
+			break;
+		case QUERY_STRING:
+			parsed_line = query;
+			break;
+		default:
+			parsed_line = std::string("");
+	}
+
+	return 0;
 }
 }

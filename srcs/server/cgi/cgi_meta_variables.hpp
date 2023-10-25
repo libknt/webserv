@@ -11,7 +11,15 @@
 #include <vector>
 
 class HttpRequest;
+enum URL_META_VARIABLES {
+	SCRIPT_NAME,
+	PATH_INFO,
+	PATH_TRANSLATED,
+	QUERY_STRING,
+};
+
 namespace server {
+
 class CgiMetaVariables {
 private:
 	HttpRequest& request_;
@@ -39,8 +47,8 @@ private:
 	int set_meta_variables();
 
 	static inline bool is_base64(unsigned char c);
-
 	static std::string base64_decode(std::string const& encoded_string);
+	int url_parse(std::string request_path, std::string& parsed_line, URL_META_VARIABLES what);
 
 	explicit CgiMetaVariables();
 

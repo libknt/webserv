@@ -250,4 +250,8 @@ std::string HttpRequest::get_server_protocol() const {
 	}
 	return protocol;
 }
+
+std::string HttpRequest::get_request_path() const {
+	return request_path_;
+}
 }

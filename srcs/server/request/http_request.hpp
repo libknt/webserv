@@ -90,6 +90,7 @@ public:
 	sockaddr_in get_server_addr() const;
 	std::string get_http_method() const;
 	std::string get_server_protocol() const;
+	std::string get_request_path() const;
 };
 }
 #endif
