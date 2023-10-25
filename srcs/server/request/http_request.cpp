@@ -10,7 +10,17 @@ HttpRequest::HttpRequest()
 	, version_(http_version::UNDEFINED)
 	, error_status_(http_error_status::UNDEFINED)
 	, chunked_status_(chunked_status::UNDEFINED)
-	, chunked_size_(0) {}
+	, chunked_size_(0)
+	, socketfd_(-1) {}
+
+HttpRequest::HttpRequest(int socketfd)
+	: status_(http_request_status::METHOD)
+	, method_(http_method::UNDEFINED)
+	, version_(http_version::UNDEFINED)
+	, error_status_(http_error_status::UNDEFINED)
+	, chunked_status_(chunked_status::UNDEFINED)
+	, chunked_size_(0)
+	, socketfd_(socketfd) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -29,6 +39,7 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		request_path_ = request.request_path_;
 		header_ = request.header_;
 		body_ = request.body_;
+		socketfd_ = request.socketfd_;
 	}
 	return (*this);
 }
@@ -195,6 +206,10 @@ void HttpRequest::getInfo(void) {
 
 http_request_status::HTTP_REQUEST_STATUS HttpRequest::get_status() const {
 	return status_;
+}
+
+int HttpRequest::get_socketfd_() const {
+	return socketfd_;
 }
 
 }

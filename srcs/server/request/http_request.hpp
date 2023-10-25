@@ -60,6 +60,7 @@ private:
 	std::string request_path_;
 	std::map<std::string, std::string> header_;
 	std::string body_;
+	int socketfd_;
 	int parseHttpMethod(std::string const& line);
 	int parseHttpHeader(std::string const& line);
 	int parseHttpBody(std::string const& line);
@@ -72,8 +73,10 @@ private:
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 
+	HttpRequest();
+
 public:
-	explicit HttpRequest();
+	explicit HttpRequest(int socketfd);
 	explicit HttpRequest(HttpRequest const& request);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
@@ -81,6 +84,7 @@ public:
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
 	http_request_status::HTTP_REQUEST_STATUS get_status() const;
+	int get_socketfd_() const;
 };
 }
 #endif
