@@ -43,8 +43,8 @@ CgiMetaVariables::CgiMetaVariables(HttpRequest& request)
 }
 
 CgiMetaVariables::CgiMetaVariables(const CgiMetaVariables& other)
-	: request_(other.request_)
-	, meta_variables_(other.meta_variables_) {}
+	:request_(other.request_) 
+ , meta_variables_(other.meta_variables_) {}
 
 CgiMetaVariables& CgiMetaVariables::operator=(const CgiMetaVariables& other) {
 	if (this != &other) {
@@ -58,17 +58,16 @@ CgiMetaVariables::~CgiMetaVariables() {
 }
 
 int CgiMetaVariables::auth_type() {
-	std::string auth_type = request_.getHeaderValue("Authorization");
-	if (auth_type.compare("") != 0) {
-		auth_type = auth_type.substr(0, auth_type.find(' '));
-	}
-	meta_variables_.insert(std::make_pair("AUTH_TYPE", auth_type));
+  std::string auth_type = request_.getHeaderValue("Authorization");
+  if (auth_type.compare("") != 0) {
+    auth_type = auth_type.substr(0, auth_type.find(' '));
+  }
+	meta_variables_.insert(std::make_pair("AUTH_TYPE", auth_type ));
 	return 0;
 }
 
 int CgiMetaVariables::content_length() {
-	meta_variables_.insert(
-		std::make_pair("CONTENT_LENGTH", request_.getHeaderValue("CONTENT_LENGTH")));
+	meta_variables_.insert(std::make_pair("CONTENT_LENGTH", request_.getHeaderValue("CONTENT_LENGTH")));
 	return 0;
 }
 
