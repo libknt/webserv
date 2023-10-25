@@ -86,7 +86,10 @@ int IoMultiplexing::accept(int listen_sd) {
 	int new_sd;
 	std::cout << "  Listening socket is readable" << std::endl;
 	do {
-		new_sd = ::accept(listen_sd, NULL, NULL);
+		sockaddr_in client_addr;
+		socklen_t addr_len = sizeof(client_addr);
+		memset(&client_addr, 0, sizeof(client_addr));
+		new_sd = ::accept(listen_sd, (sockaddr*)&client_addr, &addr_len);
 		if (new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				std::cerr << "accept() failed: " << strerror(errno) << std::endl;
@@ -94,6 +97,8 @@ int IoMultiplexing::accept(int listen_sd) {
 			}
 			break;
 		}
+
+		http_request_parse_.add_accept_client_info(new_sd, client_addr);
 
 		std::cout << "  New incoming connection -  " << new_sd << std::endl;
 		FD_SET(new_sd, &master_set_);

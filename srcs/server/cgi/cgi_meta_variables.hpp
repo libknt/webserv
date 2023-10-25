@@ -4,7 +4,9 @@
 #include "http_request.hpp"
 #include <iostream>
 #include <map>
+#include <netinet/in.h>
 #include <new>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -35,6 +37,10 @@ private:
 	int server_protocol();
 	int server_software();
 	int set_meta_variables();
+
+	static inline bool is_base64(unsigned char c);
+
+	static std::string base64_decode(std::string const& encoded_string);
 
 	explicit CgiMetaVariables();
 

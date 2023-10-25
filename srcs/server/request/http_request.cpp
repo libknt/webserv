@@ -4,19 +4,25 @@
 #include <cstdlib>
 
 namespace server {
-HttpRequest::HttpRequest()
+HttpRequest::HttpRequest(sockaddr_in client_addr)
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
 	, error_status_(http_error_status::UNDEFINED)
 	, chunked_status_(chunked_status::UNDEFINED)
-	, chunked_size_(0) {}
+	, chunked_size_(0)
+	, client_addr_(client_addr) {}
 
 HttpRequest::~HttpRequest(){};
 
-HttpRequest::HttpRequest(HttpRequest const& request) {
-	*this = request;
-}
+HttpRequest::HttpRequest(HttpRequest const& request)
+	: status_(request.status_)
+	, method_(request.method_)
+	, version_(request.version_)
+	, error_status_(request.error_status_)
+	, chunked_status_(request.chunked_status_)
+	, chunked_size_(request.chunked_size_)
+	, client_addr_(request.client_addr_) {}
 
 HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 	if (this != &request) {
@@ -29,6 +35,7 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		request_path_ = request.request_path_;
 		header_ = request.header_;
 		body_ = request.body_;
+		client_addr_ = request.client_addr_;
 	}
 	return (*this);
 }
@@ -197,4 +204,11 @@ http_request_status::HTTP_REQUEST_STATUS HttpRequest::get_status() const {
 	return status_;
 }
 
+sockaddr_in HttpRequest::get_client_addr() const {
+	return client_addr_;
+}
+
+http_method::HTTP_METHOD HttpRequest::get_http_method() const {
+	return method_;
+}
 }

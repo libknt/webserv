@@ -4,6 +4,7 @@
 #include "http_request.hpp"
 #include <iostream>
 #include <map>
+#include <netinet/in.h>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -26,6 +27,7 @@ public:
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	int handleBuffer(int socketfd, char* buf);
 	HttpRequest& get_http_request(int sd);
+	void add_accept_client_info(int socketfd, sockaddr_in client_addr);
 };
 
 }

@@ -2,6 +2,7 @@
 #define HTTP_REQUEST_HPP
 #include <iostream>
 #include <map>
+#include <netinet/in.h>
 #include <string>
 
 namespace server {
@@ -60,6 +61,7 @@ private:
 	std::string request_path_;
 	std::map<std::string, std::string> header_;
 	std::string body_;
+	sockaddr_in client_addr_;
 	int parseHttpMethod(std::string const& line);
 	int parseHttpHeader(std::string const& line);
 	int parseHttpBody(std::string const& line);
@@ -72,8 +74,10 @@ private:
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 
+	HttpRequest();
+
 public:
-	explicit HttpRequest();
+	explicit HttpRequest(sockaddr_in client_addr);
 	explicit HttpRequest(HttpRequest const& request);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
@@ -81,6 +85,9 @@ public:
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
 	http_request_status::HTTP_REQUEST_STATUS get_status() const;
+	sockaddr_in get_client_addr() const;
+	http_method::HTTP_METHOD get_http_method() const;
+
 };
 }
 #endif
