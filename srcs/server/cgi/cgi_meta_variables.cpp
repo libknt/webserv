@@ -302,6 +302,9 @@ std::string CgiMetaVariables::extract_path_info(std::string& path) {
 		if (path_info_pos != std::string::npos) {
 			path = path.substr(path_info_pos);
 		}
+		else {
+			path = "";
+		}
 		return path;
 	}
 }
@@ -365,5 +368,26 @@ int CgiMetaVariables::url_parse(std::string request_path,
 	}
 
 	return 0;
+}
+
+char ** CgiMetaVariables::get_exec_environ() const {
+	return exec_environ_;
+}
+
+std::string CgiMetaVariables::find_meta_variable(std::string key) {
+	
+	std::string meta_variable;
+	for(int i=0; exec_environ_[i] != NULL; ++i) {
+		if(std::strncmp(exec_environ_[i], key.c_str(), std::strlen(key.c_str())) ==0){
+			meta_variable = exec_environ_[i];
+		}
+	}
+	std::string::size_type pos = meta_variable.find('=');
+	if( pos != std::string::npos) {
+		meta_variable = meta_variable.substr(pos +1);
+	}else {
+		meta_variable = "";
+	}
+	return meta_variable;
 }
 }

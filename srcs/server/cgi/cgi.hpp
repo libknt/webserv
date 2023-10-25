@@ -7,6 +7,7 @@
 #include <string>
 #include <unistd.h>
 #include <vector>
+#include <fstream>
 
 namespace server {
 
@@ -16,7 +17,10 @@ private:
 	CgiMetaVariables meta_;
 	std::string body_;
 	HttpRequest request_;
-	int create_meta_variables();
+	std::string getFileExtension(const std::string& filename);
+int extension(std::string filename, std::string& path);
+int shebang(std::string file, std::string& path);
+	int exec_cgi();
 
 public:
 	explicit Cgi(HttpRequest& request);

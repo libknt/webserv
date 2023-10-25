@@ -66,6 +66,8 @@ public:
 	int create_meta_variables();
 	int unset_meta_variables();
 	void get_meta();
+	char **get_exec_environ() const;
+	std::string find_meta_variable(std::string key);
 };
 
 }
