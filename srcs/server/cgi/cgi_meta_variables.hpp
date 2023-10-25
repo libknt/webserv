@@ -49,6 +49,10 @@ private:
 	static inline bool is_base64(unsigned char c);
 	static std::string base64_decode(std::string const& encoded_string);
 	int url_parse(std::string request_path, std::string& parsed_line, URL_META_VARIABLES what);
+	std::string extract_script_name(std::string& path);
+	std::string extract_query(std::string& path);
+	std::string extract_path_info(std::string& path);
+	std::string extract_after_cgi_bin(std::string& request_path);
 
 	explicit CgiMetaVariables();
 
