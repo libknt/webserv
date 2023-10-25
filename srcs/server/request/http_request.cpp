@@ -4,14 +4,15 @@
 #include <cstdlib>
 
 namespace server {
-HttpRequest::HttpRequest(sockaddr_in client_addr)
+HttpRequest::HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr)
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
 	, error_status_(http_error_status::UNDEFINED)
 	, chunked_status_(chunked_status::UNDEFINED)
 	, chunked_size_(0)
-	, client_addr_(client_addr) {}
+	, client_addr_(client_addr)
+	, server_addr_(server_addr) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -22,7 +23,8 @@ HttpRequest::HttpRequest(HttpRequest const& request)
 	, error_status_(request.error_status_)
 	, chunked_status_(request.chunked_status_)
 	, chunked_size_(request.chunked_size_)
-	, client_addr_(request.client_addr_) {}
+	, client_addr_(request.client_addr_)
+	, server_addr_(request.server_addr_) {}
 
 HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 	if (this != &request) {
@@ -36,6 +38,7 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		header_ = request.header_;
 		body_ = request.body_;
 		client_addr_ = request.client_addr_;
+		server_addr_ = request.server_addr_;
 	}
 	return (*this);
 }
@@ -208,7 +211,43 @@ sockaddr_in HttpRequest::get_client_addr() const {
 	return client_addr_;
 }
 
-http_method::HTTP_METHOD HttpRequest::get_http_method() const {
-	return method_;
+sockaddr_in HttpRequest::get_server_addr() const {
+	return server_addr_;
+}
+
+std::string HttpRequest::get_http_method() const {
+	std::string method;
+	switch (method_) {
+		case http_method::GET:
+			method = "GET";
+			break;
+		case http_method::POST:
+			method = "POST";
+			break;
+		case http_method::DELETE:
+			method = "DELETE";
+			break;
+		default:
+			method = std::string("");
+	}
+	return method;
+}
+
+std::string HttpRequest::get_server_protocol() const {
+	std::string protocol;
+	switch (version_) {
+		case http_version::HTTP_1_0:
+			protocol = "HTTP_1_0";
+			break;
+		case http_version::HTTP_1_1:
+			protocol = "HTTP_1_1";
+			break;
+		case http_version::HTTP_2_0:
+			protocol = "HTTP_2_0";
+			break;
+		default:
+			protocol = "";
+	}
+	return protocol;
 }
 }

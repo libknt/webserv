@@ -97,8 +97,15 @@ int IoMultiplexing::accept(int listen_sd) {
 			}
 			break;
 		}
+		sockaddr_in server_addr;
+		addr_len = sizeof(server_addr);
 
-		http_request_parse_.add_accept_client_info(new_sd, client_addr);
+		if (getsockname(new_sd, (struct sockaddr*)&server_addr, &addr_len) == -1) {
+			std::cerr << strerror(errno) << std::endl;
+			return -1;
+		}
+
+		http_request_parse_.add_accept_client_info(new_sd, client_addr, server_addr);
 
 		std::cout << "  New incoming connection -  " << new_sd << std::endl;
 		FD_SET(new_sd, &master_set_);
