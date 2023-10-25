@@ -15,8 +15,9 @@ void Cgi::getInfo() {
 #include "debug.hpp"
 
 int Cgi::cgi_request() {
-	if (create_meta_variables() <0) 
+	if (meta_.create_meta_variables() < 0)
 		return -1;
+	meta_.get_meta();
 	// std::cout << YELLOW;
 	// for (char** current = environ; *current; ++current) {
 	// 	std::cout << *current << std::endl;
@@ -25,7 +26,7 @@ int Cgi::cgi_request() {
 	return 0;
 }
 // void add_auth_type(std::map<std::string, std::string> & meta) {
-// 	std::string 
+// 	std::string
 // }
 int Cgi::create_meta_variables() {
 

@@ -1,5 +1,6 @@
 #ifndef CGI_HPP
 #define CGI_HPP
+#include "cgi_meta_variables.hpp"
 #include "http_request.hpp"
 #include <iostream>
 #include <map>
@@ -12,7 +13,7 @@ namespace server {
 class Cgi {
 private:
 	Cgi();
-	std::map<std::string, std::string> meta_;
+	CgiMetaVariables meta_;
 	std::string body_;
 	HttpRequest request_;
 	int create_meta_variables();
