@@ -346,6 +346,7 @@ int CgiMetaVariables::url_parse(std::string request_path,
 	if (path_after_cgi.empty())
 		return -1;
 
+	//TODO queryが%hhの場合decodeするのかどうか調べて実装。
 	switch (what) {
 		case SCRIPT_NAME:
 			parsed_line = extract_script_name(path_after_cgi);
