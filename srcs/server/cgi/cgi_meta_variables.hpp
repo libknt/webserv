@@ -1,14 +1,18 @@
 #ifndef CGI_MRTA_VARIABLES_HPP
 #define CGI_MRTA_VARIABLES_HPP
 
+#include "http_request.hpp"
 #include <iostream>
 #include <map>
 #include <new>
 #include <string>
 #include <vector>
 
+class HttpRequest;
+namespace server {
 class CgiMetaVariables {
 private:
+	HttpRequest& request_;
 	std::map<std::string, std::string> meta_variables_;
 	typedef int (CgiMetaVariables::*MetaFuncPtr)();
 	std::vector<MetaFuncPtr> metaFuncArray;
@@ -32,8 +36,10 @@ private:
 	int server_software();
 	int set_meta_variables();
 
-public:
 	explicit CgiMetaVariables();
+
+public:
+	explicit CgiMetaVariables(HttpRequest& request);
 	explicit CgiMetaVariables(const CgiMetaVariables& other);
 	CgiMetaVariables& operator=(const CgiMetaVariables& other);
 	virtual ~CgiMetaVariables();
@@ -42,4 +48,5 @@ public:
 	void get_meta();
 };
 
+}
 #endif

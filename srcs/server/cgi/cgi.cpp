@@ -5,7 +5,8 @@ namespace server {
 
 // Cgi::Cgi(){};
 Cgi::Cgi(HttpRequest& request)
-	: request_(request) {}
+	: meta_(CgiMetaVariables(request))
+	, request_(request) {}
 Cgi::~Cgi(){};
 
 void Cgi::getInfo() {
