@@ -188,6 +188,11 @@ void HttpRequest::getInfo(void) {
 	std::cout << "header" << std::endl;
 	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
 		 ++iter)
-		std::cout << "first: " << iter->first << "second: " << iter->second << std::endl;
+		std::cout << "key: " << iter->first << "value: " << iter->second << std::endl;
+}
+
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void)
+{
+	return (status_);
 }
 }
