@@ -13,11 +13,11 @@ HttpRequest::HttpRequest()
 
 HttpRequest::~HttpRequest(){};
 
-HttpRequest::HttpRequest(HttpRequest const& request) {
+HttpRequest::HttpRequest(HttpRequest const &request) {
 	*this = request;
 }
 
-HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
+HttpRequest& HttpRequest::operator=(HttpRequest  const &request) {
 	if (this != &request) {
 		status_ = request.status_;
 		method_ = request.method_;

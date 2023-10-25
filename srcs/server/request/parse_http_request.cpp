@@ -42,4 +42,9 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		return(1);
 	return (0);
 }
+
+HttpRequest& ParseHttpRequest::get_http_request(int sd) {
+	std::map<int, server::HttpRequest>::iterator it = http_request_map_.find(sd);
+	return it->second;
+}
 }

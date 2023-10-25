@@ -74,7 +74,7 @@ private:
 
 public:
 	explicit HttpRequest();
-	explicit HttpRequest(HttpRequest const& request);
+	HttpRequest(HttpRequest const& request);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
