@@ -146,14 +146,16 @@ int IoMultiplexing::request(int sd) {
 			should_close_connection = true;
 			break;
 		}
-		if (status == 1) {
-			std::cout << RED << "TEST" << std::endl;
-			Cgi cgi(http_request_parse_.get_http_request(sd));
-			if (cgi.cgi_request() < 0) {
-				std::cerr << "cgi-request() failed" << std::endl;
-				exit(-1);
+		{
+			if (status == 1) {
+				std::cout << RED << "TEST" << std::endl;
+				Cgi cgi(http_request_parse_.get_http_request(sd));
+				if (cgi.cgi_request() < 0) {
+					std::cerr << "cgi-request() failed" << std::endl;
+					exit(-1);
+				}
+				std::cout << RESET << std::endl;
 			}
-			std::cout << RESET << std::endl;
 		}
 
 		int len = result;

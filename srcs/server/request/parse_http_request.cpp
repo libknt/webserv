@@ -39,8 +39,9 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(socketfd);
 	if (it != http_request_map_.end()) {
-		if (http_request_status::FINISHED == it->second.get_status())
+		if (http_request_status::FINISHED == it->second.get_status()) {
 			return 1;
+		}
 	}
 
 	return (0);

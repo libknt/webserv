@@ -68,12 +68,12 @@ int CgiMetaVariables::auth_type() {
 
 int CgiMetaVariables::content_length() {
 	meta_variables_.insert(
-		std::make_pair("CONTENT_LENGTH", request_.getHeaderValue("CONTENT_LENGTH")));
+		std::make_pair("CONTENT_LENGTH", request_.getHeaderValue("Content-Length")));
 	return 0;
 }
 
 int CgiMetaVariables::content_type() {
-	meta_variables_.insert(std::make_pair("CONTENT_TYPE", request_.getHeaderValue("CONTENT_TYPE")));
+	meta_variables_.insert(std::make_pair("CONTENT_TYPE", request_.getHeaderValue("Content-Type")));
 	return 0;
 }
 
@@ -301,8 +301,7 @@ std::string CgiMetaVariables::extract_path_info(std::string& path) {
 		size_t path_info_pos = path.find('/', pos);
 		if (path_info_pos != std::string::npos) {
 			path = path.substr(path_info_pos);
-		}
-		else {
+		} else {
 			path = "";
 		}
 		return path;
@@ -349,7 +348,7 @@ int CgiMetaVariables::url_parse(std::string request_path,
 	if (path_after_cgi.empty())
 		return -1;
 
-	//TODO queryが%hhの場合decodeするのかどうか調べて実装。
+	// TODO queryが%hhの場合decodeするのかどうか調べて実装。
 	switch (what) {
 		case SCRIPT_NAME:
 			parsed_line = extract_script_name(path_after_cgi);
@@ -370,22 +369,22 @@ int CgiMetaVariables::url_parse(std::string request_path,
 	return 0;
 }
 
-char ** CgiMetaVariables::get_exec_environ() const {
+char** CgiMetaVariables::get_exec_environ() const {
 	return exec_environ_;
 }
 
 std::string CgiMetaVariables::find_meta_variable(std::string key) {
-	
+
 	std::string meta_variable;
-	for(int i=0; exec_environ_[i] != NULL; ++i) {
-		if(std::strncmp(exec_environ_[i], key.c_str(), std::strlen(key.c_str())) ==0){
+	for (int i = 0; exec_environ_[i] != NULL; ++i) {
+		if (std::strncmp(exec_environ_[i], key.c_str(), std::strlen(key.c_str())) == 0) {
 			meta_variable = exec_environ_[i];
 		}
 	}
 	std::string::size_type pos = meta_variable.find('=');
-	if( pos != std::string::npos) {
-		meta_variable = meta_variable.substr(pos +1);
-	}else {
+	if (pos != std::string::npos) {
+		meta_variable = meta_variable.substr(pos + 1);
+	} else {
 		meta_variable = "";
 	}
 	return meta_variable;

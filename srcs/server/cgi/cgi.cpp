@@ -63,8 +63,7 @@ int Cgi::shebang(std::string file, std::string& path) {
 	return 0;
 }
 
-int Cgi::exec_cgi() {
-	int status = 0;
+int Cgi::create_exec_argv() {
 	std::string script = meta_.find_meta_variable("SCRIPT_NAME");
 	std::string path;
 	script = "." + script;
@@ -72,22 +71,28 @@ int Cgi::exec_cgi() {
 	if (path.empty())
 		extension(script, path);
 	char* argv[] = { (char*)path.c_str(), (char*)script.c_str(), NULL };
-	char **exec_env = meta_.get_exec_environ();
+
+	path_ = path;
+	exec_argv_ = argv;
+	return 0;
+}
+
+int Cgi::exec_cgi() {
+	int status = 0;
+	char** exec_env = meta_.get_exec_environ();
 	pid_t pid = fork();
 	if (pid == 0) {
-		std::cout << path;
-		int err = execve(path.c_str(), argv, exec_env);
+		std::cout << path_;
+		int err = execve(path_.c_str(), exec_argv_, exec_env);
 		exit(err);
 	}
 	waitpid(pid, &status, WIFEXITED(status));
-	if (status !=0) {
+	if (status != 0) {
 		std::cerr << "exec_err(): " << strerror(errno) << std::endl;
-		exit(-1); 
-	} 
+		exit(-1);
+	}
 	return status;
 }
-
-
 
 #include "debug.hpp"
 

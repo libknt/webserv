@@ -20,7 +20,7 @@ enum URL_META_VARIABLES {
 
 namespace server {
 
-//https://tex2e.github.io/rfc-translater/html/rfc3875.html#4-1--Request-Meta-Variables
+// https://tex2e.github.io/rfc-translater/html/rfc3875.html#4-1--Request-Meta-Variables
 
 class CgiMetaVariables {
 private:
@@ -66,7 +66,7 @@ public:
 	int create_meta_variables();
 	int unset_meta_variables();
 	void get_meta();
-	char **get_exec_environ() const;
+	char** get_exec_environ() const;
 	std::string find_meta_variable(std::string key);
 };
 
