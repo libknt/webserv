@@ -33,7 +33,6 @@ namespace ParserUtils {
         return extracted_tokens;
     }
 
-    // セミコロンがない場合の処理
     std::vector<std::string> extractTokensUntilSemicolon(std::vector<std::string>& tokens) {
         std::vector<std::string> extracted_tokens;
         bool has_semicolon = false;
@@ -53,6 +52,14 @@ namespace ParserUtils {
             return extracted_tokens;
         }
         return extracted_tokens;
+    }
+
+    void printTokens(std::vector<std::string>& tokens) {
+        std::cout << "========== printTokens() ==========" << std::endl;
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            std::cout << tokens[i] << " ";
+        }
+        std::cout << std::endl;
     }
 
 }
