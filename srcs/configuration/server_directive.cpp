@@ -21,33 +21,6 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 	return *this;
 }
 
-std::vector<std::string> extractLocationTokens(std::vector<std::string>& tokens) {
-	std::vector<std::string> location_tokens;
-	size_t i;
-	int num_of_left_brace = 1;
-	int num_of_right_brace = 0;
-
-	// TODO: エラー処理
-	if (tokens[0] != "location" || tokens[1] != "{") {
-		std::cerr << "non first brace error" << std::endl;
-		return location_tokens;
-	}
-	for (i = 2; i < tokens.size() && num_of_left_brace != num_of_right_brace; ++i) {
-		if (tokens[i] == "{") {
-			num_of_left_brace++;
-		} else if (tokens[i] == "}") {
-			num_of_right_brace++;
-		} else {
-			location_tokens.push_back(tokens[i]);
-		}
-	}
-	if (num_of_left_brace != num_of_right_brace) {
-		std::cerr << "non first brace error" << std::endl;
-	}
-	tokens.erase(tokens.begin(), tokens.begin() + i);
-	return location_tokens;
-}
-
 int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 	std::vector<std::string> location_tokens;
 	std::vector<std::string> args;
@@ -60,7 +33,8 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			// server_nameの処理
 		} else if (tokens[i] == "location") {
 			// locationの処理
-			location_tokens = extractLocationTokens(tokens);
+			tokens.erase(tokens.begin());
+			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			location_.parseLocationDirective(location_tokens);
 		} else {
 			// error
