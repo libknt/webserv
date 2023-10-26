@@ -126,7 +126,7 @@ int HttpRequest::parseHttpHeader(std::string const& line) {
 			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
 		}
-		if (method_ == http_method::GET)
+		if (method_ == http_method::GET || method_ == http_method::DELETE)
 			setStatus(http_request_status::FINISHED);
 		else
 			setStatus(http_request_status::BODY);
