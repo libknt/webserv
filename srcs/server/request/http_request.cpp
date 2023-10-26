@@ -8,6 +8,7 @@ HttpRequest::HttpRequest()
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
 	, error_status_(http_error_status::UNDEFINED)
+	, body_message_type_(http_body_message_type::UNDEFINED)
 	, chunked_status_(chunked_status::UNDEFINED)
 	, chunked_size_(0) {}
 
@@ -116,7 +117,13 @@ int HttpRequest::parseHttpMethod(std::string const& line) {
 int HttpRequest::parseHttpHeader(std::string const& line) {
 	std::vector<std::string> header_vector;
 	if (line == "\0") {
-		if (method_ == http_method::GET || getHeaderValue("Content-Length") == "0")
+		if (checkHeaderValue() < 0)
+		{
+			setStatus(http_request_status::ERROR);
+			setErrorStatus(http_error_status::BAD_REQUEST);
+			return (-1);
+		}
+		if (method_ == http_method::GET)
 			setStatus(http_request_status::FINISHED);
 		else
 			setStatus(http_request_status::BODY);
@@ -136,6 +143,20 @@ int HttpRequest::parseHttpHeader(std::string const& line) {
 	return (0);
 }
 
+int	HttpRequest::checkHeaderValue()
+{
+	switch (method_)
+	{
+		case http_method::GET:
+		case http_method::DELETE:
+			break;
+		case http_method::POST:
+			break;
+		default:
+			break;
+	}
+	return (-1);
+}
 int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
 	header_.insert(std::make_pair(key, value));
 	return (0);
@@ -188,7 +209,7 @@ void HttpRequest::getInfo(void) {
 	std::cout << "header" << std::endl;
 	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
 		 ++iter)
-		std::cout << "key: " << iter->first << "value: " << iter->second << std::endl;
+		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
 }
 
 http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void)
