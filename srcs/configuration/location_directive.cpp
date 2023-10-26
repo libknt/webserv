@@ -27,8 +27,8 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 	return *this;
 }
 
-int LocationDirective::parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens) {
-	std::vector<std::string> args;
+int LocationDirective::parseLocationDirective(std::string& location_path, std::list<std::string>& tokens) {
+	std::list<std::string> args;
 	(void)location_path;
 	while (!tokens.empty()) {
 		if (tokens.front() == "error_page") {

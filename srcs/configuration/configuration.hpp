@@ -10,12 +10,12 @@
 
 class Configuration {
 private:
-	std::vector<ServerDirective> servers_;
+	std::list<ServerDirective> servers_;
 
-	std::vector<std::string> tokenize_file_content(const std::string& path);
-	std::vector<std::string> tokenize(std::string& line);
+	std::list<std::string> tokenize_file_content(const std::string& path);
+	std::list<std::string> tokenize(std::string& line);
 	bool isSpecialCharacter(const char& c);
-	int parseConfiguration(std::vector<std::string>& tokens);
+	int parseConfiguration(std::list<std::string>& tokens);
 
 public:
 	Configuration();

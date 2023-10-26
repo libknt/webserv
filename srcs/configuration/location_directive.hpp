@@ -4,7 +4,7 @@
 # include <iostream>
 # include <string>
 # include <map>
-# include <vector>
+# include <list>
 # include "parser_utils.hpp"
 
 class LocationDirective {
@@ -14,7 +14,7 @@ private:
 	std::string root_;
 	std::string index_;
 	bool autoindex_;
-	std::vector<std::string> allow_methods_;
+	std::list<std::string> allow_methods_;
 	bool chunked_transfer_encoding_;
 public:
 	LocationDirective();
@@ -22,7 +22,7 @@ public:
 	LocationDirective(const LocationDirective& other);
 	LocationDirective& operator=(const LocationDirective& other);
 
-	int parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens);
+	int parseLocationDirective(std::string& location_path, std::list<std::string>& tokens);
 };
 
 #endif

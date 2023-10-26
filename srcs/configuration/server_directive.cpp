@@ -21,9 +21,9 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 	return *this;
 }
 
-int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
-	std::vector<std::string> location_tokens;
-	std::vector<std::string> args;
+int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
+	std::list<std::string> location_tokens;
+	std::list<std::string> args;
 
 	while (!tokens.empty()) {
 		LocationDirective location_directive;

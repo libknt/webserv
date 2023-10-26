@@ -7,7 +7,7 @@
 # include <sstream>
 # include "location_directive.hpp"
 # include "parser_utils.hpp"
-#include <map>
+# include <map>
 class ServerDirective {
 private:
 	int port_;
@@ -21,7 +21,7 @@ public:
 	ServerDirective(const ServerDirective& other);
 	ServerDirective& operator=(const ServerDirective& other);
 
-	int parseServerDirective(std::vector<std::string>& tokens);
+	int parseServerDirective(std::list<std::string>& tokens);
 };
 
 #endif
