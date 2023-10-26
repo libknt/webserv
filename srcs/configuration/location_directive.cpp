@@ -27,11 +27,7 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 	return *this;
 }
 
-
-int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) {
-	std::cout << "============ location =============" << std::endl;
-	for (size_t i = 0; i < tokens.size(); ++i) {
-		std::cout << tokens[i] << std::endl;
-	}
+int LocationDirective::parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens) {
+	
 	return 0;
 }

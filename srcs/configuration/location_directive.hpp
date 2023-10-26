@@ -8,6 +8,7 @@
 
 class LocationDirective {
 private:
+	std::string location_path;
 	std::map<int, std::string> error_pages_;
 	int client_max_body_size_;
 	std::string root_;
@@ -21,7 +22,7 @@ public:
 	LocationDirective(const LocationDirective& other);
 	LocationDirective& operator=(const LocationDirective& other);
 
-	int parseLocationDirective(std::vector<std::string>& tokens);
+	int parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens);
 };
 
 #endif

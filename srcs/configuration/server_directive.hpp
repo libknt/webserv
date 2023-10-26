@@ -7,13 +7,13 @@
 # include <sstream>
 # include "location_directive.hpp"
 # include "parser_utils.hpp"
-
+#include <map>
 class ServerDirective {
 private:
 	int port_;
 	std::string ip_address_;
 	std::string server_name_;
-	LocationDirective location_;
+	std::map<std::string, LocationDirective> locations_;
 
 public:
 	ServerDirective();
