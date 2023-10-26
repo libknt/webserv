@@ -23,12 +23,12 @@ namespace ParserUtils {
                 }
             } else if (token == "}") {
                 num_of_right_brace++;
+                if (num_of_left_brace == num_of_right_brace) {
+                    break;
+                }
+                extracted_tokens.push_back(token);
             } else {
                 extracted_tokens.push_back(token);
-            }
-            if (num_of_left_brace == num_of_right_brace) {
-                extracted_tokens.push_back(token);
-                break;
             }
         }
         if (num_of_left_brace != num_of_right_brace) {
@@ -36,6 +36,8 @@ namespace ParserUtils {
             extracted_tokens.clear();
             return extracted_tokens;
         }
+
+        ParserUtils::printTokens(extracted_tokens);
         return extracted_tokens;
     }
 
