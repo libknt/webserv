@@ -89,19 +89,17 @@ std::vector<std::string> extractServerTokens(std::vector<std::string>& tokens) {
 }
 
 int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
-	if (tokens.front() != "server") {
-		return -1;
-	}
-
-	size_t i = 0;
-	while (tokens.size() >= 3) {
+	while (!tokens.empty()) {
 		std::vector<std::string> server_tokens;
-		if (tokens.front() == "server") {
-			servers_.push_back(ServerDirective());
-			server_tokens = extractServerTokens(tokens);
-			servers_[i].parseServerDirective(server_tokens);
+		ServerDirective server_directive;
+
+		if (tokens.front() != "server") {
+			std::cerr << "Configration file error: invalid main directive." << std::endl;
+			return -1;
 		}
-		i++;
+		server_tokens = extractServerTokens(tokens);
+		server_directive.parseServerDirective(server_tokens);
+		servers_.push_back(server_directive);
 	}
 	return 0;
 }
