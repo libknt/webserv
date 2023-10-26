@@ -1,0 +1,19 @@
+POST /api/xml HTTP/1.1
+Host: example.com
+Content-Type: application/xml
+Transfer-Encoding: chunked
+
+B
+<message>
+6
+<text>
+7
+Hello!
+7
+</text>
+2
+</
+9
+message>
+0
+
