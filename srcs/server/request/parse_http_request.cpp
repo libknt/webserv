@@ -29,8 +29,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	http_line_stream_[socketfd] += buffer;
 	if (http_request_map_[socketfd].getHttpRequestStatus() == http_request_status::BODY)
 		http_request_map_[socketfd].parseHttpRequest(http_line_stream_[socketfd]);
-	else
-	{
+	else {
 		while ((index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
 			std::string line = http_line_stream_[socketfd].substr(0, index);
 			http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
@@ -39,7 +38,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		}
 	}
 	if (http_request_map_[socketfd].getHttpRequestStatus() == http_request_status::FINISHED)
-		return(1);
+		return (1);
 	return (0);
 }
 }

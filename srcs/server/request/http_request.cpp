@@ -191,8 +191,7 @@ void HttpRequest::getInfo(void) {
 		std::cout << "key: " << iter->first << "value: " << iter->second << std::endl;
 }
 
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void)
-{
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) {
 	return (status_);
 }
 }
