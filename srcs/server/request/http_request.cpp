@@ -15,11 +15,11 @@ HttpRequest::HttpRequest()
 
 HttpRequest::~HttpRequest(){};
 
-HttpRequest::HttpRequest(HttpRequest const &request) {
+HttpRequest::HttpRequest(HttpRequest const& request) {
 	*this = request;
 }
 
-HttpRequest& HttpRequest::operator=(HttpRequest  const &request) {
+HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 	if (this != &request) {
 		status_ = request.status_;
 		method_ = request.method_;
@@ -121,8 +121,7 @@ int HttpRequest::parseHttpMethod(std::string const& line) {
 int HttpRequest::parseHttpHeader(std::string const& line) {
 	std::vector<std::string> header_vector;
 	if (line == "\0") {
-		if (checkHeaderValue() < 0)
-		{
+		if (checkHeaderValue() < 0) {
 			setStatus(http_request_status::ERROR);
 			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
@@ -147,10 +146,8 @@ int HttpRequest::parseHttpHeader(std::string const& line) {
 	return (0);
 }
 
-int	HttpRequest::checkHeaderValue()
-{
-	switch (method_)
-	{
+int HttpRequest::checkHeaderValue() {
+	switch (method_) {
 		case http_method::GET:
 		case http_method::DELETE:
 			body_message_type_ = http_body_message_type::NONE;
@@ -158,11 +155,11 @@ int	HttpRequest::checkHeaderValue()
 		case http_method::POST:
 			if (getHeaderValue("Transfer-Encoding") == "chunked")
 				body_message_type_ = http_body_message_type::CHUNK_ENCODING;
-			else if (getHeaderValue("Content-Length") != "")
-			{
+			else if (getHeaderValue("Content-Length") != "") {
 				body_message_type_ = http_body_message_type::CONTENT_LENGTH;
-				//TODO you should check the value is affordable.
-				content_length_ = static_cast<size_t>(std::atoi(getHeaderValue("Content-Length").c_str()));
+				// TODO you should check the value is affordable.
+				content_length_ =
+					static_cast<size_t>(std::atoi(getHeaderValue("Content-Length").c_str()));
 			}
 			break;
 		default:
@@ -185,8 +182,7 @@ std::string HttpRequest::getHeaderValue(std::string const& key) {
 }
 
 int HttpRequest::parseHttpBody(std::string const& line) {
-	switch (body_message_type_)
-	{
+	switch (body_message_type_) {
 		case http_body_message_type::CHUNK_ENCODING:
 			return (parseChunkedBody(line));
 		case http_body_message_type::CONTENT_LENGTH:
@@ -204,12 +200,9 @@ int HttpRequest::parseChunkedBody(std::string const& line) {
 		// TODO Caution ! strtol is C++ 11 function.
 		chunked_size_ = std::strtol(line.c_str(), NULL, 16);
 		chunked_status_ = chunked_status::CHUNKED_MESSAGE;
-	} else if (line == "" && chunked_size_ == 0)
-	{
+	} else if (line == "" && chunked_size_ == 0) {
 		setStatus(http_request_status::FINISHED);
-	}
-	else
-	{
+	} else {
 		body_ += line;
 		chunked_status_ = chunked_status::CHUNKED_SIZE;
 	}
@@ -234,13 +227,11 @@ void HttpRequest::getInfo(void) {
 		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
 }
 
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void)
-{
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) {
 	return (status_);
 }
 
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void)
-{
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void) {
 	return (body_message_type_);
 }
 }

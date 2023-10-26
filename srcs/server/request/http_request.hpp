@@ -50,14 +50,13 @@ enum HTTP_ERROR_STATUS {
 }
 
 namespace http_body_message_type {
-	enum HTTP_BODY_MESSAGE_TYPE {
-		CONTENT_LENGTH,
-		CHUNK_ENCODING,
-		NONE,
-		UNDEFINED,
+enum HTTP_BODY_MESSAGE_TYPE {
+	CONTENT_LENGTH,
+	CHUNK_ENCODING,
+	NONE,
+	UNDEFINED,
 };
 }
-
 
 class HttpRequest {
 private:
@@ -65,8 +64,8 @@ private:
 	http_method::HTTP_METHOD method_;
 	http_version::HTTP_VERSION version_;
 	http_error_status::HTTP_ERROR_STATUS error_status_;
-	http_body_message_type::HTTP_BODY_MESSAGE_TYPE	body_message_type_;	
-	size_t	content_length_;
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE body_message_type_;
+	size_t content_length_;
 	chunked_status::CHUNKED_STATUS chunked_status_;
 	size_t chunked_size_;
 	std::string request_path_;
@@ -77,7 +76,7 @@ private:
 	int parseHttpBody(std::string const& line);
 	int parseContentLengthBody(std::string const& line);
 	int parseChunkedBody(std::string const& line);
-	int	checkHeaderValue();
+	int checkHeaderValue();
 	int setMethod(std::string const& method);
 	int setRequestPath(std::string const& request_path);
 	int setVersion(std::string const& version);
