@@ -208,15 +208,15 @@ http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void)
 	return (status_);
 }
 
-sockaddr_in HttpRequest::get_client_addr() const {
+sockaddr_in HttpRequest::getClientAddress() const {
 	return client_addr_;
 }
 
-sockaddr_in HttpRequest::get_server_addr() const {
+sockaddr_in HttpRequest::getServerAddress() const {
 	return server_addr_;
 }
 
-std::string HttpRequest::get_http_method() const {
+std::string HttpRequest::getHttpMethod() const {
 	std::string method;
 	switch (method_) {
 		case http_method::GET:
@@ -234,7 +234,7 @@ std::string HttpRequest::get_http_method() const {
 	return method;
 }
 
-std::string HttpRequest::get_server_protocol() const {
+std::string HttpRequest::getServerProtocol() const {
 	std::string protocol;
 	switch (version_) {
 		case http_version::HTTP_1_0:
@@ -252,7 +252,7 @@ std::string HttpRequest::get_server_protocol() const {
 	return protocol;
 }
 
-std::string HttpRequest::get_request_path() const {
+std::string HttpRequest::getRequestPath() const {
 	return request_path_;
 }
 

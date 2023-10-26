@@ -105,7 +105,7 @@ int IoMultiplexing::accept(int listen_sd) {
 			return -1;
 		}
 
-		http_request_parse_.add_accept_client_info(new_sd, client_addr, server_addr);
+		http_request_parse_.addAcceptClientInfo(new_sd, client_addr, server_addr);
 
 		std::cout << "  New incoming connection -  " << new_sd << std::endl;
 		FD_SET(new_sd, &master_set_);
@@ -150,7 +150,7 @@ int IoMultiplexing::request(int sd) {
 			if (status == 1) {
 				std::cout << RED << "TEST" << std::endl;
 				Cgi cgi(http_request_parse_.get_http_request(sd));
-				if (cgi.cgi_request() < 0) {
+				if (cgi.cgiRequest() < 0) {
 					std::cerr << "cgi-request() failed" << std::endl;
 					exit(-1);
 				}

@@ -50,7 +50,7 @@ HttpRequest& ParseHttpRequest::get_http_request(int sd) {
 	return it->second;
 }
 
-void ParseHttpRequest::add_accept_client_info(int socketfd,
+void ParseHttpRequest::addAcceptClientInfo(int socketfd,
 	sockaddr_in client_addr,
 	sockaddr_in server_addr) {
 	if (http_request_map_.find(socketfd) == http_request_map_.end()) {

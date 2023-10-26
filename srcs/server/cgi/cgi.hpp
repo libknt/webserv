@@ -22,13 +22,13 @@ private:
 	std::string getFileExtension(const std::string& filename);
 	int extension(std::string filename, std::string& path);
 	int shebang(std::string file, std::string& path);
-	int exec_cgi();
-	int create_exec_argv();
+	int execCgi();
+	int createExecArgv();
 
 public:
 	explicit Cgi(HttpRequest& request);
 	~Cgi();
-	int cgi_request();
+	int cgiRequest();
 	void getInfo();
 };
 }

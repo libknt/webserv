@@ -63,8 +63,8 @@ int Cgi::shebang(std::string file, std::string& path) {
 	return 0;
 }
 
-int Cgi::create_exec_argv() {
-	std::string script = meta_.find_meta_variable("SCRIPT_NAME");
+int Cgi::createExecArgv() {
+	std::string script = meta_.findMetaVariable("SCRIPT_NAME");
 	std::string path;
 	script = "." + script;
 	shebang(script, path);
@@ -76,13 +76,13 @@ int Cgi::create_exec_argv() {
 	return 0;
 }
 
-int Cgi::exec_cgi() {
+int Cgi::execCgi() {
 	int status = 0;
 	int sv[2];
-	create_exec_argv();
+	createExecArgv();
 	this->body_ = request_.getBody();
 	std::cout << "getBody:  " << request_.getBody() << std::endl;
-	char** exec_env = meta_.get_exec_environ();
+	char** exec_env = meta_.getExecEnviron();
 	char* exec_argv[] = { (char*)path_.c_str(), (char*)script_.c_str(), NULL };
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == -1) {
 		perror("socketpair");
@@ -121,12 +121,12 @@ int Cgi::exec_cgi() {
 
 #include "debug.hpp"
 
-int Cgi::cgi_request() {
-	if (meta_.create_meta_variables() < 0)
+int Cgi::cgiRequest() {
+	if (meta_.createMetaVariables() < 0)
 		return -1;
-	meta_.get_meta();
+	meta_.getMeta();
 	std::cout << YELLOW;
-	exec_cgi();
+	execCgi();
 	std::cout << RESET;
 	return 0;
 }
