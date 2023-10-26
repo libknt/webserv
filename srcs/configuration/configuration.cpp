@@ -66,14 +66,15 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 		std::vector<std::string> server_tokens;
 		ServerDirective server_directive;
 
-		if (tokens.front() != "server") {
+		if (tokens.front() == "server") {
+			tokens.erase(tokens.begin());
+			server_tokens = ParserUtils::extractTokensFromBlock(tokens);
+			server_directive.parseServerDirective(server_tokens);
+			servers_.push_back(server_directive);
+		} else {
 			std::cerr << "Configration file error: invalid main directive." << std::endl;
 			return -1;
 		}
-		tokens.erase(tokens.begin());
-		server_tokens = ParserUtils::extractTokensFromBlock(tokens);
-		server_directive.parseServerDirective(server_tokens);
-		servers_.push_back(server_directive);
 	}
 	return 0;
 }
