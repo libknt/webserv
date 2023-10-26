@@ -81,7 +81,6 @@ int Cgi::execCgi() {
 	int sv[2];
 	createExecArgv();
 	this->body_ = request_.getBody();
-	std::cout << "getBody:  " << request_.getBody() << std::endl;
 	char** exec_env = meta_.getExecEnviron();
 	char* exec_argv[] = { (char*)path_.c_str(), (char*)script_.c_str(), NULL };
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == -1) {
@@ -102,6 +101,7 @@ int Cgi::execCgi() {
 	close(sv[1]);
 
 	write(sv[0], body_.c_str(), body_.length());
+	close(sv[0]);
 
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
@@ -115,7 +115,6 @@ int Cgi::execCgi() {
 		std::cout.write(buffer, bytes_read);
 	}
 
-	close(sv[0]);
 	return status;
 }
 
