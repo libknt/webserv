@@ -27,12 +27,18 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
 	}
 	http_line_stream_[socketfd] += buffer;
-	while ((index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
-		std::string line = http_line_stream_[socketfd].substr(0, index);
-		http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
-		http_request_map_[socketfd].parseHttpRequest(line);
-		// TODO if error occured, you parseHttpRequest(line) must return -1. So handle it.
+	if (http_request_map_[socketfd].getHttpRequestStatus() == http_request_status::BODY)
+		http_request_map_[socketfd].parseHttpRequest(http_line_stream_[socketfd]);
+	else {
+		while ((index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
+			std::string line = http_line_stream_[socketfd].substr(0, index);
+			http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
+			http_request_map_[socketfd].parseHttpRequest(line);
+			// TODO if error occured, you parseHttpRequest(line) must return -1. So handle it.
+		}
 	}
+	if (http_request_map_[socketfd].getHttpRequestStatus() == http_request_status::FINISHED)
+		return (1);
 	return (0);
 }
 }
