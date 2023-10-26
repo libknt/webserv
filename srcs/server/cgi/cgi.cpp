@@ -92,11 +92,13 @@ int Cgi::execCgi() {
 		char buffer[4096];
 		dup2(sv[1], STDOUT_FILENO);
 		dup2(sv[1], STDIN_FILENO);
-		memset(buffer, '\0',sizeof(buffer));
+		memset(buffer, '\0', sizeof(buffer));
 		ssize_t bytes_read;
 		bytes_read = read(1, buffer, sizeof(buffer));
 		std::string ss(buffer);
-		char* exec_argv[] = { (char*)path_.c_str(), (char*)script_.c_str(),(char *)ss.c_str(), NULL };
+		char* exec_argv[] = {
+			(char*)path_.c_str(), (char*)script_.c_str(), (char*)ss.c_str(), NULL
+		};
 		int err = execve(path_.c_str(), exec_argv, exec_env);
 		exit(err);
 	}
@@ -104,7 +106,19 @@ int Cgi::execCgi() {
 
 	write(sv[0], body_.c_str(), body_.length());
 
-	waitpid(pid, &status, 0);
+	const int timeout = 5;
+	bool b = false;
+	for (int i = 0; i < timeout; ++i) {
+		int status;
+		if (waitpid(pid, &status, WNOHANG) != 0) {
+			std::cout << "Child process ended." << std::endl;
+			b = true;
+			break;
+		}
+		sleep(1);
+	}
+	if (!b)
+		kill(pid, SIGKILL);
 	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 		std::cerr << "exec_err(): " << strerror(errno) << std::endl;
 		exit(-1);

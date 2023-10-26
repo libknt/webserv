@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <signal.h>
 #include <string>
 #include <unistd.h>
 #include <vector>
