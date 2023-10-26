@@ -1,6 +1,9 @@
-#include <iostream>
-#include <string>
-#include <vector>
+#ifndef PARSER_UTILS_HPP
+# define PARSER_UTILS_HPP
+
+# include <iostream>
+# include <string>
+# include <vector>
 
 namespace ParserUtils {
 
@@ -15,8 +18,9 @@ namespace ParserUtils {
             }
             extracted_tokens.push_back(token);
         }
-
         return extracted_tokens;
     }
 
 }
+
+#endif

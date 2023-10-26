@@ -1,4 +1,5 @@
 #include "server_directive.hpp"
+#include "parser_utils.hpp"
 
 ServerDirective::ServerDirective() {}
 
@@ -50,10 +51,13 @@ std::vector<std::string> extractLocationTokens(std::vector<std::string>& tokens)
 
 int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 	std::vector<std::string> location_tokens;
+	std::vector<std::string> args;
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		if (tokens[i] == "listen") {
 			// listenの処理
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 		} else if (tokens[i] == "server_name") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			// server_nameの処理
 		} else if (tokens[i] == "location") {
 			// locationの処理
