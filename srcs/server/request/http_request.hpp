@@ -85,12 +85,13 @@ public:
 	int parseHttpRequest(std::string const& line);
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
-	http_request_status::HTTP_REQUEST_STATUS get_status() const;
 	sockaddr_in get_client_addr() const;
 	sockaddr_in get_server_addr() const;
 	std::string get_http_method() const;
 	std::string get_server_protocol() const;
 	std::string get_request_path() const;
+	http_request_status::HTTP_REQUEST_STATUS getHttpRequestStatus(void);
+	std::string getBody() const;
 };
 }
 #endif

@@ -23,6 +23,7 @@ HttpRequest::HttpRequest(HttpRequest const& request)
 	, error_status_(request.error_status_)
 	, chunked_status_(request.chunked_status_)
 	, chunked_size_(request.chunked_size_)
+	, body_(request.body_)
 	, client_addr_(request.client_addr_)
 	, server_addr_(request.server_addr_) {}
 
@@ -200,11 +201,11 @@ void HttpRequest::getInfo(void) {
 	std::cout << "header" << std::endl;
 	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
 		 ++iter)
-		std::cout << "first: " << iter->first << "second: " << iter->second << std::endl;
+		std::cout << "key: " << iter->first << "value: " << iter->second << std::endl;
 }
 
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::get_status() const {
-	return status_;
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) {
+	return (status_);
 }
 
 sockaddr_in HttpRequest::get_client_addr() const {
@@ -254,4 +255,9 @@ std::string HttpRequest::get_server_protocol() const {
 std::string HttpRequest::get_request_path() const {
 	return request_path_;
 }
+
+std::string HttpRequest::getBody() const {
+	return body_;
+}
+
 }

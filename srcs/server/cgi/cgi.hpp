@@ -17,8 +17,8 @@ private:
 	CgiMetaVariables meta_;
 	std::string body_;
 	HttpRequest request_;
-	char** exec_argv_;
 	std::string path_;
+	std::string script_;
 	std::string getFileExtension(const std::string& filename);
 	int extension(std::string filename, std::string& path);
 	int shebang(std::string file, std::string& path);

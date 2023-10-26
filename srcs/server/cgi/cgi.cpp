@@ -70,27 +70,52 @@ int Cgi::create_exec_argv() {
 	shebang(script, path);
 	if (path.empty())
 		extension(script, path);
-	char* argv[] = { (char*)path.c_str(), (char*)script.c_str(), NULL };
 
 	path_ = path;
-	exec_argv_ = argv;
+	script_ = script;
 	return 0;
 }
 
 int Cgi::exec_cgi() {
 	int status = 0;
+	int sv[2];
+	create_exec_argv();
+	this->body_ = request_.getBody();
+	std::cout << "getBody:  " << request_.getBody() << std::endl;
 	char** exec_env = meta_.get_exec_environ();
+	char* exec_argv[] = { (char*)path_.c_str(), (char*)script_.c_str(), NULL };
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == -1) {
+		perror("socketpair");
+		exit(1);
+	}
 	pid_t pid = fork();
 	if (pid == 0) {
-		std::cout << path_;
-		int err = execve(path_.c_str(), exec_argv_, exec_env);
+		close(sv[0]);
+
+		dup2(sv[1], STDOUT_FILENO);
+		dup2(sv[1], STDIN_FILENO);
+		close(sv[1]);
+
+		int err = execve(path_.c_str(), exec_argv, exec_env);
 		exit(err);
 	}
-	waitpid(pid, &status, WIFEXITED(status));
-	if (status != 0) {
+	close(sv[1]);
+
+	write(sv[0], body_.c_str(), body_.length());
+
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 		std::cerr << "exec_err(): " << strerror(errno) << std::endl;
 		exit(-1);
 	}
+
+	char buffer[4096];
+	ssize_t bytes_read;
+	while ((bytes_read = read(sv[0], buffer, sizeof(buffer))) > 0) {
+		std::cout.write(buffer, bytes_read);
+	}
+
+	close(sv[0]);
 	return status;
 }
 
@@ -102,9 +127,6 @@ int Cgi::cgi_request() {
 	meta_.get_meta();
 	std::cout << YELLOW;
 	exec_cgi();
-	// for (char** current = environ; *current; ++current) {
-	// 	std::cout << *current << std::endl;
-	// }
 	std::cout << RESET;
 	return 0;
 }
