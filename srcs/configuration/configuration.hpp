@@ -6,6 +6,7 @@
 # include <fstream>
 # include <sstream>
 # include "server_directive.hpp"
+# include "parser_utils.hpp"
 
 class Configuration {
 private:

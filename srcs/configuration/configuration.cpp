@@ -97,7 +97,8 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 			std::cerr << "Configration file error: invalid main directive." << std::endl;
 			return -1;
 		}
-		server_tokens = extractServerTokens(tokens);
+		tokens.erase(tokens.begin());
+		server_tokens = ParserUtils::extractTokensFromBlock(tokens);
 		server_directive.parseServerDirective(server_tokens);
 		servers_.push_back(server_directive);
 	}
