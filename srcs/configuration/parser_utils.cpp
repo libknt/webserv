@@ -11,34 +11,28 @@ namespace ParserUtils {
         if (tokens.empty() || tokens.front() != "{") {
             std::cout << tokens.front() << std::endl;
             std::cerr << "Parse Error: Invalid Block" << std::endl;
-            return extracted_tokens;
+            return std::vector<std::string>();
         }
+
         while (!tokens.empty()) {
             std::string token = tokens.front();
             tokens.erase(tokens.begin());
             if (token == "{") {
                 num_of_left_brace++;
-                if (num_of_left_brace != 1) {
-                    extracted_tokens.push_back(token);
+                if (num_of_left_brace == 1) {
+                    continue;
                 }
             } else if (token == "}") {
                 num_of_right_brace++;
                 if (num_of_left_brace == num_of_right_brace) {
-                    break;
+                    return extracted_tokens;
                 }
-                extracted_tokens.push_back(token);
-            } else {
-                extracted_tokens.push_back(token);
             }
-        }
-        if (num_of_left_brace != num_of_right_brace) {
-            std::cerr << "Parse Error: Invalid Block" << std::endl;
-            extracted_tokens.clear();
-            return extracted_tokens;
+            extracted_tokens.push_back(token);
         }
 
-        ParserUtils::printTokens(extracted_tokens);
-        return extracted_tokens;
+        std::cerr << "Parse Error: Invalid Block" << std::endl;
+        return std::vector<std::string>();
     }
 
     std::vector<std::string> extractTokensUntilSemicolon(std::vector<std::string>& tokens) {
