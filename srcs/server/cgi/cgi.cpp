@@ -82,7 +82,6 @@ int Cgi::execCgi() {
 	createExecArgv();
 	this->body_ = request_.getBody();
 	char** exec_env = meta_.getExecEnviron();
-	char* exec_argv[] = { (char*)path_.c_str(), (char*)script_.c_str(), NULL };
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == -1) {
 		perror("socketpair");
 		exit(1);
@@ -90,18 +89,20 @@ int Cgi::execCgi() {
 	pid_t pid = fork();
 	if (pid == 0) {
 		close(sv[0]);
-
+		char buffer[4096];
 		dup2(sv[1], STDOUT_FILENO);
 		dup2(sv[1], STDIN_FILENO);
-		close(sv[1]);
-
+		memset(buffer, '\0',sizeof(buffer));
+		ssize_t bytes_read;
+		bytes_read = read(1, buffer, sizeof(buffer));
+		std::string ss(buffer);
+		char* exec_argv[] = { (char*)path_.c_str(), (char*)script_.c_str(),(char *)ss.c_str(), NULL };
 		int err = execve(path_.c_str(), exec_argv, exec_env);
 		exit(err);
 	}
 	close(sv[1]);
 
 	write(sv[0], body_.c_str(), body_.length());
-	close(sv[0]);
 
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
@@ -114,6 +115,7 @@ int Cgi::execCgi() {
 	while ((bytes_read = read(sv[0], buffer, sizeof(buffer))) > 0) {
 		std::cout.write(buffer, bytes_read);
 	}
+	close(sv[0]);
 
 	return status;
 }

@@ -3,6 +3,6 @@
 import sys
 
 if __name__ == "__main__":
-    data = sys.stdin.read()
+    data = sys.argv
     print("Received data:")
     print(data)
