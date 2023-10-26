@@ -28,6 +28,42 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 }
 
 int LocationDirective::parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens) {
-	
+	std::vector<std::string> args;
+	(void)location_path;
+	while (!tokens.empty()) {
+		if (tokens.front() == "error_pages") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ error_pages ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else if (tokens.front() == "client_max_body_size") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ client_max_body_size ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else if (tokens.front() == "root") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ root ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else if (tokens.front() == "index") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ index ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else if (tokens.front() == "auto_index") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ auto_index ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else if (tokens.front() == "allow_methods") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ allow_methods ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else if (tokens.front() == "chunked_transfer_encoding") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "+++++++++ chuncked_trasfer_encoding ++++++++++++" << std::endl;
+			ParserUtils::printTokens(args);
+		} else {
+			ParserUtils::printTokens(tokens);
+			return -1;
+		}
+		args.clear();
+	}
 	return 0;
 }

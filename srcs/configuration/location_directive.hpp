@@ -5,10 +5,10 @@
 # include <string>
 # include <map>
 # include <vector>
+# include "parser_utils.hpp"
 
 class LocationDirective {
 private:
-	std::string location_path;
 	std::map<int, std::string> error_pages_;
 	int client_max_body_size_;
 	std::string root_;

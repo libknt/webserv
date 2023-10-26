@@ -2,12 +2,14 @@
 
 namespace ParserUtils {
 
+    // Todo: リファクタリング
     std::vector<std::string> extractTokensFromBlock(std::vector<std::string>& tokens) {
         std::vector<std::string> extracted_tokens;
         size_t num_of_left_brace = 0;
         size_t num_of_right_brace = 0;
 
         if (tokens.empty() || tokens.front() != "{") {
+            std::cout << tokens.front() << std::endl;
             std::cerr << "Parse Error: Invalid Block" << std::endl;
             return extracted_tokens;
         }
@@ -16,12 +18,16 @@ namespace ParserUtils {
             tokens.erase(tokens.begin());
             if (token == "{") {
                 num_of_left_brace++;
+                if (num_of_left_brace != 1) {
+                    extracted_tokens.push_back(token);
+                }
             } else if (token == "}") {
                 num_of_right_brace++;
             } else {
                 extracted_tokens.push_back(token);
             }
             if (num_of_left_brace == num_of_right_brace) {
+                extracted_tokens.push_back(token);
                 break;
             }
         }
@@ -57,7 +63,7 @@ namespace ParserUtils {
     void printTokens(std::vector<std::string>& tokens) {
         std::cout << "========== printTokens() ==========" << std::endl;
         for (size_t i = 0; i < tokens.size(); ++i) {
-            std::cout << tokens[i] << " ";
+            std::cout << "[" << tokens[i] << "]" << " ";
         }
         std::cout << std::endl;
     }

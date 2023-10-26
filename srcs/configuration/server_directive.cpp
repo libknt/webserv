@@ -32,15 +32,22 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 		if (tokens.front() == "listen") {
 			// listenの処理
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			std::cout << "________ listen ___________" << std::endl;
+			ParserUtils::printTokens(args);
 		} else if (tokens.front() == "server_name") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			// server_nameの処理
+			std::cout << "________ server_name ___________" << std::endl;
+			ParserUtils::printTokens(args);
 		} else if (tokens.front() == "location") {
-			// locationの処理
+			// location の削除
+			std::cout << "before location: " << tokens.front() << std::endl;
 			tokens.erase(tokens.begin());
-			if (tokens.size() >= 2) {
+			std::cout << "after location: " << tokens.front()  << ": " << tokens[1] << std::endl;
+
+			if (tokens.size()) {
 				location_path = tokens.front();
 				tokens.erase(tokens.begin());
+				std::cout << "ああああああ: " << tokens.front() << std::endl;
 			} else {
 				std::cerr << "Parse Error: Invalid Location" << std::endl;
 				return -1;
@@ -48,8 +55,8 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			location_directive.parseLocationDirective(location_path, location_tokens);
 		} else {
-			// error
-			ParserUtils::printTokens(tokens);
+			std::cout << "Parse Error: serverDirective" << std::endl;
+			std::cout << tokens.front() << std::endl;
 			return -1;
 		}
 		args.clear();
