@@ -53,6 +53,7 @@ namespace http_body_message_type {
 	enum HTTP_BODY_MESSAGE_TYPE {
 		CONTENT_LENGTH,
 		CHUNK_ENCODING,
+		NONE,
 		UNDEFINED,
 };
 }
@@ -65,8 +66,9 @@ private:
 	http_version::HTTP_VERSION version_;
 	http_error_status::HTTP_ERROR_STATUS error_status_;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE	body_message_type_;	
+	size_t	content_length_;
 	chunked_status::CHUNKED_STATUS chunked_status_;
-	long chunked_size_;
+	size_t chunked_size_;
 	std::string request_path_;
 	std::map<std::string, std::string> header_;
 	std::string body_;
@@ -92,6 +94,7 @@ public:
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
 	http_request_status::HTTP_REQUEST_STATUS getHttpRequestStatus(void);
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getHttpBodyMessageType(void);
 };
 }
 #endif

@@ -27,7 +27,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
 	}
 	http_line_stream_[socketfd] += buffer;
-	if (http_request_map_[socketfd].getHttpRequestStatus() == http_request_status::BODY)
+	if (http_request_map_[socketfd].getHttpBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
 		http_request_map_[socketfd].parseHttpRequest(http_line_stream_[socketfd]);
 	else
 	{
