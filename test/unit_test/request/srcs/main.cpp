@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	{
 		if (0 < fd[i])
 		{
-			server::HttpRequest request = parse_http_request.get_http_request(fd[i]);
+			server::HttpRequest request = parse_http_request.getHttpRequest(fd[i]);
 			if (request.getHttpRequestStatus() == server::http_request_status::FINISHED)
 				std::cerr << "TEST"<< argv[i] << ": OK" << std::endl;
 			else

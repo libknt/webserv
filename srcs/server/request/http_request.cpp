@@ -10,7 +10,7 @@ HttpRequest::HttpRequest()
 	, error_status_(http_error_status::UNDEFINED)
 	, body_message_type_(http_body_message_type::UNDEFINED)
 	, content_length_(0)
-	, chunked_status_(chunked_status::UNDEFINED)
+	, chunked_status_(chunked_status::CHUNKED_SIZE)
 	, chunked_size_(0) {}
 
 HttpRequest::~HttpRequest(){};
@@ -204,12 +204,15 @@ int HttpRequest::parseChunkedBody(std::string const& line) {
 		// TODO Caution ! strtol is C++ 11 function.
 		chunked_size_ = std::strtol(line.c_str(), NULL, 16);
 		chunked_status_ = chunked_status::CHUNKED_MESSAGE;
-		if (chunked_size_ == 0)
-			setStatus(http_request_status::FINISHED);
-	} else if (line == "")
-		chunked_status_ = chunked_status::CHUNKED_SIZE;
+	} else if (line == "" && chunked_size_ == 0)
+	{
+		setStatus(http_request_status::FINISHED);
+	}
 	else
+	{
 		body_ += line;
+		chunked_status_ = chunked_status::CHUNKED_SIZE;
+	}
 	return (0);
 }
 
