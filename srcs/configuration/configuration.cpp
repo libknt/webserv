@@ -71,6 +71,7 @@ std::vector<std::string> extractServerTokens(std::vector<std::string>& tokens) {
 	// TODO: エラー処理
 	if (tokens[0] != "server" || tokens[1] != "{") {
 		std::cerr << "non first brace error" << std::endl;
+		return server_tokens;
 	}
 	for (i = 2; i < tokens.size() && num_of_left_brace != num_of_right_brace; ++i) {
 		if (tokens[i] == "{") {
@@ -105,5 +106,3 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 	}
 	return 0;
 }
-
-// 先に閉じるまでチェックしてからインサート

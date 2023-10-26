@@ -20,6 +20,8 @@ public:
 	~LocationDirective();
 	LocationDirective(const LocationDirective& other);
 	LocationDirective& operator=(const LocationDirective& other);
+
+	int parseLocationDirective(std::vector<std::string>& tokens);
 };
 
 #endif
