@@ -22,8 +22,16 @@ int Configuration::init(const std::string& path) {
 	return 0;
 }
 
-bool Configuration::isSpecialCharacter(const char& c) {
-	return (c == '{' || c == '}' || c == ';');
+std::vector<std::string> Configuration::tokenize_file_content(const std::string& path) {
+    std::ifstream conf_file(path);
+    std::string line;
+    std::vector<std::string> tokens;
+
+    while (getline(conf_file, line)) {
+		std::vector<std::string> tmp = tokenize(line);
+		tokens.insert(tokens.end(), tmp.begin(), tmp.end());
+    }
+    return tokens;
 }
 
 std::vector<std::string> Configuration::tokenize(std::string& line) {
@@ -49,17 +57,8 @@ std::vector<std::string> Configuration::tokenize(std::string& line) {
 	return tokens;
 }
 
- std::vector<std::string> Configuration::tokenize_file_content(const std::string& path) {
-    std::ifstream conf_file(path);
-    std::string line;
-    std::vector<std::string> tokens;
-
-    while (getline(conf_file, line)) {
-		std::vector<std::string> tmp = tokenize(line);
-		tokens.insert(tokens.end(), tmp.begin(), tmp.end());
-    }
-
-    return tokens;
+bool Configuration::isSpecialCharacter(const char& c) {
+	return (c == '{' || c == '}' || c == ';');
 }
 
 std::vector<std::string> extractServerTokens(std::vector<std::string>& tokens) {
