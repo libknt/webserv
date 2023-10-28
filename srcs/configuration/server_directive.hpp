@@ -5,9 +5,10 @@
 # include <iostream>
 # include <fstream>
 # include <sstream>
+# include <map>
 # include "location_directive.hpp"
 # include "parser_utils.hpp"
-# include <map>
+
 class ServerDirective {
 private:
 	int port_;
@@ -15,6 +16,8 @@ private:
 	std::string server_name_;
 	std::map<std::string, LocationDirective> locations_;
 
+	int parseListenDirective(std::list<std::string>& tokens);
+	int parseServerNameDirective(std::list<std::string>& tokens);
 public:
 	ServerDirective();
 	~ServerDirective();

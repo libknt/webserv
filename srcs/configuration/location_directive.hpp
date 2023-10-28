@@ -16,6 +16,15 @@ private:
 	bool autoindex_;
 	std::list<std::string> allow_methods_;
 	bool chunked_transfer_encoding_;
+
+
+	int parseErrorPagesDirective(std::list<std::string>& tokens);
+	int parseClientMaxBodySizeDirective(std::list<std::string>& tokens);
+	int parseRootDirective(std::list<std::string>& tokens);
+	int parseIndexDirective(std::list<std::string>& tokens);
+	int parseAutoindexDirective(std::list<std::string>& tokens);
+	int parseAllowMethodsDirective(std::list<std::string>& tokens);
+	int parseChunkedTransferEncodingDirective(std::list<std::string>& tokens);
 public:
 	LocationDirective();
 	~LocationDirective();
