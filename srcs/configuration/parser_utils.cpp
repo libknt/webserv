@@ -38,6 +38,7 @@ namespace ParserUtils {
         std::list<std::string> extracted_tokens;
         bool has_semicolon = false;
 
+        tokens.erase(tokens.begin());
         while (!tokens.empty()) {
             std::string token = tokens.front();
             tokens.erase(tokens.begin());

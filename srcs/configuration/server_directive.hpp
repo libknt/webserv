@@ -6,6 +6,7 @@
 # include <fstream>
 # include <sstream>
 # include <map>
+# include <sstream>
 # include "location_directive.hpp"
 # include "parser_utils.hpp"
 

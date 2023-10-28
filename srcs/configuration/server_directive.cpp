@@ -33,10 +33,12 @@ int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			std::cout << "________ listen ___________" << std::endl;
 			ParserUtils::printTokens(args);
+			parseListenDirective(args);
 		} else if (tokens.front() == "server_name") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			std::cout << "________ server_name ___________" << std::endl;
 			ParserUtils::printTokens(args);
+			parseServerNameDirective(args);
 		} else if (tokens.front() == "location") {
 			tokens.erase(tokens.begin());
 			if (tokens.size()) {
@@ -58,8 +60,19 @@ int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
 	return 0;
 }
 
+// エラー処理
 int ServerDirective::parseListenDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	int port;
+
+	if (tokens.size() == 1) {
+		token >> port;
+		port_ = port;
+	} else if (tokens.size() == 3) {
+		ip_address_ = tokens.front();
+		port_ = (tokens.front());
+	} else {
+		return -1;
+	}
 	return 0;
 }
 
@@ -67,3 +80,7 @@ int ServerDirective::parseServerNameDirective(std::list<std::string>& tokens) {
 	(void)tokens;
 	return 0;
 }
+
+// listen <port>;
+
+// listen <ipaddress>:<port>;
