@@ -83,7 +83,21 @@ int LocationDirective::parseErrorPageDirective(std::list<std::string>& tokens) {
 }
 
 int LocationDirective::parseClientMaxBodySizeDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	if (tokens.size() != 1) {
+		return -1;
+	}
+	std::string token = tokens.front();
+	if (token.size() < 2) {
+		return -1;
+	}
+	for (size_t i = 0; i < token.size() - 1; ++i) {
+		if (!std::isdigit(token[i])) {
+			return -1;
+		}
+	}
+	if (token.back() != 'K' && token.back() != 'M') {
+		return -1;
+	}
 	return 0;
 }
 
