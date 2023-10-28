@@ -119,6 +119,11 @@ int LocationDirective::parseAllowMethodsDirective(std::list<std::string>& tokens
 }
 
 int LocationDirective::parseChunkedTransferEncodingDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	if (tokens.size() != 1) {
+		return -1;
+	} else if (tokens.front() != "on" && tokens.front() != "off") {
+		return -1;
+	}
+	chunked_transfer_encoding_ = tokens.front();
 	return 0;
 }
