@@ -1,26 +1,6 @@
 #include "cgi_meta_variables.hpp"
 
 namespace server {
-// CgiMetaVariables::CgiMetaVariables()
-// 	: exec_environ_(NULL) {
-// 	metaFuncArray.push_back(&CgiMetaVariables::auth_type);
-// 	metaFuncArray.push_back(&CgiMetaVariables::content_length);
-// 	metaFuncArray.push_back(&CgiMetaVariables::content_type);
-// 	metaFuncArray.push_back(&CgiMetaVariables::gateway_interface);
-// 	metaFuncArray.push_back(&CgiMetaVariables::path_info);
-// 	metaFuncArray.push_back(&CgiMetaVariables::path_translated);
-// 	metaFuncArray.push_back(&CgiMetaVariables::query_string);
-// 	metaFuncArray.push_back(&CgiMetaVariables::remote_addr);
-// 	metaFuncArray.push_back(&CgiMetaVariables::remote_host);
-// 	metaFuncArray.push_back(&CgiMetaVariables::remote_user);
-// 	metaFuncArray.push_back(&CgiMetaVariables::request_method);
-// 	metaFuncArray.push_back(&CgiMetaVariables::script_name);
-// 	metaFuncArray.push_back(&CgiMetaVariables::server_name);
-// 	metaFuncArray.push_back(&CgiMetaVariables::server_port);
-// 	metaFuncArray.push_back(&CgiMetaVariables::server_protocol);
-// 	metaFuncArray.push_back(&CgiMetaVariables::server_software);
-// }
-
 CgiMetaVariables::CgiMetaVariables(HttpRequest& request)
 	: request_(request)
 	, exec_environ_(NULL) {
