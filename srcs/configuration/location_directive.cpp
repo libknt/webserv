@@ -128,7 +128,11 @@ int LocationDirective::parseAutoindexDirective(std::list<std::string>& tokens) {
 }
 
 int LocationDirective::parseAllowMethodsDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	for (std::list<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+		if (*it != "GET" && *it != "POST" && *it != "DELETE") {
+			return -1;
+		}
+	}
 	return 0;
 }
 
