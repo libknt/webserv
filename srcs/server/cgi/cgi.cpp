@@ -2,7 +2,7 @@
 #include <cstdlib>
 extern char** environ;
 namespace server {
-
+//clsoe signal がミスってcloseできない場合がある。signalが来るとcloseされない場合がある。
 // Cgi::Cgi(){};
 Cgi::Cgi(HttpRequest& request)
 	: meta_(CgiMetaVariables(request))
@@ -84,15 +84,17 @@ int Cgi::execCgi() {
 	char** exec_env = meta_.getExecEnviron();
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == -1) {
 		perror("socketpair");
-		exit(1);
+		std::exit(1);
 	}
+	// fork < 0
 	pid_t pid = fork();
 	if (pid == 0) {
 		close(sv[0]);
 		char buffer[4096];
+		// dup2 < 0
 		dup2(sv[1], STDOUT_FILENO);
 		dup2(sv[1], STDIN_FILENO);
-		memset(buffer, '\0', sizeof(buffer));
+		std::memset(buffer, '\0', sizeof(buffer));
 		ssize_t bytes_read;
 		bytes_read = read(1, buffer, sizeof(buffer));
 		std::string ss(buffer);
@@ -100,15 +102,15 @@ int Cgi::execCgi() {
 			(char*)path_.c_str(), (char*)script_.c_str(), (char*)ss.c_str(), NULL
 		};
 		int err = execve(path_.c_str(), exec_argv, exec_env);
-		exit(err);
+		std::exit(err);
 	}
 	close(sv[1]);
 
 	write(sv[0], body_.c_str(), body_.length());
 
-	const int timeout = 5;
+ //TODO timeoutの設定をする
 	bool b = false;
-	for (int i = 0; i < timeout; ++i) {
+	for (;;) {
 		int status;
 		if (waitpid(pid, &status, WNOHANG) != 0) {
 			std::cout << "Child process ended." << std::endl;
@@ -117,11 +119,12 @@ int Cgi::execCgi() {
 		}
 		sleep(1);
 	}
+	// kill < 0
 	if (!b)
 		kill(pid, SIGKILL);
 	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 		std::cerr << "exec_err(): " << strerror(errno) << std::endl;
-		exit(-1);
+		std::exit(-1);
 	}
 
 	char buffer[4096];

@@ -155,6 +155,7 @@ std::string CgiMetaVariables::base64Decode(std::string const& encoded_string) {
 
 	return ret;
 }
+
 int CgiMetaVariables::remoteUser() {
 	std::string remote_user = request_.getHeaderValue("Authorization");
 	if (remote_user.compare("") != 0) {
