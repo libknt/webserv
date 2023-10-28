@@ -62,17 +62,7 @@ int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
 
 // エラー処理
 int ServerDirective::parseListenDirective(std::list<std::string>& tokens) {
-	int port;
-
-	if (tokens.size() == 1) {
-		token >> port;
-		port_ = port;
-	} else if (tokens.size() == 3) {
-		ip_address_ = tokens.front();
-		port_ = (tokens.front());
-	} else {
-		return -1;
-	}
+	(void)tokens;
 	return 0;
 }
 

@@ -12,7 +12,7 @@
 
 class ServerDirective {
 private:
-	int port_;
+	std::string port_;
 	std::string ip_address_;
 	std::string server_name_;
 	std::map<std::string, LocationDirective> locations_;
