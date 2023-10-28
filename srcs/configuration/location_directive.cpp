@@ -96,7 +96,10 @@ int LocationDirective::parseRootDirective(std::list<std::string>& tokens) {
 }
 
 int LocationDirective::parseIndexDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	if (tokens.size() != 1) {
+		return -1;
+	}
+	index_ = tokens.front();
 	return 0;
 }
 
