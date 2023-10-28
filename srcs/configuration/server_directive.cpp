@@ -57,3 +57,13 @@ int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
 	}
 	return 0;
 }
+
+int ServerDirective::parseListenDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int ServerDirective::parseServerNameDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}

@@ -69,3 +69,38 @@ int LocationDirective::parseLocationDirective(std::string& location_path, std::l
 	ParserUtils::printTokens(tokens);
 	return 0;
 }
+
+int LocationDirective::parseErrorPageDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int LocationDirective::parseClientMaxBodySizeDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int LocationDirective::parseRootDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int LocationDirective::parseIndexDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int LocationDirective::parseAutoindexDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int LocationDirective::parseAllowMethodsDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
+
+int LocationDirective::parseChunkedTransferEncodingDirective(std::list<std::string>& tokens) {
+	(void)tokens;
+	return 0;
+}
