@@ -7,21 +7,19 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "fd.hpp"
 
 namespace server {
 
-enum SERVER_STATUS {
-	REQUEST,
-	RESPONSE,
-	CGI,
-	FINISHED,
-	ERROR,
-	UNDEFINED,
+enum RequestProcessStatus {
+    RECEIVED,
+		UNDEFINED,
 };
 
 class IoMultiplexing {
 
 private:
+	std::map<int, RequestProcessStatus> request_process_status_;
 	std::vector<socket_conf> socket_conf_;
 	std::vector<server::Socket> socket_;
 	std::map<int, time_t> activity_times_;

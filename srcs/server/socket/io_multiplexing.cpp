@@ -3,7 +3,8 @@
 
 namespace server {
 IoMultiplexing::IoMultiplexing()
-	: socket_conf_(std::vector<socket_conf>())
+	: request_process_status_(std::map<int, RequestProcessStatus>())
+	, socket_conf_(std::vector<socket_conf>())
 	, socket_(std::vector<server::Socket>())
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
@@ -17,7 +18,8 @@ IoMultiplexing::IoMultiplexing()
 }
 
 IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
-	: socket_conf_(conf)
+	: request_process_status_(std::map<int, RequestProcessStatus>())
+	, socket_conf_(conf)
 	, socket_(std::vector<server::Socket>())
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
@@ -33,7 +35,8 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 IoMultiplexing::~IoMultiplexing() {}
 
 IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
-	: socket_conf_(other.socket_conf_)
+	: request_process_status_(other.request_process_status_)
+	, socket_conf_(other.socket_conf_)
 	, socket_(other.socket_)
 	, activity_times_(other.activity_times_)
 	, max_sd_(other.max_sd_)
@@ -47,6 +50,7 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 
 	if (this != &other) {
+		request_process_status_ = other.request_process_status_;
 		socket_conf_ = other.socket_conf_;
 		socket_ = other.socket_;
 		activity_times_ = other.activity_times_;
