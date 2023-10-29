@@ -1,0 +1,9 @@
+POST /api/xml-upload HTTP/1.1
+Host: example.com
+Transfer-Encoding: chunked
+Content-Type: application/xml
+
+1a
+<sample><data>Test</data></sample>
+0
+
