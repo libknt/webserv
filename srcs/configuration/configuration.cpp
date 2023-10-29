@@ -79,3 +79,8 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 	}
 	return 0;
 }
+
+std::vector<ServerDirective> Configuration::getServers() const {
+	return servers_;
+}
+

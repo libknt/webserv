@@ -160,3 +160,31 @@ int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::st
 	chunked_transfer_encoding_ = tokens.front();
 	return 0;
 }
+
+std::vector<std::string> LocationDirective::getErrorPage() const {
+	return error_page_;
+}
+
+std::vector<std::string> LocationDirective::getAllowMethods() const {
+	return allow_methods_;
+}
+
+std::string LocationDirective::getClientMaxBodySize() const {
+	return client_max_body_size_;
+}
+
+std::string LocationDirective::getRoot() const {
+	return root_;
+}
+
+std::string LocationDirective::getIndex() const {
+	return index_;
+}
+
+std::string LocationDirective::getAutoindex() const {
+	return autoindex_;
+}
+
+std::string LocationDirective::getChunkedTransferEncoding() const {
+	return chunked_transfer_encoding_;
+}

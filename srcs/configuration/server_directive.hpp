@@ -26,6 +26,10 @@ public:
 	ServerDirective& operator=(const ServerDirective& other);
 
 	int parseServerDirective(std::vector<std::string>& tokens);
+	std::string getPort() const;
+	std::string getIpAddress() const;
+	std::string getServerName() const;
+	std::map<std::string, LocationDirective> getLocations() const;
 };
 
 #endif

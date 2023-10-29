@@ -85,3 +85,18 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 	return 0;
 }
 
+std::string ServerDirective::getPort() const {
+	return port_;
+}
+
+std::string ServerDirective::getIpAddress() const {
+	return ip_address_;
+}
+
+std::string ServerDirective::getServerName() const {
+	return server_name_;
+}
+
+std::map<std::string, LocationDirective> ServerDirective::getLocations() const {
+	return locations_;
+}

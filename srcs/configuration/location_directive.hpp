@@ -31,6 +31,13 @@ public:
 	LocationDirective& operator=(const LocationDirective& other);
 
 	int parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens);
+	std::vector<std::string> getErrorPage() const;
+	std::vector<std::string> getAllowMethods() const;
+	std::string getClientMaxBodySize() const;
+	std::string getRoot() const;
+	std::string getIndex() const;
+	std::string getAutoindex() const;
+	std::string getChunkedTransferEncoding() const;
 };
 
 #endif
