@@ -15,15 +15,19 @@ Configuration& Configuration::operator=(const Configuration& other) {
 
 int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
-	tokens = tokenize_file_content(path);
+	std::ifstream conf_file(path.c_str());
+	if (conf_file.fail()) {
+		std::cerr << "Open conf file failed" << std::endl;
+		return -1;
+	}
+	tokens = tokenize_file_content(conf_file);
 	if (parseConfiguration(tokens) == -1) {
 		return -1;
 	}
 	return 0;
 }
 
-std::vector<std::string> Configuration::tokenize_file_content(const std::string& path) {
-	std::ifstream conf_file(path.c_str());
+std::vector<std::string> Configuration::tokenize_file_content(std::ifstream& conf_file) {
 	std::string line;
 	std::vector<std::string> tokens;
 

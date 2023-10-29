@@ -12,7 +12,7 @@ class Configuration {
 private:
 	std::vector<ServerDirective> servers_;
 
-	std::vector<std::string> tokenize_file_content(const std::string& path);
+	std::vector<std::string> tokenize_file_content(std::ifstream& conf_file);
 	std::vector<std::string> tokenize(std::string& line);
 	bool isSpecialCharacter(const char& c);
 	int parseConfiguration(std::vector<std::string>& tokens);
