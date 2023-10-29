@@ -41,7 +41,7 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds_(other.read_fds_)
-	,write_fds_(other.write_fds_)
+	, write_fds_(other.write_fds_)
 	, should_stop_server_(other.should_stop_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
@@ -204,10 +204,10 @@ int IoMultiplexing::select() {
 				}
 				--desc_ready;
 			}
-			//TODO recvとsendを分けないと
-			// if (FD_ISSET(sd, &write_fds_)) {
-			// 	send(sd);
-			// }
+			// TODO recvとsendを分けないと
+			//  if (FD_ISSET(sd, &write_fds_)) {
+			//  	send(sd);
+			//  }
 		}
 	}
 	return 0;
