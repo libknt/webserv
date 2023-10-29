@@ -3,7 +3,17 @@
 #include <cstdlib>
 
 namespace server {
-HttpRequest::HttpRequest()
+// HttpRequest::HttpRequest()
+// 	: status_(http_request_status::METHOD)
+// 	, method_(http_method::UNDEFINED)
+// 	, version_(http_version::UNDEFINED)
+// 	, error_status_(http_error_status::UNDEFINED)
+// 	, body_message_type_(http_body_message_type::UNDEFINED)
+// 	, content_length_(0)
+// 	, chunked_status_(chunked_status::CHUNKED_SIZE)
+// 	, chunked_size_(0) {}
+
+HttpRequest::HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr)
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
@@ -11,7 +21,9 @@ HttpRequest::HttpRequest()
 	, body_message_type_(http_body_message_type::UNDEFINED)
 	, content_length_(0)
 	, chunked_status_(chunked_status::CHUNKED_SIZE)
-	, chunked_size_(0) {}
+	, chunked_size_(0)
+	, client_addr_(client_addr)
+	, server_addr_(server_addr) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -32,6 +44,8 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		request_path_ = request.request_path_;
 		header_ = request.header_;
 		body_ = request.body_;
+		client_addr_ = request.client_addr_;
+		server_addr_ = request.server_addr_;
 	}
 	return (*this);
 }
@@ -227,11 +241,64 @@ void HttpRequest::getInfo(void) {
 		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
 }
 
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) {
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) const {
 	return (status_);
 }
 
 http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void) {
 	return (body_message_type_);
 }
+
+sockaddr_in HttpRequest::getClientAddress() const {
+	return client_addr_;
+}
+
+sockaddr_in HttpRequest::getServerAddress() const {
+	return server_addr_;
+}
+
+std::string HttpRequest::getHttpMethod() const {
+	std::string method;
+	switch (method_) {
+		case http_method::GET:
+			method = "GET";
+			break;
+		case http_method::POST:
+			method = "POST";
+			break;
+		case http_method::DELETE:
+			method = "DELETE";
+			break;
+		default:
+			method = std::string("");
+	}
+	return method;
+}
+
+std::string HttpRequest::getServerProtocol() const {
+	std::string protocol;
+	switch (version_) {
+		case http_version::HTTP_1_0:
+			protocol = "HTTP_1_0";
+			break;
+		case http_version::HTTP_1_1:
+			protocol = "HTTP_1_1";
+			break;
+		case http_version::HTTP_2_0:
+			protocol = "HTTP_2_0";
+			break;
+		default:
+			protocol = "";
+	}
+	return protocol;
+}
+
+std::string HttpRequest::getRequestPath() const {
+	return request_path_;
+}
+
+std::string HttpRequest::getBody() const {
+	return body_;
+}
+
 }

@@ -2,6 +2,7 @@
 #define HTTP_REQUEST_HPP
 #include <iostream>
 #include <map>
+#include <netinet/in.h>
 #include <string>
 
 namespace server {
@@ -71,6 +72,8 @@ private:
 	std::string request_path_;
 	std::map<std::string, std::string> header_;
 	std::string body_;
+	sockaddr_in client_addr_;
+	sockaddr_in server_addr_;
 	int parseHttpMethod(std::string const& line);
 	int parseHttpHeader(std::string const& line);
 	int parseHttpBody(std::string const& line);
@@ -84,16 +87,24 @@ private:
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 
+	HttpRequest();
+
 public:
-	explicit HttpRequest();
+	explicit HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr);
 	HttpRequest(HttpRequest const& request);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
-	http_request_status::HTTP_REQUEST_STATUS getHttpRequestStatus(void);
+	http_request_status::HTTP_REQUEST_STATUS getHttpRequestStatus(void) const;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getHttpBodyMessageType(void);
+	sockaddr_in getClientAddress() const;
+	sockaddr_in getServerAddress() const;
+	std::string getHttpMethod() const;
+	std::string getServerProtocol() const;
+	std::string getRequestPath() const;
+	std::string getBody() const;
 };
 }
 #endif
