@@ -32,6 +32,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 	std::vector<std::string> location_tokens;
 	std::vector<std::string> args;
 
+	// TODO: too many elseif
 	while (!tokens.empty()) {
 		LocationDirective location_directive;
 		std::string location_path;
