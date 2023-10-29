@@ -61,20 +61,26 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 }
 
 int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 3) {
-		std::cerr << "Parse Error: parseListenDirective" << std::endl;
+	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseListenDirective1" << std::endl;
 		return -1;
 	}
-	if (tokens[1] != ":") {
-		std::cerr << "Parse Error: parseListenDirective" << std::endl;
+
+	std::string token = tokens.front();
+	size_t found = token.find(":");
+	if (found == std::string::npos || found == 0 || found == token.size() - 1) {
+		std::cerr << "Parse Error: parseListenDirective2" << std::endl;
 		return -1;
 	}
-	for (size_t i = 0; i < tokens[2].size(); ++i) {
-		if (!std::isdigit(tokens[2][i])) {
-			std::cerr << "Parse Error: parseListenDirective" << std::endl;
+
+	std::string port = token.substr(found + 1);
+	for (size_t i = 0; i < port.size(); ++i) {
+		if (!isdigit(port[i])) {
+			std::cerr << "Parse Error: parseListenDirective3" << std::endl;
 			return -1;
 		}
 	}
+
 	ip_address_ = tokens.front();
 	port_ = tokens.back();
 	return 0;
