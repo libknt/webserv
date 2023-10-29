@@ -21,19 +21,19 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 	return *this;
 }
 
-int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
-	std::list<std::string> location_tokens;
-	std::list<std::string> args;
+int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
+	std::vector<std::string> location_tokens;
+	std::vector<std::string> args;
 
 	while (!tokens.empty()) {
 		LocationDirective location_directive;
 		std::string location_path;
 
-		if (tokens.front() == "listen") {
+		if (tokens.front() == "vectoren") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "________ listen ___________" << std::endl;
+			std::cout << "________ vectoren ___________" << std::endl;
 			ParserUtils::printTokens(args);
-			parseListenDirective(args);
+			parsevectorenDirective(args);
 		} else if (tokens.front() == "server_name") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			std::cout << "________ server_name ___________" << std::endl;
@@ -60,12 +60,12 @@ int ServerDirective::parseServerDirective(std::list<std::string>& tokens) {
 	return 0;
 }
 
-int ServerDirective::parseListenDirective(std::list<std::string>& tokens) {
+int ServerDirective::parsevectorenDirective(std::vector<std::string>& tokens) {
 	(void)tokens;
 	return 0;
 }
 
-int ServerDirective::parseServerNameDirective(std::list<std::string>& tokens) {
+int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		return -1;
 	}

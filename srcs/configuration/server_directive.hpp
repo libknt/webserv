@@ -17,15 +17,15 @@ private:
 	std::string server_name_;
 	std::map<std::string, LocationDirective> locations_;
 
-	int parseListenDirective(std::list<std::string>& tokens);
-	int parseServerNameDirective(std::list<std::string>& tokens);
+	int parsevectorenDirective(std::vector<std::string>& tokens);
+	int parseServerNameDirective(std::vector<std::string>& tokens);
 public:
 	ServerDirective();
 	~ServerDirective();
 	ServerDirective(const ServerDirective& other);
 	ServerDirective& operator=(const ServerDirective& other);
 
-	int parseServerDirective(std::list<std::string>& tokens);
+	int parseServerDirective(std::vector<std::string>& tokens);
 };
 
 #endif

@@ -2,15 +2,15 @@
 
 namespace ParserUtils {
 
-    std::list<std::string> extractTokensFromBlock(std::list<std::string>& tokens) {
-        std::list<std::string> extracted_tokens;
+    std::vector<std::string> extractTokensFromBlock(std::vector<std::string>& tokens) {
+        std::vector<std::string> extracted_tokens;
         size_t num_of_left_brace = 0;
         size_t num_of_right_brace = 0;
 
         if (tokens.empty() || tokens.front() != "{") {
             std::cout << tokens.front() << std::endl;
             std::cerr << "Parse Error: Invalid Block" << std::endl;
-            return std::list<std::string>();
+            return std::vector<std::string>();
         }
 
         while (!tokens.empty()) {
@@ -31,11 +31,11 @@ namespace ParserUtils {
         }
 
         std::cerr << "Parse Error: Invalid Block" << std::endl;
-        return std::list<std::string>();
+        return std::vector<std::string>();
     }
 
-    std::list<std::string> extractTokensUntilSemicolon(std::list<std::string>& tokens) {
-        std::list<std::string> extracted_tokens;
+    std::vector<std::string> extractTokensUntilSemicolon(std::vector<std::string>& tokens) {
+        std::vector<std::string> extracted_tokens;
         bool has_semicolon = false;
 
         tokens.erase(tokens.begin());
@@ -56,10 +56,10 @@ namespace ParserUtils {
         return extracted_tokens;
     }
 
-    void printTokens(std::list<std::string>& tokens) {
+    void printTokens(std::vector<std::string>& tokens) {
         std::cout << "========== printTokens() ==========" << std::endl;
-        for (std::list<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
-            std::cout << "[" << *it << "] " << " ";
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            std::cout << "[" << tokens[i] << "]" << std::endl;
         }
         std::cout << std::endl;
     }

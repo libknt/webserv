@@ -27,8 +27,8 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 	return *this;
 }
 
-int LocationDirective::parseLocationDirective(std::string& location_path, std::list<std::string>& tokens) {
-	std::list<std::string> args;
+int LocationDirective::parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens) {
+	std::vector<std::string> args;
 	(void)location_path;
 	while (!tokens.empty()) {
 		if (tokens.front() == "error_page") {
@@ -77,14 +77,13 @@ int LocationDirective::parseLocationDirective(std::string& location_path, std::l
 	return 0;
 }
 
-int LocationDirective::parseErrorPageDirective(std::list<std::string>& tokens) {
-	for (std::list<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
-		std::string token = *it;
-		if (token.size() < 2) {
+int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens) {
+	for (size_t i = 0; i < tokens.size(); ++i) {
+		if (tokens[i].size() < 2) {
 			return -1;
 		}
-		for (size_t i = 0; i < token.size() - 1; ++i) {
-			if (!std::isdigit(token[i])) {
+		for (size_t j = 0; j < tokens[j].size() - 1; ++j) {
+			if (!std::isdigit(tokens[i][j])) {
 				return -1;
 			}
 		}
@@ -92,7 +91,7 @@ int LocationDirective::parseErrorPageDirective(std::list<std::string>& tokens) {
 	return 0;
 }
 
-int LocationDirective::parseClientMaxBodySizeDirective(std::list<std::string>& tokens) {
+int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		return -1;
 	}
@@ -111,7 +110,7 @@ int LocationDirective::parseClientMaxBodySizeDirective(std::list<std::string>& t
 	return 0;
 }
 
-int LocationDirective::parseRootDirective(std::list<std::string>& tokens) {
+int LocationDirective::parseRootDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		return -1;
 	}
@@ -119,7 +118,7 @@ int LocationDirective::parseRootDirective(std::list<std::string>& tokens) {
 	return 0;
 }
 
-int LocationDirective::parseIndexDirective(std::list<std::string>& tokens) {
+int LocationDirective::parseIndexDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		return -1;
 	}
@@ -127,7 +126,7 @@ int LocationDirective::parseIndexDirective(std::list<std::string>& tokens) {
 	return 0;
 }
 
-int LocationDirective::parseAutoindexDirective(std::list<std::string>& tokens) {
+int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		return -1;
 	}
@@ -138,16 +137,19 @@ int LocationDirective::parseAutoindexDirective(std::list<std::string>& tokens) {
 	return 0;
 }
 
-int LocationDirective::parseAllowMethodsDirective(std::list<std::string>& tokens) {
-	for (std::list<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
-		if (*it != "GET" && *it != "POST" && *it != "DELETE") {
+int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() == 0) {
+		return -1;
+	}
+	for (size_t i = 0; i < tokens.size(); ++i) {
+		if (tokens[i] != "GET" && tokens[i] != "POST" && tokens[i] != "DELETE") {
 			return -1;
 		}
 	}
 	return 0;
 }
 
-int LocationDirective::parseChunkedTransferEncodingDirective(std::list<std::string>& tokens) {
+int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		return -1;
 	}
