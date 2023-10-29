@@ -61,7 +61,19 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 }
 
 int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
-	(void)tokens;
+	if (tokens.size() != 3) {
+		return -1;
+	}
+	if (tokens[1] != ":") {
+		return -1;
+	}
+	for (size_t i = 0; i < tokens[2].size(); ++i) {
+		if (!std::isdigit(tokens[2][i])) {
+			return -1;
+		}
+	}
+	ip_address_ = tokens.front();
+	port_ = tokens.back();
 	return 0;
 }
 
@@ -69,6 +81,7 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 	if (tokens.size() != 1) {
 		return -1;
 	}
+	server_name_ = tokens.front();
 	return 0;
 }
 
