@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 			return 1;
 	}
 
-	// std::cout << configuration << std::endl;
+	std::cout << configuration << std::endl;
 
 	// start();
 	return 0;

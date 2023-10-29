@@ -25,7 +25,7 @@ int Configuration::init(const std::string& path) {
 }
 
 std::vector<std::string> Configuration::tokenize_file_content(const std::string& path) {
-	std::ifstream conf_file(path);
+	std::ifstream conf_file(path.c_str());
 	std::string line;
 	std::vector<std::string> tokens;
 
