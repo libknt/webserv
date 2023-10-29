@@ -31,14 +31,14 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 
 		if (tokens.front() == "listen") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "________ listen ___________" << std::endl;
-			ParserUtils::printTokens(args);
-			parseListenDirective(args);
+			if (parseListenDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "server_name") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "________ server_name ___________" << std::endl;
-			ParserUtils::printTokens(args);
-			parseServerNameDirective(args);
+			if (parseServerNameDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "location") {
 			tokens.erase(tokens.begin());
 			if (tokens.size()) {
@@ -49,7 +49,9 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 				return -1;
 			}
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
-			location_directive.parseLocationDirective(location_tokens);
+			if (location_directive.parseLocationDirective(location_tokens) == -1) {
+				return -1;
+			}
 			locations_[location_path] = location_directive;
 		} else {
 			std::cout << "Parse Error: serverDirective" << std::endl;

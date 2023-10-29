@@ -32,39 +32,39 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 	while (!tokens.empty()) {
 		if (tokens.front() == "error_page") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ error_page ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseErrorPageDirective(args);
+			if (parseErrorPageDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "client_max_body_size") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ client_max_body_size ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseClientMaxBodySizeDirective(args);
+			if (parseClientMaxBodySizeDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "root") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ root ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseRootDirective(args);
+			if (parseRootDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "index") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ index ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseIndexDirective(args);
+			if (parseIndexDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "autoindex") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ autoindex ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseAutoindexDirective(args);
+			if (parseAutoindexDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "allow_methods") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ allow_methods ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseAllowMethodsDirective(args);
+			if (parseAllowMethodsDirective(args) == -1) {
+				return -1;
+			}
 		} else if (tokens.front() == "chunked_transfer_encoding") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "+++++++++ chuncked_transfer_encoding ++++++++++++" << std::endl;
-			ParserUtils::printTokens(args);
-			parseChunkedTransferEncodingDirective(args);
+			if (parseChunkedTransferEncodingDirective(args) == -1) {
+				return -1;
+			}
 		} else {
 			std::cout << "Parse Error: Location Directive" << std::endl;
 			ParserUtils::printTokens(tokens);
