@@ -1,6 +1,16 @@
 #include "location_directive.hpp"
 
-LocationDirective::LocationDirective() {}
+LocationDirective::LocationDirective() {
+	std::vector<std::string> allow_methods;
+	allow_methods.push_back("GET");
+	allow_methods_ = allow_methods;
+
+	client_max_body_size_ = "1M";
+	root_ = "html";
+	index_ = "index.html";
+	autoindex_ = "off";
+	chunked_transfer_encoding_ = "off";
+}
 
 LocationDirective::~LocationDirective() {}
 

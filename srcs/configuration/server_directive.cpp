@@ -1,6 +1,10 @@
 #include "server_directive.hpp"
 
-ServerDirective::ServerDirective() {}
+ServerDirective::ServerDirective() {
+	ip_address_ = "127.0.0.1";
+	port_ = "80";
+	server_name_ = "localhost";
+}
 
 ServerDirective::~ServerDirective() {}
 
