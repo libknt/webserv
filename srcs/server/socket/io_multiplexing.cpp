@@ -9,8 +9,8 @@ IoMultiplexing::IoMultiplexing()
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, should_stop_server_(false) {
-	FD_ZERO(&master_set_);
-	FD_ZERO(&working_set_);
+	FD_ZERO(&master_read_fds_);
+	FD_ZERO(&read_fds__);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -22,8 +22,8 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, should_stop_server_(false) {
-	FD_ZERO(&master_set_);
-	FD_ZERO(&working_set_);
+	FD_ZERO(&master_read_fds_);
+	FD_ZERO(&read_fds__);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -37,8 +37,8 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, max_sd_(other.max_sd_)
 	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
-	, master_set_(other.master_set_)
-	, working_set_(other.working_set_)
+	, master_read_fds_(other.master_read_fds_)
+	, read_fds__(other.read_fds__)
 	, should_stop_server_(other.should_stop_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
@@ -50,8 +50,8 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 		max_sd_ = other.max_sd_;
 		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
-		master_set_ = other.master_set_;
-		working_set_ = other.working_set_;
+		master_read_fds_ = other.master_read_fds_;
+		read_fds__ = other.read_fds__;
 		should_stop_server_ = other.should_stop_server_;
 	}
 	return *this;
@@ -95,7 +95,7 @@ int IoMultiplexing::accept(int listen_sd) {
 		}
 
 		std::cout << "  New incoming connection -  " << new_sd << std::endl;
-		FD_SET(new_sd, &master_set_);
+		FD_SET(new_sd, &master_read_fds_);
 		if (new_sd > max_sd_)
 			max_sd_ = new_sd;
 
@@ -105,9 +105,9 @@ int IoMultiplexing::accept(int listen_sd) {
 
 int IoMultiplexing::disconnect(int sd) {
 	close(sd);
-	FD_CLR(sd, &master_set_);
+	FD_CLR(sd, &master_read_fds_);
 	if (sd == max_sd_) {
-		while (!FD_ISSET(max_sd_, &master_set_))
+		while (!FD_ISSET(max_sd_, &master_read_fds_))
 			--max_sd_;
 	}
 	return 0;
@@ -159,10 +159,10 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 
 int IoMultiplexing::select() {
 	while (should_stop_server_ == false) {
-		std::memcpy(&working_set_, &master_set_, sizeof(master_set_));
+		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int result = ::select(max_sd_ + 1, &working_set_, NULL, NULL, &timeout_);
+		int result = ::select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
 
 		if (result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -177,7 +177,7 @@ int IoMultiplexing::select() {
 		int desc_ready = result;
 
 		for (int sd = 0; sd <= max_sd_ && desc_ready > 0; ++sd) {
-			if (FD_ISSET(sd, &working_set_)) {
+			if (FD_ISSET(sd, &read_fds__)) {
 				if (isListeningSocket(sd)) {
 					if (accept(sd) < 0)
 						should_stop_server_ = true;
@@ -193,12 +193,12 @@ int IoMultiplexing::select() {
 }
 
 int IoMultiplexing::server_start() {
-	FD_ZERO(&master_set_);
+	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->getListenSd() > max_sd_) {
 			max_sd_ = it->getListenSd();
 		}
-		FD_SET(it->getListenSd(), &master_set_);
+		FD_SET(it->getListenSd(), &master_read_fds_);
 	}
 	return select();
 }

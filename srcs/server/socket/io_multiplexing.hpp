@@ -19,8 +19,8 @@ private:
 	int max_sd_;
 	int max_clients_;
 	struct timeval timeout_;
-	fd_set master_set_;
-	fd_set working_set_;
+	fd_set master_read_fds_;
+	fd_set read_fds__;
 	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
