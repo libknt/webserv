@@ -26,5 +26,4 @@ public:
 	int init(const std::string& path);
 };
 
-
 #endif
