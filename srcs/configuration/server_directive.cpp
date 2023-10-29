@@ -67,7 +67,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			}
 			locations_[location_path] = location_directive;
 		} else {
-			std::cout << "Parse Error: serverDirective" << std::endl;
+			std::cerr << "Parse Error: serverDirective" << std::endl;
 			std::cout << tokens.front() << std::endl;
 			return -1;
 		}
