@@ -8,7 +8,6 @@ std::vector<std::string> extractTokensFromBlock(std::vector<std::string>& tokens
 	size_t num_of_right_brace = 0;
 
 	if (tokens.empty() || tokens.front() != "{") {
-		std::cout << tokens.front() << std::endl;
 		std::cerr << "Parse Error: Invalid Block" << std::endl;
 		return std::vector<std::string>();
 	}

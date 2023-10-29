@@ -47,7 +47,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 				return -1;
 			}
 		} else if (tokens.front() == "default_error_page") {
-			args = ParserUtils::extractTokensFromBlock(tokens);
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseDefaultErrorPageDirective(args) == -1) {
 				return -1;
 			}
