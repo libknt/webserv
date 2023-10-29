@@ -1,16 +1,16 @@
 #include "socket.hpp"
 
 namespace server {
-Socket::Socket(const char* server_addr, int port)
-	: server_addr_(server_addr)
+Socket::Socket(const char* server_address, int port)
+	: server_address_(server_address)
 	, port_(port)
 	, listen_sd_(-1)
 	, backlog_(SOMAXCONN) {
 	std::memset(&addr_, 0, sizeof(addr_));
 }
 
-Socket::Socket(const char* server_addr, int port, int backlog)
-	: server_addr_(server_addr)
+Socket::Socket(const char* server_address, int port, int backlog)
+	: server_address_(server_address)
 	, port_(port)
 	, listen_sd_(-1)
 	, backlog_(backlog) {
@@ -18,7 +18,7 @@ Socket::Socket(const char* server_addr, int port, int backlog)
 }
 
 Socket::Socket(const Socket& other)
-	: server_addr_(other.server_addr_)
+	: server_address_(other.server_address_)
 	, port_(other.port_)
 	, listen_sd_(other.listen_sd_)
 	, backlog_(other.backlog_) {
@@ -27,7 +27,7 @@ Socket::Socket(const Socket& other)
 
 Socket& Socket::operator=(const Socket& other) {
 	if (this != &other) {
-		server_addr_ = other.server_addr_;
+		server_address_ = other.server_address_;
 		port_ = other.port_;
 		listen_sd_ = other.listen_sd_;
 		backlog_ = other.backlog_;
@@ -101,7 +101,7 @@ int Socket::setSocketAddress() {
 	oss << port_;
 	std::string port_str = oss.str();
 
-	if ((status = getaddrinfo(server_addr_, port_str.c_str(), &hints, &res)) != 0) {
+	if ((status = getaddrinfo(server_address_, port_str.c_str(), &hints, &res)) != 0) {
 		std::cerr << "getaddrinfo() failed: " << gai_strerror(status) << std::endl;
 		return -1;
 	}
@@ -146,7 +146,7 @@ bool Socket::isValid() {
 		return false;
 
 	struct sockaddr_in sa;
-	int result = inet_pton(AF_INET, server_addr_, &(sa.sin_addr));
+	int result = inet_pton(AF_INET, server_address_, &(sa.sin_addr));
 	if (result <= 0)
 		return false;
 
@@ -168,8 +168,8 @@ int Socket::initialize() {
 		return -1;
 	if (listen() < 0)
 		return -1;
-	std::cout << "Socket initialization succeeded!! address: " << server_addr_ << " port: " << port_
-			  << std::endl;
+	std::cout << "Socket initialization succeeded!! address: " << server_address_
+			  << " port: " << port_ << std::endl;
 	return 0;
 }
 

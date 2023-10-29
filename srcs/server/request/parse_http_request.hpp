@@ -2,6 +2,7 @@
 #define PARSE_HTTP_REQUEST_HPP
 
 #include "http_request.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -26,6 +27,8 @@ public:
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	int handleBuffer(int socketfd, char* buf);
 	HttpRequest& getHttpRequest(int sd);
+	void addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
+	void getInfo();
 };
 
 }

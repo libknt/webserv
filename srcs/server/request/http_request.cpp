@@ -3,7 +3,8 @@
 #include <cstdlib>
 
 namespace server {
-HttpRequest::HttpRequest()
+
+HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
@@ -11,7 +12,9 @@ HttpRequest::HttpRequest()
 	, body_message_type_(http_body_message_type::UNDEFINED)
 	, content_length_(0)
 	, chunked_status_(chunked_status::CHUNKED_SIZE)
-	, chunked_size_(0) {}
+	, chunked_size_(0)
+	, client_address_(client_address)
+	, server_address_(server_address) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -32,6 +35,8 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		request_path_ = request.request_path_;
 		header_ = request.header_;
 		body_ = request.body_;
+		client_address_ = request.client_address_;
+		server_address_ = request.server_address_;
 	}
 	return (*this);
 }
@@ -227,11 +232,64 @@ void HttpRequest::getInfo(void) {
 		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
 }
 
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) {
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) const {
 	return (status_);
 }
 
 http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void) {
 	return (body_message_type_);
 }
+
+sockaddr_in HttpRequest::getClientAddress() const {
+	return client_address_;
+}
+
+sockaddr_in HttpRequest::getServerAddress() const {
+	return server_address_;
+}
+
+std::string HttpRequest::getHttpMethod() const {
+	std::string method;
+	switch (method_) {
+		case http_method::GET:
+			method = "GET";
+			break;
+		case http_method::POST:
+			method = "POST";
+			break;
+		case http_method::DELETE:
+			method = "DELETE";
+			break;
+		default:
+			method = std::string("");
+	}
+	return method;
+}
+
+std::string HttpRequest::getServerProtocol() const {
+	std::string protocol;
+	switch (version_) {
+		case http_version::HTTP_1_0:
+			protocol = "HTTP_1_0";
+			break;
+		case http_version::HTTP_1_1:
+			protocol = "HTTP_1_1";
+			break;
+		case http_version::HTTP_2_0:
+			protocol = "HTTP_2_0";
+			break;
+		default:
+			protocol = "";
+	}
+	return protocol;
+}
+
+std::string HttpRequest::getRequestPath() const {
+	return request_path_;
+}
+
+std::string HttpRequest::getBody() const {
+	return body_;
+}
+
 }

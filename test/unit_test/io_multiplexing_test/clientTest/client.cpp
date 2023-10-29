@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[]) {
 	int rc;
-	struct sockaddr_in server_addr;
+	struct sockaddr_in server_address;
 	char sendBuffer[1024];
 	char recvBuffer[1024];
 
