@@ -10,6 +10,15 @@
 
 namespace server {
 
+enum SERVER_STATUS {
+	REQUEST,
+	RESPONSE,
+	CGI,
+	FINISHED,
+	ERROR,
+	UNDEFINED,
+};
+
 class IoMultiplexing {
 
 private:
