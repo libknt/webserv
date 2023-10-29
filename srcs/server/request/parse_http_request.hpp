@@ -25,6 +25,7 @@ public:
 	virtual ~ParseHttpRequest();
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	int handleBuffer(int socketfd, char* buf);
+	HttpRequest& getHttpRequest(int sd);
 };
 
 }
