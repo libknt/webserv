@@ -138,7 +138,7 @@ int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens)
 }
 
 int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() == 0) {
+	if (tokens.empty()) {
 		return -1;
 	}
 	for (size_t i = 0; i < tokens.size(); ++i) {
