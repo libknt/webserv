@@ -52,10 +52,10 @@ HttpRequest& ParseHttpRequest::getHttpRequest(int sd) {
 }
 
 void ParseHttpRequest::addAcceptClientInfo(int socketfd,
-	sockaddr_in client_addr,
-	sockaddr_in server_addr) {
+	sockaddr_in client_address,
+	sockaddr_in server_address) {
 	if (http_request_map_.find(socketfd) == http_request_map_.end()) {
-		HttpRequest request(client_addr, server_addr);
+		HttpRequest request(client_address, server_address);
 		http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
 	}
 }

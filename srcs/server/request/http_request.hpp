@@ -72,8 +72,8 @@ private:
 	std::string request_path_;
 	std::map<std::string, std::string> header_;
 	std::string body_;
-	sockaddr_in client_addr_;
-	sockaddr_in server_addr_;
+	sockaddr_in client_address_;
+	sockaddr_in server_address_;
 	int parseHttpMethod(std::string const& line);
 	int parseHttpHeader(std::string const& line);
 	int parseHttpBody(std::string const& line);
@@ -90,7 +90,7 @@ private:
 	HttpRequest();
 
 public:
-	explicit HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr);
+	explicit HttpRequest(sockaddr_in client_address, sockaddr_in server_address);
 	HttpRequest(HttpRequest const& request);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);

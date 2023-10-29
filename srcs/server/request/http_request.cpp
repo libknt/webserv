@@ -13,7 +13,7 @@ namespace server {
 // 	, chunked_status_(chunked_status::CHUNKED_SIZE)
 // 	, chunked_size_(0) {}
 
-HttpRequest::HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr)
+HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
@@ -22,8 +22,8 @@ HttpRequest::HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr)
 	, content_length_(0)
 	, chunked_status_(chunked_status::CHUNKED_SIZE)
 	, chunked_size_(0)
-	, client_addr_(client_addr)
-	, server_addr_(server_addr) {}
+	, client_address_(client_address)
+	, server_address_(server_address) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -44,8 +44,8 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		request_path_ = request.request_path_;
 		header_ = request.header_;
 		body_ = request.body_;
-		client_addr_ = request.client_addr_;
-		server_addr_ = request.server_addr_;
+		client_address_ = request.client_address_;
+		server_address_ = request.server_address_;
 	}
 	return (*this);
 }
@@ -250,11 +250,11 @@ http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageTy
 }
 
 sockaddr_in HttpRequest::getClientAddress() const {
-	return client_addr_;
+	return client_address_;
 }
 
 sockaddr_in HttpRequest::getServerAddress() const {
-	return server_addr_;
+	return server_address_;
 }
 
 std::string HttpRequest::getHttpMethod() const {

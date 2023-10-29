@@ -1,7 +1,7 @@
 #include "ClientSocket.hpp"
 
-http::ClientSocket::ClientSocket(const char* server_addr, int port)
-	: server_addr_(server_addr)
+http::ClientSocket::ClientSocket(const char* server_address, int port)
+	: server_address_(server_address)
 	, port_(port)
 	, client_socket_(-1) {
 	std::memset(&addr_, 0, sizeof(addr_));
@@ -28,7 +28,7 @@ int http::ClientSocket::socket() {
 int http::ClientSocket::set() {
 
 	addr_.sin_family = AF_INET;
-	if (inet_pton(AF_INET, server_addr_, &(addr_.sin_addr)) <= 0) {
+	if (inet_pton(AF_INET, server_address_, &(addr_.sin_addr)) <= 0) {
 		perror("inet_pton() failed");
 		std::cerr << "inet_pton(): " << strerror(errno) << std::endl;
 		return -1;
@@ -57,7 +57,7 @@ int http::ClientSocket::initialize() {
 }
 
 const char* http::ClientSocket::getServerAddr_() const {
-	return server_addr_;
+	return server_address_;
 }
 int http::ClientSocket::getPort_() const {
 	return port_;
