@@ -18,7 +18,9 @@ Configuration& Configuration::operator=(const Configuration& other) {
 int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
 	tokens = tokenize_file_content(path);
-	parseConfiguration(tokens);
+	if (parseConfiguration(tokens) == -1) {
+		return -1;
+	}
 	return 0;
 }
 

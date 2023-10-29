@@ -31,7 +31,7 @@ public:
 	std::string getPort() const;
 	std::string getIpAddress() const;
 	std::string getServerName() const;
-	std::string getDefaultErrorPage() const; 
+	std::string getDefaultErrorPage() const;
 	std::map<std::string, LocationDirective> getLocations() const;
 };
 
