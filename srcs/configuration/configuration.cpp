@@ -4,9 +4,7 @@ Configuration::Configuration() {}
 
 Configuration::~Configuration() {}
 
-Configuration::Configuration(const Configuration& other) {
-	servers_ = other.servers_;
-}
+Configuration::Configuration(const Configuration& other) : servers_(other.servers_) {}
 
 Configuration& Configuration::operator=(const Configuration& other) {
 	if (this != &other) {
@@ -71,6 +69,7 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 
 		if (tokens.front() == "server") {
 			tokens.erase(tokens.begin());
+
 			server_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			server_directive.parseServerDirective(server_tokens);
 			servers_.push_back(server_directive);
