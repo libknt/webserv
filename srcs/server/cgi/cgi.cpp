@@ -28,6 +28,7 @@ int Cgi::extension(std::string filename, std::string& path) {
 	interpreterMap.insert(std::make_pair(".pl", "/usr/bin/perl"));
 	interpreterMap.insert(std::make_pair(".sh", "/bin/bash"));
 	interpreterMap.insert(std::make_pair(".rb", "/usr/bin/ruby"));
+	interpreterMap.insert(std::make_pair(".php", "/usr/bin/php"));
 
 	std::string extension = getFileExtension(filename);
 	path.clear();
