@@ -114,18 +114,20 @@ std::map<std::string, LocationDirective> ServerDirective::getLocations() const {
 	return locations_;
 }
 
-std::ostream& operator<<(std::ostream &out, const ServerDirective& server_directive) {
+std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;
 	out << "ServerName : " << server_directive.getServerName() << std::endl;
 
 	std::map<std::string, LocationDirective> locations = server_directive.getLocations();
 	size_t i = 0;
-    for (std::map<std::string, LocationDirective>::iterator it = locations.begin(); it != locations.end(); ++it) {
+	for (std::map<std::string, LocationDirective>::iterator it = locations.begin();
+		 it != locations.end();
+		 ++it) {
 		out << "===== location" << i << " =====" << std::endl;
 		out << "LocationPath: " << it->first << std::endl;
-        out << it->second << std::endl;
+		out << it->second << std::endl;
 		i++;
-    }
+	}
 	return out;
 }

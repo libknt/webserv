@@ -1,12 +1,12 @@
 #ifndef CONFIGURATION_HPP
-# define CONFIGURATION_HPP
+#define CONFIGURATION_HPP
 
-# include <string>
-# include <iostream>
-# include <fstream>
-# include <sstream>
-# include "server_directive.hpp"
-# include "parser_utils.hpp"
+#include "parser_utils.hpp"
+#include "server_directive.hpp"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 class Configuration {
 private:
@@ -27,8 +27,6 @@ public:
 	std::vector<ServerDirective> getServers() const;
 };
 
-std::ostream& operator<<(std::ostream &out, const Configuration& configuration);
-
-
+std::ostream& operator<<(std::ostream& out, const Configuration& configuration);
 
 #endif

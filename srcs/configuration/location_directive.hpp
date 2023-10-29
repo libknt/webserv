@@ -1,11 +1,11 @@
 #ifndef LOCATION_DIRECTIVE_HPP
-# define LOCATION_DIRECTIVE_HPP
+#define LOCATION_DIRECTIVE_HPP
 
-# include <iostream>
-# include <string>
-# include <map>
-# include <vector>
-# include "parser_utils.hpp"
+#include "parser_utils.hpp"
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
 
 class LocationDirective {
 private:
@@ -24,6 +24,7 @@ private:
 	int parseAutoindexDirective(std::vector<std::string>& tokens);
 	int parseAllowMethodsDirective(std::vector<std::string>& tokens);
 	int parseChunkedTransferEncodingDirective(std::vector<std::string>& tokens);
+
 public:
 	LocationDirective();
 	~LocationDirective();
@@ -40,6 +41,6 @@ public:
 	std::string getChunkedTransferEncoding() const;
 };
 
-std::ostream& operator<<(std::ostream &out, const LocationDirective& location_directive);
+std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive);
 
 #endif

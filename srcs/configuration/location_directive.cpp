@@ -204,7 +204,7 @@ std::string LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
 
-std::ostream& operator<<(std::ostream &out, const LocationDirective& location_directive) {
+std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
 	std::vector<std::string> error_pages = location_directive.getErrorPage();
 	out << "ErrorPages: " << std::endl;
 	for (size_t i = 0; i < error_pages.size(); ++i) {
@@ -221,7 +221,8 @@ std::ostream& operator<<(std::ostream &out, const LocationDirective& location_di
 	out << "Root: " << location_directive.getRoot() << std::endl;
 	out << "Index: " << location_directive.getIndex() << std::endl;
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
-	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding() << std::endl;
+	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding()
+		<< std::endl;
 
 	return out;
 }

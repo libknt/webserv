@@ -1,14 +1,13 @@
 #ifndef SERVER_DIRECTIVE_HPP
-# define SERVER_DIRECTIVE_HPP
+#define SERVER_DIRECTIVE_HPP
 
-# include <string>
-# include <iostream>
-# include <fstream>
-# include <sstream>
-# include <map>
-# include <sstream>
-# include "location_directive.hpp"
-# include "parser_utils.hpp"
+#include "location_directive.hpp"
+#include "parser_utils.hpp"
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
 
 class ServerDirective {
 private:
@@ -19,6 +18,7 @@ private:
 
 	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
+
 public:
 	ServerDirective();
 	~ServerDirective();
@@ -32,6 +32,6 @@ public:
 	std::map<std::string, LocationDirective> getLocations() const;
 };
 
-std::ostream& operator<<(std::ostream &out, const ServerDirective& server_directive);
+std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);
 
 #endif
