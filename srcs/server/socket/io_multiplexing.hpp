@@ -29,7 +29,8 @@ private:
 	int max_clients_;
 	struct timeval timeout_;
 	fd_set master_read_fds_;
-	fd_set read_fds__;
+	fd_set read_fds_;
+	fd_set write_fds_;
 	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
@@ -44,7 +45,7 @@ public:
 	int server_start();
 	int select();
 	int accept(int listen_sd);
-	int request(int sd);
+	int recv(int sd);
 	int disconnect(int sd);
 	bool isListeningSocket(int sd);
 };

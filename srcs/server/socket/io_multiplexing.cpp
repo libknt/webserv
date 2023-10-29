@@ -10,7 +10,8 @@ IoMultiplexing::IoMultiplexing()
 	, max_clients_(-1)
 	, should_stop_server_(false) {
 	FD_ZERO(&master_read_fds_);
-	FD_ZERO(&read_fds__);
+	FD_ZERO(&read_fds_);
+	FD_ZERO(&write_fds_);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -23,7 +24,8 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	, max_clients_(-1)
 	, should_stop_server_(false) {
 	FD_ZERO(&master_read_fds_);
-	FD_ZERO(&read_fds__);
+	FD_ZERO(&read_fds_);
+	FD_ZERO(&write_fds_);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -38,7 +40,8 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
-	, read_fds__(other.read_fds__)
+	, read_fds_(other.read_fds_)
+	,write_fds_(other.write_fds_)
 	, should_stop_server_(other.should_stop_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
@@ -51,7 +54,8 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
-		read_fds__ = other.read_fds__;
+		read_fds_ = other.read_fds_;
+		write_fds_ = other.write_fds_;
 		should_stop_server_ = other.should_stop_server_;
 	}
 	return *this;
@@ -127,14 +131,14 @@ int IoMultiplexing::disconnect(int sd) {
 	return 0;
 }
 
-int IoMultiplexing::request(int sd) {
+int IoMultiplexing::recv(int sd) {
 	bool should_close_connection;
 	char buffer[BUFFER_SIZE];
 
 	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
 	should_close_connection = false;
 	while (1) {
-		int result = recv(sd, buffer, sizeof(buffer), 0);
+		int result = ::recv(sd, buffer, sizeof(buffer), 0);
 		if (result < 0) {
 			std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 			should_close_connection = true;
@@ -173,10 +177,10 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 
 int IoMultiplexing::select() {
 	while (should_stop_server_ == false) {
-		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
+		std::memcpy(&read_fds_, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int result = ::select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		int result = ::select(max_sd_ + 1, &read_fds_, &write_fds_, NULL, &timeout_);
 
 		if (result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -191,16 +195,19 @@ int IoMultiplexing::select() {
 		int desc_ready = result;
 
 		for (int sd = 0; sd <= max_sd_ && desc_ready > 0; ++sd) {
-			if (FD_ISSET(sd, &read_fds__)) {
+			if (FD_ISSET(sd, &read_fds_)) {
 				if (isListeningSocket(sd)) {
 					if (accept(sd) < 0)
 						should_stop_server_ = true;
 				} else {
-					request(sd);
+					recv(sd);
 				}
-
 				--desc_ready;
 			}
+			//TODO recvとsendを分けないと
+			// if (FD_ISSET(sd, &write_fds_)) {
+			// 	send(sd);
+			// }
 		}
 	}
 	return 0;
