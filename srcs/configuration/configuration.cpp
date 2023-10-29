@@ -4,7 +4,8 @@ Configuration::Configuration() {}
 
 Configuration::~Configuration() {}
 
-Configuration::Configuration(const Configuration& other) : servers_(other.servers_) {}
+Configuration::Configuration(const Configuration& other)
+	: servers_(other.servers_) {}
 
 Configuration& Configuration::operator=(const Configuration& other) {
 	if (this != &other) {

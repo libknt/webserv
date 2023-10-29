@@ -14,7 +14,8 @@ LocationDirective::LocationDirective() {
 
 LocationDirective::~LocationDirective() {}
 
-LocationDirective::LocationDirective(const LocationDirective& other) : error_page_(other.error_page_)
+LocationDirective::LocationDirective(const LocationDirective& other)
+	: error_page_(other.error_page_)
 	, allow_methods_(other.allow_methods_)
 	, client_max_body_size_(other.client_max_body_size_)
 	, root_(other.root_)
