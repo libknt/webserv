@@ -66,7 +66,9 @@ int ServerDirective::parseListenDirective(std::list<std::string>& tokens) {
 }
 
 int ServerDirective::parseServerNameDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	if (tokens.size() != 1) {
+		return -1;
+	}
 	return 0;
 }
 
