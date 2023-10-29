@@ -63,6 +63,7 @@ bool Configuration::isSpecialCharacter(const char& c) {
 
 int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 	while (!tokens.empty()) {
+		// TODO: rename server_tokens
 		std::vector<std::string> server_tokens;
 		ServerDirective server_directive;
 
