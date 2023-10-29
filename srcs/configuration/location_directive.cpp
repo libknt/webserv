@@ -78,7 +78,17 @@ int LocationDirective::parseLocationDirective(std::string& location_path, std::l
 }
 
 int LocationDirective::parseErrorPageDirective(std::list<std::string>& tokens) {
-	(void)tokens;
+	for (std::list<std::string>::iterator it = tokens.begin(); it != tokens.end(); ++it) {
+		std::string token = *it;
+		if (token.size() < 2) {
+			return -1;
+		}
+		for (size_t i = 0; i < token.size() - 1; ++i) {
+			if (!std::isdigit(token[i])) {
+				return -1;
+			}
+		}
+	}
 	return 0;
 }
 
