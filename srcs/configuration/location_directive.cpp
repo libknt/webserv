@@ -77,12 +77,10 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 			}
 		} else {
 			std::cout << "Parse Error: Location Directive" << std::endl;
-			ParserUtils::printTokens(tokens);
 			return -1;
 		}
 		args.clear();
 	}
-	ParserUtils::printTokens(tokens);
 	return 0;
 }
 

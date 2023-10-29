@@ -14,10 +14,12 @@ private:
 	std::string ip_address_;
 	std::string port_;
 	std::string server_name_;
+	std::string default_error_page_;
 	std::map<std::string, LocationDirective> locations_;
 
 	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
+	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 
 public:
 	ServerDirective();
@@ -29,6 +31,7 @@ public:
 	std::string getPort() const;
 	std::string getIpAddress() const;
 	std::string getServerName() const;
+	std::string getDefaultErrorPage() const; 
 	std::map<std::string, LocationDirective> getLocations() const;
 };
 

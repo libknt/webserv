@@ -69,7 +69,6 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 		if (tokens.front() == "server") {
 			tokens.erase(tokens.begin());
 			server_tokens = ParserUtils::extractTokensFromBlock(tokens);
-			ParserUtils::printTokens(server_tokens);
 			server_directive.parseServerDirective(server_tokens);
 			servers_.push_back(server_directive);
 		} else {
