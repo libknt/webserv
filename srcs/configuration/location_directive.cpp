@@ -80,10 +80,12 @@ int LocationDirective::parseLocationDirective(std::string& location_path, std::v
 int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens) {
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		if (tokens[i].size() < 2) {
+			std::cerr << "Parse Error: parseErrorPageDirective" << std::endl;
 			return -1;
 		}
 		for (size_t j = 0; j < tokens[j].size() - 1; ++j) {
 			if (!std::isdigit(tokens[i][j])) {
+				std::cerr << "Parse Error: parseErrorPageDirective" << std::endl;
 				return -1;
 			}
 		}
@@ -93,18 +95,22 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 
 int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;
 	}
 	std::string token = tokens.front();
 	if (token.size() < 2) {
+		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;
 	}
 	for (size_t i = 0; i < token.size() - 1; ++i) {
 		if (!std::isdigit(token[i])) {
+			std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 			return -1;
 		}
 	}
 	if (token.back() != 'K' && token.back() != 'M') {
+		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;
 	}
 	return 0;
@@ -112,6 +118,7 @@ int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>&
 
 int LocationDirective::parseRootDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseRootDirective" << std::endl;
 		return -1;
 	}
 	root_ = tokens.front();
@@ -120,6 +127,7 @@ int LocationDirective::parseRootDirective(std::vector<std::string>& tokens) {
 
 int LocationDirective::parseIndexDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseIndexDirective" << std::endl;
 		return -1;
 	}
 	index_ = tokens.front();
@@ -128,9 +136,11 @@ int LocationDirective::parseIndexDirective(std::vector<std::string>& tokens) {
 
 int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseAutondexDirective" << std::endl;
 		return -1;
 	}
 	if (tokens.front() != "on" && tokens.front() != "off") {
+		std::cerr << "Parse Error: parseAutondexDirective" << std::endl;
 		return -1;
 	}
 	autoindex_ = tokens.front();
@@ -139,10 +149,12 @@ int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens)
 
 int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& tokens) {
 	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseAllowMethodsDirective" << std::endl;
 		return -1;
 	}
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		if (tokens[i] != "GET" && tokens[i] != "POST" && tokens[i] != "DELETE") {
+			std::cerr << "Parse Error: parseAllowMethodsDirective" << std::endl;
 			return -1;
 		}
 		allow_methods_.push_back(tokens[i]);
@@ -152,9 +164,11 @@ int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& toke
 
 int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseChunkedTransferEncodingDirective" << std::endl;
 		return -1;
 	}
 	if (tokens.front() != "on" && tokens.front() != "off") {
+		std::cerr << "Parse Error: parseChunkedTransferEncodingDirective" << std::endl;
 		return -1;
 	}
 	chunked_transfer_encoding_ = tokens.front();
