@@ -188,3 +188,23 @@ std::string LocationDirective::getAutoindex() const {
 std::string LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
+
+std::ostream& operator<<(std::ostream &out, const LocationDirective& location_directive) {
+	std::vector<std::string> error_pages = location_directive.getErrorPage();
+	for (size_t i = 0; i < error_pages.size(); ++i) {
+		out << error_pages[i] << std::endl;
+	}
+
+	std::vector<std::string> allow_methods = location_directive.getAllowMethods();
+	for (size_t i = 0; i < allow_methods.size(); ++i) {
+		out << allow_methods[i] << std::endl;
+	}
+
+	out << location_directive.getClientMaxBodySize() << std::endl;
+	out << location_directive.getRoot() << std::endl;
+	out << location_directive.getIndex() << std::endl;
+	out << location_directive.getAutoindex() << std::endl;
+	out << location_directive.getChunkedTransferEncoding() << std::endl;
+
+	return out;
+}

@@ -13,6 +13,10 @@ int main(int argc, char** argv) {
 	default:
 		return 1;
 	}
+
+	std::cout << "test: " << std::endl;
+	std::cout << configuration << std::endl;
+
 	// start();
 	return 0;
 }

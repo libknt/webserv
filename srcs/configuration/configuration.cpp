@@ -84,3 +84,10 @@ std::vector<ServerDirective> Configuration::getServers() const {
 	return servers_;
 }
 
+std::ostream& operator<<(std::ostream &out, const Configuration& configuration) {
+	std::vector<ServerDirective> servers = configuration.getServers();
+	for (size_t i = 0; i < servers.size(); ++i) {
+		out << servers[i] << std::endl;
+	}
+	return out;
+}

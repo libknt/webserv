@@ -12,8 +12,8 @@
 
 class ServerDirective {
 private:
-	std::string port_;
 	std::string ip_address_;
+	std::string port_;
 	std::string server_name_;
 	std::map<std::string, LocationDirective> locations_;
 
@@ -31,5 +31,7 @@ public:
 	std::string getServerName() const;
 	std::map<std::string, LocationDirective> getLocations() const;
 };
+
+std::ostream& operator<<(std::ostream &out, const ServerDirective& server_directive);
 
 #endif

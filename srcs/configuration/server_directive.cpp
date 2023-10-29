@@ -62,13 +62,16 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 
 int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 3) {
+		std::cerr << "Parse Error: parseListenDirective" << std::endl;
 		return -1;
 	}
 	if (tokens[1] != ":") {
+		std::cerr << "Parse Error: parseListenDirective" << std::endl;
 		return -1;
 	}
 	for (size_t i = 0; i < tokens[2].size(); ++i) {
 		if (!std::isdigit(tokens[2][i])) {
+			std::cerr << "Parse Error: parseListenDirective" << std::endl;
 			return -1;
 		}
 	}
@@ -79,6 +82,7 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 
 int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseServerNameDirective" << std::endl;
 		return -1;
 	}
 	server_name_ = tokens.front();
@@ -99,4 +103,16 @@ std::string ServerDirective::getServerName() const {
 
 std::map<std::string, LocationDirective> ServerDirective::getLocations() const {
 	return locations_;
+}
+
+std::ostream& operator<<(std::ostream &out, const ServerDirective& server_directive) {
+	out << server_directive.getIpAddress() << std::endl;
+	out << server_directive.getPort() << std::endl;
+	out << server_directive.getServerName() << std::endl;
+
+	std::map<std::string, LocationDirective> locations = server_directive.getLocations();
+    for (std::map<std::string, LocationDirective>::iterator it = locations.begin(); it != locations.end(); ++it) {
+        std::cout << it->first << ": " << it->second << std::endl;
+    }
+	return out;
 }

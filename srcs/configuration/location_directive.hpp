@@ -40,4 +40,6 @@ public:
 	std::string getChunkedTransferEncoding() const;
 };
 
+std::ostream& operator<<(std::ostream &out, const LocationDirective& location_directive);
+
 #endif
