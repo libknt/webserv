@@ -145,6 +145,7 @@ int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& toke
 		if (tokens[i] != "GET" && tokens[i] != "POST" && tokens[i] != "DELETE") {
 			return -1;
 		}
+		allow_methods_.push_back(tokens[i]);
 	}
 	return 0;
 }

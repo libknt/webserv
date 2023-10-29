@@ -17,7 +17,7 @@ private:
 	std::string server_name_;
 	std::map<std::string, LocationDirective> locations_;
 
-	int parsevectorenDirective(std::vector<std::string>& tokens);
+	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
 public:
 	ServerDirective();

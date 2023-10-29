@@ -29,11 +29,11 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 		LocationDirective location_directive;
 		std::string location_path;
 
-		if (tokens.front() == "vectoren") {
+		if (tokens.front() == "listen") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			std::cout << "________ vectoren ___________" << std::endl;
+			std::cout << "________ listen ___________" << std::endl;
 			ParserUtils::printTokens(args);
-			parsevectorenDirective(args);
+			parseListenDirective(args);
 		} else if (tokens.front() == "server_name") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			std::cout << "________ server_name ___________" << std::endl;
@@ -60,7 +60,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 	return 0;
 }
 
-int ServerDirective::parsevectorenDirective(std::vector<std::string>& tokens) {
+int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 	(void)tokens;
 	return 0;
 }
