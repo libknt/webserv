@@ -14,7 +14,6 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	std::cout << "test: " << std::endl;
 	std::cout << configuration << std::endl;
 
 	// start();

@@ -49,7 +49,8 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 				return -1;
 			}
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
-			location_directive.parseLocationDirective(location_path, location_tokens);
+			location_directive.parseLocationDirective(location_tokens);
+			locations_[location_path] = location_directive;
 		} else {
 			std::cout << "Parse Error: serverDirective" << std::endl;
 			std::cout << tokens.front() << std::endl;
@@ -112,13 +113,17 @@ std::map<std::string, LocationDirective> ServerDirective::getLocations() const {
 }
 
 std::ostream& operator<<(std::ostream &out, const ServerDirective& server_directive) {
-	out << server_directive.getIpAddress() << std::endl;
-	out << server_directive.getPort() << std::endl;
-	out << server_directive.getServerName() << std::endl;
+	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
+	out << "Port: " << server_directive.getPort() << std::endl;
+	out << "ServerName : " << server_directive.getServerName() << std::endl;
 
 	std::map<std::string, LocationDirective> locations = server_directive.getLocations();
+	size_t i = 0;
     for (std::map<std::string, LocationDirective>::iterator it = locations.begin(); it != locations.end(); ++it) {
-        std::cout << it->first << ": " << it->second << std::endl;
+		out << "===== location" << i << " =====" << std::endl;
+		out << "LocationPath: " << it->first << std::endl;
+        out << it->second << std::endl;
+		i++;
     }
 	return out;
 }

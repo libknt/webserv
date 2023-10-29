@@ -30,7 +30,7 @@ public:
 	LocationDirective(const LocationDirective& other);
 	LocationDirective& operator=(const LocationDirective& other);
 
-	int parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens);
+	int parseLocationDirective(std::vector<std::string>& tokens);
 	std::vector<std::string> getErrorPage() const;
 	std::vector<std::string> getAllowMethods() const;
 	std::string getClientMaxBodySize() const;

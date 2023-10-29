@@ -27,9 +27,8 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 	return *this;
 }
 
-int LocationDirective::parseLocationDirective(std::string& location_path, std::vector<std::string>& tokens) {
+int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) {
 	std::vector<std::string> args;
-	(void)location_path;
 	while (!tokens.empty()) {
 		if (tokens.front() == "error_page") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
@@ -90,6 +89,7 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 				return -1;
 			}
 		}
+		error_page_.push_back(tokens[i]);
 	}
 	return 0;
 }
@@ -206,20 +206,22 @@ std::string LocationDirective::getChunkedTransferEncoding() const {
 
 std::ostream& operator<<(std::ostream &out, const LocationDirective& location_directive) {
 	std::vector<std::string> error_pages = location_directive.getErrorPage();
+	out << "ErrorPages: " << std::endl;
 	for (size_t i = 0; i < error_pages.size(); ++i) {
 		out << error_pages[i] << std::endl;
 	}
 
 	std::vector<std::string> allow_methods = location_directive.getAllowMethods();
+	out << "HTTPMethods: " << std::endl;
 	for (size_t i = 0; i < allow_methods.size(); ++i) {
 		out << allow_methods[i] << std::endl;
 	}
 
-	out << location_directive.getClientMaxBodySize() << std::endl;
-	out << location_directive.getRoot() << std::endl;
-	out << location_directive.getIndex() << std::endl;
-	out << location_directive.getAutoindex() << std::endl;
-	out << location_directive.getChunkedTransferEncoding() << std::endl;
+	out << "GetClientMaxBodySize: " << location_directive.getClientMaxBodySize() << std::endl;
+	out << "Root: " << location_directive.getRoot() << std::endl;
+	out << "Index: " << location_directive.getIndex() << std::endl;
+	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
+	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding() << std::endl;
 
 	return out;
 }
