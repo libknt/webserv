@@ -168,8 +168,8 @@ int Socket::initialize() {
 		return -1;
 	if (listen() < 0)
 		return -1;
-	std::cout << "Socket initialization succeeded!! address: " << server_address_ << " port: " << port_
-			  << std::endl;
+	std::cout << "Socket initialization succeeded!! address: " << server_address_
+			  << " port: " << port_ << std::endl;
 	return 0;
 }
 

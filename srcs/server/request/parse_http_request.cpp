@@ -26,7 +26,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(socketfd);
 	if (it == http_request_map_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		std::exit(-1);
+		exit(-1);
 	}
 	if (it->second.getHttpBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
 		it->second.parseHttpRequest(http_line_stream_[socketfd]);
