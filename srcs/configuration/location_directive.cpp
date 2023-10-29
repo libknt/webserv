@@ -78,14 +78,15 @@ int LocationDirective::parseLocationDirective(std::string& location_path, std::v
 }
 
 int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens) {
-	for (size_t i = 0; i < tokens.size(); ++i) {
-		if (tokens[i].size() < 2) {
-			std::cerr << "Parse Error: parseErrorPageDirective" << std::endl;
-			return -1;
-		}
-		for (size_t j = 0; j < tokens[j].size() - 1; ++j) {
+	if (tokens.size() < 2) {
+		std::cerr << "Parse Error: parseErrorPageDirective1" << std::endl;
+		return -1;
+	}
+	for (size_t i = 0; i < tokens.size() - 1; ++i) {
+		for (size_t j = 0; j < tokens[j].size(); ++j) {
 			if (!std::isdigit(tokens[i][j])) {
-				std::cerr << "Parse Error: parseErrorPageDirective" << std::endl;
+				std::cout << tokens[i][j] << std::endl;
+				std::cerr << "Parse Error: parseErrorPageDirective2" << std::endl;
 				return -1;
 			}
 		}
