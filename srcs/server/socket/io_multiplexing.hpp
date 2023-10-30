@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <map>
 #include <vector>
-#include "fd.hpp"
 
 namespace server {
 
