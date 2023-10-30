@@ -140,14 +140,6 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 		return -1;
 	}
 
-	// std::string port = token.substr(found + 1);
-	// for (size_t i = 0; i < port.size(); ++i) {
-	// 	if (!isdigit(port[i])) {
-	// 		std::cerr << "Parse Error: parseListenDirective3" << std::endl;
-	// 		return -1;
-	// 	}
-	// }
-
 	ip_address_ = token.substr(0, found);
 	std::cout << ip_address_ << std::endl;
 	if (!isValidIPv4(ip_address_)) {
