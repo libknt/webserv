@@ -243,8 +243,10 @@ int IoMultiplexing::select() {
 					if (accept(sd) < 0)
 						should_stop_server_ = true;
 				} else {
-					if (recv(sd) < 0)
+					if (recv(sd) < 0) {
+						--desc_ready;
 						continue;
+					}
 					if (request_process_status_[sd] == REQUESTFINISH) {
 						setResponseStatus(sd);
 						// response execute
@@ -254,11 +256,13 @@ int IoMultiplexing::select() {
 						}
 						if (request_process_status_[sd] == SEND) {
 							FD_SET(sd, &master_write_fds_);
+							--desc_ready;
 							continue;
 						}
 						// cgi execute
 						if (request_process_status_[sd] == CGI) {
 							// 何かしらのcgi実行
+							--desc_ready;
 							continue;
 						}
 					}
@@ -274,6 +278,7 @@ int IoMultiplexing::select() {
 				if (request_process_status_[sd] == SEND) {
 					send(sd);
 				}
+				--desc_ready;
 			}
 		}
 	}
