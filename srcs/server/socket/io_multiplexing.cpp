@@ -9,7 +9,8 @@ IoMultiplexing::IoMultiplexing()
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
 	, max_clients_(-1)
-	, should_stop_server_(false) {
+	, should_stop_server_(false)
+	, response_(std::map<int, std::string>()) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds_);
 	FD_ZERO(&master_write_fds_);
@@ -130,6 +131,7 @@ int IoMultiplexing::accept(int listen_sd) {
 int IoMultiplexing::disconnect(int sd) {
 	close(sd);
 	FD_CLR(sd, &master_read_fds_);
+	FD_CLR(sd, &master_write_fds_);
 	if (sd == max_sd_) {
 		while (!FD_ISSET(max_sd_, &master_read_fds_))
 			--max_sd_;
@@ -170,9 +172,18 @@ int IoMultiplexing::send(int sd) {
 	char buffer[BUFFER_SIZE];
 
 	std::memset(buffer, 0, BUFFER_SIZE);
-	std::memset(buffer, 97, BUFFER_SIZE - 1);
 
-	int result = ::send(sd, buffer, sizeof(buffer), 0);
+	size_t size;
+	if (response_[sd].size() < BUFFER_SIZE) {
+		size = response_[sd].size();
+	} else {
+		size = BUFFER_SIZE;
+	}
+	std::memcpy(buffer, response_[sd].c_str(), size);
+	response_[sd] = response_[sd].substr(size);
+	std::cout << buffer << std::endl;
+
+	int result = ::send(sd, buffer, size, 0);
 	if (result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
@@ -184,10 +195,15 @@ int IoMultiplexing::send(int sd) {
 		return -1;
 	}
 
+	if (response_.empty()) {
+		request_process_status_[sd] = FINISH;
+	}
+
 	if (request_process_status_[sd] == FINISH) {
 		disconnect(sd);
 	}
-	std::cout << sd << "  " << BUFFER_SIZE << " bytes sended\n" << std::endl;
+
+	std::cout << sd << "  " << size << " bytes sended\n" << std::endl;
 	return 0;
 }
 
@@ -205,8 +221,10 @@ void IoMultiplexing::setResponseStatus(int sd) {
 	// if (isCgi) {
 	// request_process_status_[sd] = CGI;
 	// } else {
-	request_process_status_[sd] = RESPONSE;
+	// request_process_status_[sd] = RESPONSE;
 	// }
+	request_process_status_[sd] = SEND;
+	response_[sd] = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 1098\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n    <head>\r\n\r\n    <title>Extended Simple Response</title>\r\n</head>\r\n<body>\r\n\r\n    <h1>Hello, this is an extended simple HTTP response!</h1>\r\n\r\n<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum. Donec in efficitur leo. In nisl ligula, vulputate id diam in, condimentum tincidunt sapien. Maecenas gravida velit vitae dolor finibus, in feugiat urna interdum. Vestibulum euismod euismod velit, nec feugiat lacus feugiat sit amet. Vestibulum consectetur sit amet lacus a pellentesque. Duis tincidunt, est sed sodales tincidunt, ipsum erat elementum massa, at lacinia arcu ex a est. Fusce ut congue metus, sed tincidunt urna.</p>\r\n\r\n<p>Quisque egestas eget lacus non condimentum. Sed at imperdiet dui, vel facilisis velit. Proin ac neque nec arcu commodo aliquet. Morbi tincidunt turpis et tincidunt. Fusce id dui id libero aliquet sagittis a at libero. Nulla at libero pharetra, bibendum metus sed, malesuada metus. Cras sollicitudin, quam pellentesque lobortis auctor, ante eros bibendum nunc, sed bibendum quam ex non metus. Curabitur in pharetra odio, in efficitur leo.</p>\r\n</body>\r\n</html>";
 }
 
 int IoMultiplexing::select() {
