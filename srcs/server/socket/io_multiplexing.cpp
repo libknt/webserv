@@ -211,8 +211,13 @@ void IoMultiplexing::setResponseStatus(int sd) {
 
 int IoMultiplexing::select() {
 	while (should_stop_server_ == false) {
+#ifdef FD_COPY
 		FD_COPY(&master_read_fds_, &read_fds_);
 		FD_COPY(&master_write_fds_, &write_fds_);
+#else
+		std::memcpy(&read_fds_, &master_read_fds_, sizeof(master_read_fds_));
+		std::memcpy(&write_fds_, &master_write_fds_, sizeof(master_write_fds_));
+#endif
 
 		std::cout << "Waiting on select()!" << std::endl;
 		int result = ::select(max_sd_ + 1, &read_fds_, &write_fds_, NULL, &timeout_);
