@@ -140,27 +140,22 @@ int IoMultiplexing::disconnect(int sd) {
 }
 
 int IoMultiplexing::recv(int sd) {
-	bool should_close_connection;
 	char buffer[BUFFER_SIZE];
 
 	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
-	should_close_connection = false;
 	int result = ::recv(sd, buffer, sizeof(buffer), 0);
 	if (result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-		should_close_connection = true;
 		disconnect(sd);
 		return -1;
 	}
 	if (result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		should_close_connection = true;
 		disconnect(sd);
 		return -1;
 	}
 	request_process_status_[sd] = http_request_parse_.handleBuffer(sd, buffer);
 	if (request_process_status_[sd] == ERROR) {
-		should_close_connection = true;
 	}
 
 	if (request_process_status_[sd] == REQUESTFINISH) {
@@ -171,7 +166,6 @@ int IoMultiplexing::recv(int sd) {
 }
 
 int IoMultiplexing::send(int sd) {
-	bool should_close_connection = false;
 
 	char buffer[BUFFER_SIZE];
 
@@ -181,13 +175,11 @@ int IoMultiplexing::send(int sd) {
 	int result = ::send(sd, buffer, sizeof(buffer), 0);
 	if (result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
-		should_close_connection = true;
 		disconnect(sd);
 		return -1;
 	}
 	if (result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		should_close_connection = true;
 		disconnect(sd);
 		return -1;
 	}
