@@ -143,12 +143,14 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 		}
 	}
 
-	ip_address_ = token.substr(0,found);
+	ip_address_ = token.substr(0, found);
 	if (!isValidIPv4(ip_address_)) {
+		std::cerr << "Invalid IP address." << std::endl;
 		return -1;
 	}
-	port_ = token.substr(found +1);
+	port_ = token.substr(found + 1);
 	if (!isValidPort(port)) {
+		std::cerr << "Invalid port." << std::endl;
 		return -1;
 	}
 	return 0;
