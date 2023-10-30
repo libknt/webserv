@@ -238,10 +238,10 @@ int IoMultiplexing::select() {
 			} else if (FD_ISSET(sd, &write_fds_)) {
 				// if(cgi)
 				if (request_process_status_[sd] == CGI_SEND_BODY) {
-					//子プロセスにbodyを送る
+					// 子プロセスにbodyを送る
 				}
-				//TODO 
-				// if (request_process_status_[sd] == CGI_LOCAL_REDIRECT) {}
+				// TODO
+				//  if (request_process_status_[sd] == CGI_LOCAL_REDIRECT) {}
 				if (request_process_status_[sd] == SEND) {
 					// ::send()
 					disconnect(sd);
