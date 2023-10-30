@@ -116,10 +116,15 @@ bool ServerDirective::isValidPort(const std::string& port_string) {
 
 	ss >> port_number;
 
+	if (ss.fail()) {
+		std::cerr << "Failed to parse port." << std::endl;
+		return false;
+	}
+
 	std::string remainder;
 	ss >> remainder;
 
-	return !ss.fail() && remainder.empty() && port_number >= min_port && port_number <= max_port;
+	return remainder.empty() && port_number >= min_port && port_number <= max_port;
 }
 
 int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
@@ -135,21 +140,23 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 		return -1;
 	}
 
-	std::string port = token.substr(found + 1);
-	for (size_t i = 0; i < port.size(); ++i) {
-		if (!isdigit(port[i])) {
-			std::cerr << "Parse Error: parseListenDirective3" << std::endl;
-			return -1;
-		}
-	}
+	// std::string port = token.substr(found + 1);
+	// for (size_t i = 0; i < port.size(); ++i) {
+	// 	if (!isdigit(port[i])) {
+	// 		std::cerr << "Parse Error: parseListenDirective3" << std::endl;
+	// 		return -1;
+	// 	}
+	// }
 
 	ip_address_ = token.substr(0, found);
+	std::cout << ip_address_ << std::endl;
 	if (!isValidIPv4(ip_address_)) {
 		std::cerr << "Invalid IP address." << std::endl;
 		return -1;
 	}
 	port_ = token.substr(found + 1);
-	if (!isValidPort(port)) {
+	std::cout << port_ << std::endl;
+	if (!isValidPort(port_)) {
 		std::cerr << "Invalid port." << std::endl;
 		return -1;
 	}
