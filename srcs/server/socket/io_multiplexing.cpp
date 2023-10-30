@@ -170,6 +170,35 @@ int IoMultiplexing::recv(int sd) {
 	return 0;
 }
 
+int IoMultiplexing::send(int sd) {
+	bool should_close_connection = false;
+
+	char buffer[BUFFER_SIZE];
+
+	std::memset(buffer, 0, BUFFER_SIZE);
+	std::memset(buffer, 97, BUFFER_SIZE - 1);
+
+	int result = ::send(sd, buffer, sizeof(buffer), 0);
+	if (result < 0) {
+		std::cerr << "send() failed: " << strerror(errno) << std::endl;
+		should_close_connection = true;
+		disconnect(sd);
+		return -1;
+	}
+	if (result == 0) {
+		std::cout << "  Connection closed" << std::endl;
+		should_close_connection = true;
+		disconnect(sd);
+		return -1;
+	}
+
+	if (request_process_status_[sd] == FINISH) {
+		disconnect(sd);
+	}
+	std::cout << sd << "  " << BUFFER_SIZE << " bytes sended\n" << std::endl;
+	return 0;
+}
+
 bool IoMultiplexing::isListeningSocket(int sd) {
 	return std::find_if(socket_.begin(), socket_.end(), IsListeningSocketPredicate(sd)) !=
 		   socket_.end();
@@ -243,8 +272,7 @@ int IoMultiplexing::select() {
 				// TODO
 				//  if (request_process_status_[sd] == CGI_LOCAL_REDIRECT) {}
 				if (request_process_status_[sd] == SEND) {
-					// ::send()
-					disconnect(sd);
+					send(sd);
 				}
 			}
 		}

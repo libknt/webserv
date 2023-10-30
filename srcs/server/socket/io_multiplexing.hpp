@@ -39,6 +39,7 @@ public:
 	int select();
 	int accept(int listen_sd);
 	int recv(int sd);
+	int send(int sd);
 	int disconnect(int sd);
 	bool isListeningSocket(int sd);
 	void setResponseStatus(int sd);
