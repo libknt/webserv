@@ -10,11 +10,6 @@
 
 namespace server {
 
-enum RequestProcessStatus {
-    RECEIVED,
-		UNDEFINED,
-};
-
 class IoMultiplexing {
 
 private:
@@ -27,6 +22,7 @@ private:
 	struct timeval timeout_;
 	fd_set master_read_fds_;
 	fd_set read_fds_;
+	fd_set master_write_fds_;
 	fd_set write_fds_;
 	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
@@ -45,6 +41,8 @@ public:
 	int recv(int sd);
 	int disconnect(int sd);
 	bool isListeningSocket(int sd);
+	void setResponseStatus(int sd);
+	bool isCgi();
 };
 
 class IsListeningSocketPredicate {

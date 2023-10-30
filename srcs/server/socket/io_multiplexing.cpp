@@ -12,6 +12,7 @@ IoMultiplexing::IoMultiplexing()
 	, should_stop_server_(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds_);
+	FD_ZERO(&master_write_fds_);
 	FD_ZERO(&write_fds_);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
@@ -27,6 +28,7 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	, should_stop_server_(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds_);
+	FD_ZERO(&master_write_fds_);
 	FD_ZERO(&write_fds_);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
@@ -44,6 +46,7 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds_(other.read_fds_)
+	, master_write_fds_(other.master_write_fds_)
 	, write_fds_(other.write_fds_)
 	, should_stop_server_(other.should_stop_server_) {}
 
@@ -59,6 +62,7 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
 		read_fds_ = other.read_fds_;
+		master_write_fds_ = other.master_write_fds_;
 		write_fds_ = other.write_fds_;
 		should_stop_server_ = other.should_stop_server_;
 	}
@@ -120,8 +124,6 @@ int IoMultiplexing::accept(int listen_sd) {
 			max_sd_ = new_sd;
 
 	} while (new_sd != -1);
-	std::cout << "TEST" << std::endl;
-	http_request_parse_.getInfo();
 	return 0;
 }
 
@@ -132,6 +134,8 @@ int IoMultiplexing::disconnect(int sd) {
 		while (!FD_ISSET(max_sd_, &master_read_fds_))
 			--max_sd_;
 	}
+	request_process_status_.erase(sd);
+	http_request_parse_.httpRequestErase(sd);
 	return 0;
 }
 
@@ -141,34 +145,26 @@ int IoMultiplexing::recv(int sd) {
 
 	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
 	should_close_connection = false;
-	while (1) {
-		int result = ::recv(sd, buffer, sizeof(buffer), 0);
-		if (result < 0) {
-			std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-			should_close_connection = true;
-			break;
-		}
-		http_request_parse_.handleBuffer(sd, buffer);
-		if (result == 0) {
-			std::cout << "  Connection closed" << std::endl;
-			should_close_connection = true;
-			break;
-		}
-
-		int len = result;
-		std::cout << "  " << len << " bytes received\n" << std::endl;
-
-		result = send(sd, buffer, len, 0);
-		if (result < 0) {
-			std::cerr << "send() failed: " << strerror(errno) << std::endl;
-			should_close_connection = true;
-			break;
-		}
-		std::memset(buffer, '\0', sizeof(buffer));
-	};
-
-	if (should_close_connection) {
+	int result = ::recv(sd, buffer, sizeof(buffer), 0);
+	if (result < 0) {
+		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
+		should_close_connection = true;
 		disconnect(sd);
+		return -1;
+	}
+	if (result == 0) {
+		std::cout << "  Connection closed" << std::endl;
+		should_close_connection = true;
+		disconnect(sd);
+		return -1;
+	}
+	request_process_status_[sd] = http_request_parse_.handleBuffer(sd, buffer);
+	if (request_process_status_[sd] == ERROR) {
+		should_close_connection = true;
+	}
+
+	if (request_process_status_[sd] == REQUESTFINISH) {
+		std::cout << "request finish !!!" << std::endl;
 	}
 
 	return 0;
@@ -179,9 +175,23 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 		   socket_.end();
 }
 
+bool IoMultiplexing::isCgi() {
+	return true;
+}
+
+// cgiかhttp responseかどうか調べてsetする.
+void IoMultiplexing::setResponseStatus(int sd) {
+	// if (isCgi) {
+	// request_process_status_[sd] = CGI;
+	// } else {
+	request_process_status_[sd] = RESPONSE;
+	// }
+}
+
 int IoMultiplexing::select() {
 	while (should_stop_server_ == false) {
-		std::memcpy(&read_fds_, &master_read_fds_, sizeof(master_read_fds_));
+		FD_COPY(&master_read_fds_, &read_fds_);
+		FD_COPY(&master_write_fds_, &write_fds_);
 
 		std::cout << "Waiting on select()!" << std::endl;
 		int result = ::select(max_sd_ + 1, &read_fds_, &write_fds_, NULL, &timeout_);
@@ -204,14 +214,39 @@ int IoMultiplexing::select() {
 					if (accept(sd) < 0)
 						should_stop_server_ = true;
 				} else {
-					recv(sd);
+					if (recv(sd) < 0)
+						continue;
+					if (request_process_status_[sd] == REQUESTFINISH) {
+						setResponseStatus(sd);
+						// response execute
+						if (request_process_status_[sd] == RESPONSE) {
+							// レスポンスの作成
+							// そして、ステータスの変更
+						}
+						if (request_process_status_[sd] == SEND) {
+							FD_SET(sd, &master_write_fds_);
+							continue;
+						}
+						// cgi execute
+						if (request_process_status_[sd] == CGI) {
+							// 何かしらのcgi実行
+							continue;
+						}
+					}
 				}
 				--desc_ready;
+			} else if (FD_ISSET(sd, &write_fds_)) {
+				// if(cgi)
+				if (request_process_status_[sd] == CGI_SEND_BODY) {
+					//子プロセスにbodyを送る
+				}
+				//TODO 
+				// if (request_process_status_[sd] == CGI_LOCAL_REDIRECT) {}
+				if (request_process_status_[sd] == SEND) {
+					// ::send()
+					disconnect(sd);
+				}
 			}
-			// TODO recvとsendを分けないと
-			//  if (FD_ISSET(sd, &write_fds_)) {
-			//  	send(sd);
-			//  }
 		}
 	}
 	return 0;
