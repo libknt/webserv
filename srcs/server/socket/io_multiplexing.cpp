@@ -221,10 +221,25 @@ void IoMultiplexing::setResponseStatus(int sd) {
 	// if (isCgi) {
 	// request_process_status_[sd] = CGI;
 	// } else {
-	// request_process_status_[sd] = RESPONSE;
+	request_process_status_[sd] = RESPONSE;
 	// }
 	request_process_status_[sd] = SEND;
-	response_[sd] = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: 1098\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n    <head>\r\n\r\n    <title>Extended Simple Response</title>\r\n</head>\r\n<body>\r\n\r\n    <h1>Hello, this is an extended simple HTTP response!</h1>\r\n\r\n<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum. Donec in efficitur leo. In nisl ligula, vulputate id diam in, condimentum tincidunt sapien. Maecenas gravida velit vitae dolor finibus, in feugiat urna interdum. Vestibulum euismod euismod velit, nec feugiat lacus feugiat sit amet. Vestibulum consectetur sit amet lacus a pellentesque. Duis tincidunt, est sed sodales tincidunt, ipsum erat elementum massa, at lacinia arcu ex a est. Fusce ut congue metus, sed tincidunt urna.</p>\r\n\r\n<p>Quisque egestas eget lacus non condimentum. Sed at imperdiet dui, vel facilisis velit. Proin ac neque nec arcu commodo aliquet. Morbi tincidunt turpis et tincidunt. Fusce id dui id libero aliquet sagittis a at libero. Nulla at libero pharetra, bibendum metus sed, malesuada metus. Cras sollicitudin, quam pellentesque lobortis auctor, ante eros bibendum nunc, sed bibendum quam ex non metus. Curabitur in pharetra odio, in efficitur leo.</p>\r\n</body>\r\n</html>";
+	response_[sd] =
+		"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: "
+		"1098\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n    <head>\r\n\r\n    <title>Extended Simple "
+		"Response</title>\r\n</head>\r\n<body>\r\n\r\n    <h1>Hello, this is an extended simple "
+		"HTTP response!</h1>\r\n\r\n<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+		"Vivamus lacinia odio vitae vestibulum. Donec in efficitur leo. In nisl ligula, vulputate "
+		"id diam in, condimentum tincidunt sapien. Maecenas gravida velit vitae dolor finibus, in "
+		"feugiat urna interdum. Vestibulum euismod euismod velit, nec feugiat lacus feugiat sit "
+		"amet. Vestibulum consectetur sit amet lacus a pellentesque. Duis tincidunt, est sed "
+		"sodales tincidunt, ipsum erat elementum massa, at lacinia arcu ex a est. Fusce ut congue "
+		"metus, sed tincidunt urna.</p>\r\n\r\n<p>Quisque egestas eget lacus non condimentum. Sed "
+		"at imperdiet dui, vel facilisis velit. Proin ac neque nec arcu commodo aliquet. Morbi "
+		"tincidunt turpis et tincidunt. Fusce id dui id libero aliquet sagittis a at libero. Nulla "
+		"at libero pharetra, bibendum metus sed, malesuada metus. Cras sollicitudin, quam "
+		"pellentesque lobortis auctor, ante eros bibendum nunc, sed bibendum quam ex non metus. "
+		"Curabitur in pharetra odio, in efficitur leo.</p>\r\n</body>\r\n</html>";
 }
 
 int IoMultiplexing::select() {
