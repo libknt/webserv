@@ -15,7 +15,7 @@ namespace http {
 
 class ClientSocket {
 private:
-	const char* server_addr_;
+	const char* server_address_;
 	const int port_;
 	int client_socket_;
 	struct sockaddr_in addr_;
@@ -26,7 +26,7 @@ private:
 	int connect();
 
 public:
-	ClientSocket(const char* server_addr, int port);
+	ClientSocket(const char* server_address, int port);
 	~ClientSocket();
 	int initialize();
 	const char* getServerAddr_() const;
