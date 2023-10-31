@@ -101,21 +101,13 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 	return 0;
 }
 
-bool ServerDirective::isValidIPv4(const std::string& ip) const {
-	std::stringstream ss(ip);
+bool ServerDirective::isValidIPv4(const std::string& ip_address) const {
+	std::stringstream stringstream(ip_address);
 	int segment1, segment2, segment3, segment4;
 	char dot1, dot2, dot3;
 
-	ss >> segment1 >> dot1 >> segment2 >> dot2 >> segment3 >> dot3 >> segment4;
-
-	if (ss.fail()) {
-		std::cerr << "Failed to parse ipaddress." << std::endl;
-		return false;
-	}
-
-	std::string remainder;
-	ss >> remainder;
-	if (!remainder.empty()) {
+	stringstream >> segment1 >> dot1 >> segment2 >> dot2 >> segment3 >> dot3 >> segment4;
+	if (stringstream.fail() || !stringstream.eof()) {
 		return false;
 	}
 
