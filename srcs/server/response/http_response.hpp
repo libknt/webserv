@@ -7,11 +7,15 @@
 namespace server {
 
 class HttpResponse {
+private:
+	std::string response_;
+
 public:
 	HttpResponse();
 	~HttpResponse();
 	int initialize();
-	RequestProcessStatus finish();
+	RequestProcessStatus setSendBuffer(char* buffer, size_t max_buffer_size);
+	std::string substr_response(size_t size);
 };
 
 } // namespace server

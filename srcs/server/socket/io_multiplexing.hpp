@@ -1,6 +1,7 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
+#include "http_response.hpp"
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"
@@ -28,8 +29,7 @@ private:
 	static const time_t CONNECTION_TIMEOUT = 10;
 	IoMultiplexing();
 	ParseHttpRequest http_request_parse_;
-	// response classになる予定
-	std::map<int, std::string> response_;
+	std::map<int, HttpResponse> response_;
 
 public:
 	explicit IoMultiplexing(std::vector<socket_conf>& conf);
@@ -46,6 +46,7 @@ public:
 	bool isListeningSocket(int sd);
 	void setResponseStatus(int sd);
 	bool isCgi();
+	int createResponse(int sd);
 };
 
 class IsListeningSocketPredicate {

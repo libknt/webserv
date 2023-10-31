@@ -10,7 +10,7 @@ IoMultiplexing::IoMultiplexing()
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, should_stop_server_(false)
-	, response_(std::map<int, std::string>()) {
+	, response_(std::map<int, HttpResponse>()) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds_);
 	FD_ZERO(&master_write_fds_);
@@ -31,7 +31,7 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	FD_ZERO(&read_fds_);
 	FD_ZERO(&master_write_fds_);
 	FD_ZERO(&write_fds_);
-	timeout_.tv_sec = 10;
+	timeout_.tv_sec = 60;
 	timeout_.tv_usec = 0;
 }
 
@@ -144,7 +144,6 @@ int IoMultiplexing::disconnect(int sd) {
 int IoMultiplexing::recv(int sd) {
 	char buffer[BUFFER_SIZE];
 
-	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
 	int result = ::recv(sd, buffer, sizeof(buffer), 0);
 	if (result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
@@ -158,10 +157,9 @@ int IoMultiplexing::recv(int sd) {
 	}
 	request_process_status_[sd] = http_request_parse_.handleBuffer(sd, buffer);
 	if (request_process_status_[sd] == ERROR) {
-	}
-
-	if (request_process_status_[sd] == REQUESTFINISH) {
-		std::cout << "request finish !!!" << std::endl;
+		std::cout << " request handle err" << std::endl;
+		disconnect(sd);
+		return -1;
 	}
 
 	return 0;
@@ -171,19 +169,13 @@ int IoMultiplexing::send(int sd) {
 
 	char buffer[BUFFER_SIZE];
 
-	std::memset(buffer, 0, BUFFER_SIZE);
+	std::map<int, HttpResponse>::iterator it = response_.find(sd);
 
-	size_t size;
-	if (response_[sd].size() < BUFFER_SIZE) {
-		size = response_[sd].size();
-	} else {
-		size = BUFFER_SIZE;
-	}
-	std::memcpy(buffer, response_[sd].c_str(), size);
-	response_[sd] = response_[sd].substr(size);
+	request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
+
 	std::cout << buffer << std::endl;
 
-	int result = ::send(sd, buffer, size, 0);
+	int result = ::send(sd, buffer, sizeof(buffer), 0);
 	if (result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
@@ -195,15 +187,11 @@ int IoMultiplexing::send(int sd) {
 		return -1;
 	}
 
-	if (response_.empty()) {
-		request_process_status_[sd] = FINISH;
-	}
-
 	if (request_process_status_[sd] == FINISH) {
 		disconnect(sd);
 	}
 
-	std::cout << sd << "  " << size << " bytes sended\n" << std::endl;
+	std::cout << sd << "  " << sizeof(buffer) << " bytes sended\n" << std::endl;
 	return 0;
 }
 
@@ -223,23 +211,18 @@ void IoMultiplexing::setResponseStatus(int sd) {
 	// } else {
 	request_process_status_[sd] = RESPONSE;
 	// }
+	return;
+}
+
+int IoMultiplexing::createResponse(int sd) {
+	if (request_process_status_[sd] == RESPONSE) {
+		HttpResponse response;
+		response_[sd] = response;
+	} else if (request_process_status_[sd] == CGI) {
+	}
 	request_process_status_[sd] = SEND;
-	response_[sd] =
-		"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: "
-		"1098\r\n\r\n<!DOCTYPE html>\r\n<html>\r\n    <head>\r\n\r\n    <title>Extended Simple "
-		"Response</title>\r\n</head>\r\n<body>\r\n\r\n    <h1>Hello, this is an extended simple "
-		"HTTP response!</h1>\r\n\r\n<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-		"Vivamus lacinia odio vitae vestibulum. Donec in efficitur leo. In nisl ligula, vulputate "
-		"id diam in, condimentum tincidunt sapien. Maecenas gravida velit vitae dolor finibus, in "
-		"feugiat urna interdum. Vestibulum euismod euismod velit, nec feugiat lacus feugiat sit "
-		"amet. Vestibulum consectetur sit amet lacus a pellentesque. Duis tincidunt, est sed "
-		"sodales tincidunt, ipsum erat elementum massa, at lacinia arcu ex a est. Fusce ut congue "
-		"metus, sed tincidunt urna.</p>\r\n\r\n<p>Quisque egestas eget lacus non condimentum. Sed "
-		"at imperdiet dui, vel facilisis velit. Proin ac neque nec arcu commodo aliquet. Morbi "
-		"tincidunt turpis et tincidunt. Fusce id dui id libero aliquet sagittis a at libero. Nulla "
-		"at libero pharetra, bibendum metus sed, malesuada metus. Cras sollicitudin, quam "
-		"pellentesque lobortis auctor, ante eros bibendum nunc, sed bibendum quam ex non metus. "
-		"Curabitur in pharetra odio, in efficitur leo.</p>\r\n</body>\r\n</html>";
+	FD_SET(sd, &master_write_fds_);
+	return 0;
 }
 
 int IoMultiplexing::select() {
@@ -279,30 +262,14 @@ int IoMultiplexing::select() {
 					}
 					if (request_process_status_[sd] == REQUESTFINISH) {
 						setResponseStatus(sd);
-						// response execute
-						if (request_process_status_[sd] == RESPONSE) {
-							// レスポンスの作成
-							// そして、ステータスの変更
-						}
-						if (request_process_status_[sd] == SEND) {
-							FD_SET(sd, &master_write_fds_);
-							--desc_ready;
-							continue;
-						}
-						// cgi execute
-						if (request_process_status_[sd] == CGI) {
-							// 何かしらのcgi実行
+						if (createResponse(sd) < 0) {
 							--desc_ready;
 							continue;
 						}
 					}
+					--desc_ready;
 				}
-				--desc_ready;
 			} else if (FD_ISSET(sd, &write_fds_)) {
-				// if(cgi)
-				if (request_process_status_[sd] == CGI_SEND_BODY) {
-					// 子プロセスにbodyを送る
-				}
 				// TODO
 				//  if (request_process_status_[sd] == CGI_LOCAL_REDIRECT) {}
 				if (request_process_status_[sd] == SEND) {
