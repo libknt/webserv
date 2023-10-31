@@ -1,31 +1,26 @@
 #include "http_request.hpp"
-#include "cgi.hpp"
 #include "parse_sentense.hpp"
 #include <cstdlib>
 
 namespace server {
-HttpRequest::HttpRequest(sockaddr_in client_addr, sockaddr_in server_addr)
+
+HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	: status_(http_request_status::METHOD)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
 	, error_status_(http_error_status::UNDEFINED)
-	, chunked_status_(chunked_status::UNDEFINED)
+	, body_message_type_(http_body_message_type::UNDEFINED)
+	, content_length_(0)
+	, chunked_status_(chunked_status::CHUNKED_SIZE)
 	, chunked_size_(0)
-	, client_addr_(client_addr)
-	, server_addr_(server_addr) {}
+	, client_address_(client_address)
+	, server_address_(server_address) {}
 
 HttpRequest::~HttpRequest(){};
 
-HttpRequest::HttpRequest(HttpRequest const& request)
-	: status_(request.status_)
-	, method_(request.method_)
-	, version_(request.version_)
-	, error_status_(request.error_status_)
-	, chunked_status_(request.chunked_status_)
-	, chunked_size_(request.chunked_size_)
-	, body_(request.body_)
-	, client_addr_(request.client_addr_)
-	, server_addr_(request.server_addr_) {}
+HttpRequest::HttpRequest(HttpRequest const& request) {
+	*this = request;
+}
 
 HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 	if (this != &request) {
@@ -33,13 +28,15 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
 		method_ = request.method_;
 		version_ = request.version_;
 		error_status_ = request.error_status_;
+		body_message_type_ = request.body_message_type_;
+		content_length_ = request.content_length_;
 		chunked_status_ = request.chunked_status_;
 		chunked_size_ = request.chunked_size_;
 		request_path_ = request.request_path_;
 		header_ = request.header_;
 		body_ = request.body_;
-		client_addr_ = request.client_addr_;
-		server_addr_ = request.server_addr_;
+		client_address_ = request.client_address_;
+		server_address_ = request.server_address_;
 	}
 	return (*this);
 }
@@ -51,6 +48,7 @@ void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& stat
 void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
 	error_status_ = error_status;
 }
+
 int HttpRequest::setMethod(std::string const& method) {
 	if (method == "GET")
 		method_ = http_method::GET;
@@ -128,7 +126,12 @@ int HttpRequest::parseHttpMethod(std::string const& line) {
 int HttpRequest::parseHttpHeader(std::string const& line) {
 	std::vector<std::string> header_vector;
 	if (line == "\0") {
-		if (method_ == http_method::GET || getHeaderValue("Content-Length") == "0")
+		if (checkHeaderValue() < 0) {
+			setStatus(http_request_status::ERROR);
+			setErrorStatus(http_error_status::BAD_REQUEST);
+			return (-1);
+		}
+		if (method_ == http_method::GET || method_ == http_method::DELETE)
 			setStatus(http_request_status::FINISHED);
 		else
 			setStatus(http_request_status::BODY);
@@ -148,6 +151,29 @@ int HttpRequest::parseHttpHeader(std::string const& line) {
 	return (0);
 }
 
+int HttpRequest::checkHeaderValue() {
+	switch (method_) {
+		case http_method::GET:
+		case http_method::DELETE:
+			body_message_type_ = http_body_message_type::NONE;
+			break;
+		case http_method::POST:
+			if (getHeaderValue("Transfer-Encoding") == "chunked")
+				body_message_type_ = http_body_message_type::CHUNK_ENCODING;
+			else if (getHeaderValue("Content-Length") != "") {
+				body_message_type_ = http_body_message_type::CONTENT_LENGTH;
+				// TODO you should check the value is affordable.
+				content_length_ =
+					static_cast<size_t>(std::atoi(getHeaderValue("Content-Length").c_str()));
+			}
+			break;
+		default:
+			setStatus(http_request_status::ERROR);
+			setErrorStatus(http_error_status::BAD_REQUEST);
+			return (-1);
+	}
+	return (0);
+}
 int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
 	header_.insert(std::make_pair(key, value));
 	return (0);
@@ -161,14 +187,16 @@ std::string HttpRequest::getHeaderValue(std::string const& key) {
 }
 
 int HttpRequest::parseHttpBody(std::string const& line) {
-	if (getHeaderValue("Transfer-Encoding") == "chunked") {
-		return (parseChunkedBody(line));
-	} else if (getHeaderValue("Content-Length") != "") {
-		return (parseContentLengthBody(line));
+	switch (body_message_type_) {
+		case http_body_message_type::CHUNK_ENCODING:
+			return (parseChunkedBody(line));
+		case http_body_message_type::CONTENT_LENGTH:
+			return (parseContentLengthBody(line));
+		default:
+			setStatus(http_request_status::ERROR);
+			setErrorStatus(http_error_status::BAD_REQUEST);
+			return (-1);
 	}
-	setStatus(http_request_status::ERROR);
-	setErrorStatus(http_error_status::BAD_REQUEST);
-	return (-1);
 }
 
 int HttpRequest::parseChunkedBody(std::string const& line) {
@@ -177,19 +205,19 @@ int HttpRequest::parseChunkedBody(std::string const& line) {
 		// TODO Caution ! strtol is C++ 11 function.
 		chunked_size_ = std::strtol(line.c_str(), NULL, 16);
 		chunked_status_ = chunked_status::CHUNKED_MESSAGE;
-		if (chunked_size_ == 0)
-			setStatus(http_request_status::FINISHED);
-	} else if (line == "")
-		chunked_status_ = chunked_status::CHUNKED_SIZE;
-	else
+	} else if (line == "" && chunked_size_ == 0) {
+		setStatus(http_request_status::FINISHED);
+	} else {
 		body_ += line;
+		chunked_status_ = chunked_status::CHUNKED_SIZE;
+	}
 	return (0);
 }
 
 int HttpRequest::parseContentLengthBody(std::string const& line) {
 	// TODO  no error handling
 	body_ += line;
-	if (body_.size() == static_cast<size_t>(std::atoi(getHeaderValue("Content-Length").c_str())))
+	if (body_.size() == content_length_)
 		setStatus(http_request_status::FINISHED);
 	return (0);
 }
@@ -201,19 +229,23 @@ void HttpRequest::getInfo(void) {
 	std::cout << "header" << std::endl;
 	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
 		 ++iter)
-		std::cout << "key: " << iter->first << "value: " << iter->second << std::endl;
+		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
 }
 
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) {
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) const {
 	return (status_);
 }
 
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void) {
+	return (body_message_type_);
+}
+
 sockaddr_in HttpRequest::getClientAddress() const {
-	return client_addr_;
+	return client_address_;
 }
 
 sockaddr_in HttpRequest::getServerAddress() const {
-	return server_addr_;
+	return server_address_;
 }
 
 std::string HttpRequest::getHttpMethod() const {

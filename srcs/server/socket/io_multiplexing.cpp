@@ -1,5 +1,4 @@
 #include "io_multiplexing.hpp"
-#include "cgi.hpp"
 #include "parse_http_request.hpp"
 
 namespace server {
@@ -10,8 +9,8 @@ IoMultiplexing::IoMultiplexing()
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, should_stop_server_(false) {
-	FD_ZERO(&master_set_);
-	FD_ZERO(&working_set_);
+	FD_ZERO(&master_read_fds_);
+	FD_ZERO(&read_fds__);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -23,8 +22,8 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	, max_sd_(-1)
 	, max_clients_(-1)
 	, should_stop_server_(false) {
-	FD_ZERO(&master_set_);
-	FD_ZERO(&working_set_);
+	FD_ZERO(&master_read_fds_);
+	FD_ZERO(&read_fds__);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -38,8 +37,8 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, max_sd_(other.max_sd_)
 	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
-	, master_set_(other.master_set_)
-	, working_set_(other.working_set_)
+	, master_read_fds_(other.master_read_fds_)
+	, read_fds__(other.read_fds__)
 	, should_stop_server_(other.should_stop_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
@@ -51,8 +50,8 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 		max_sd_ = other.max_sd_;
 		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
-		master_set_ = other.master_set_;
-		working_set_ = other.working_set_;
+		master_read_fds_ = other.master_read_fds_;
+		read_fds__ = other.read_fds__;
 		should_stop_server_ = other.should_stop_server_;
 	}
 	return *this;
@@ -86,10 +85,10 @@ int IoMultiplexing::accept(int listen_sd) {
 	int new_sd;
 	std::cout << "  Listening socket is readable" << std::endl;
 	do {
-		sockaddr_in client_addr;
-		socklen_t addr_len = sizeof(client_addr);
-		memset(&client_addr, 0, sizeof(client_addr));
-		new_sd = ::accept(listen_sd, (sockaddr*)&client_addr, &addr_len);
+		sockaddr_in client_address;
+		socklen_t addr_len = sizeof(client_address);
+		memset(&client_address, 0, sizeof(client_address));
+		new_sd = ::accept(listen_sd, (sockaddr*)&client_address, &addr_len);
 		if (new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				std::cerr << "accept() failed: " << strerror(errno) << std::endl;
@@ -97,35 +96,37 @@ int IoMultiplexing::accept(int listen_sd) {
 			}
 			break;
 		}
-		sockaddr_in server_addr;
-		addr_len = sizeof(server_addr);
+		sockaddr_in server_address;
+		addr_len = sizeof(server_address);
 
-		if (getsockname(new_sd, (struct sockaddr*)&server_addr, &addr_len) == -1) {
+		if (getsockname(new_sd, (struct sockaddr*)&server_address, &addr_len) == -1) {
 			std::cerr << strerror(errno) << std::endl;
 			return -1;
 		}
 
-		http_request_parse_.addAcceptClientInfo(new_sd, client_addr, server_addr);
+		http_request_parse_.addAcceptClientInfo(new_sd, client_address, server_address);
 
 		std::cout << "  New incoming connection -  " << new_sd << std::endl;
-		FD_SET(new_sd, &master_set_);
+		FD_SET(new_sd, &master_read_fds_);
 		if (new_sd > max_sd_)
 			max_sd_ = new_sd;
 
 	} while (new_sd != -1);
+	std::cout << "TEST" << std::endl;
+	http_request_parse_.getInfo();
 	return 0;
 }
 
 int IoMultiplexing::disconnect(int sd) {
 	close(sd);
-	FD_CLR(sd, &master_set_);
+	FD_CLR(sd, &master_read_fds_);
 	if (sd == max_sd_) {
-		while (!FD_ISSET(max_sd_, &master_set_))
+		while (!FD_ISSET(max_sd_, &master_read_fds_))
 			--max_sd_;
 	}
 	return 0;
 }
-#include "debug.hpp"
+
 int IoMultiplexing::request(int sd) {
 	bool should_close_connection;
 	char buffer[BUFFER_SIZE];
@@ -139,23 +140,11 @@ int IoMultiplexing::request(int sd) {
 			should_close_connection = true;
 			break;
 		}
-		int status = http_request_parse_.handleBuffer(sd, buffer);
-
-		if (result == 0 || status == -1) {
+		http_request_parse_.handleBuffer(sd, buffer);
+		if (result == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			should_close_connection = true;
 			break;
-		}
-		{
-			if (status == 1) {
-				std::cout << RED << "TEST" << std::endl;
-				Cgi cgi(http_request_parse_.get_http_request(sd));
-				if (cgi.cgiRequest() < 0) {
-					std::cerr << "cgi-request() failed" << std::endl;
-					exit(-1);
-				}
-				std::cout << RESET << std::endl;
-			}
 		}
 
 		int len = result;
@@ -184,10 +173,10 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 
 int IoMultiplexing::select() {
 	while (should_stop_server_ == false) {
-		std::memcpy(&working_set_, &master_set_, sizeof(master_set_));
+		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int result = ::select(max_sd_ + 1, &working_set_, NULL, NULL, &timeout_);
+		int result = ::select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
 
 		if (result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -202,7 +191,7 @@ int IoMultiplexing::select() {
 		int desc_ready = result;
 
 		for (int sd = 0; sd <= max_sd_ && desc_ready > 0; ++sd) {
-			if (FD_ISSET(sd, &working_set_)) {
+			if (FD_ISSET(sd, &read_fds__)) {
 				if (isListeningSocket(sd)) {
 					if (accept(sd) < 0)
 						should_stop_server_ = true;
@@ -218,12 +207,12 @@ int IoMultiplexing::select() {
 }
 
 int IoMultiplexing::server_start() {
-	FD_ZERO(&master_set_);
+	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->getListenSd() > max_sd_) {
 			max_sd_ = it->getListenSd();
 		}
-		FD_SET(it->getListenSd(), &master_set_);
+		FD_SET(it->getListenSd(), &master_read_fds_);
 	}
 	return select();
 }
