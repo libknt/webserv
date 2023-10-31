@@ -6,4 +6,18 @@ struct socket_conf {
 	int port;
 };
 
+namespace server {
+enum RequestProcessStatus {
+	RECV,
+	REQUESTFINISH,
+	RESPONSE,
+	CGI,
+	CGI_SEND_BODY,
+	CGI_EXEC,
+	SEND,
+	FINISH,
+	ERROR,
+	UNDEFINED,
+};
+}
 #endif
