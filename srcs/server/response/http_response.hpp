@@ -3,6 +3,7 @@
 
 #include "struct.hpp"
 #include <iostream>
+#include <cstring>
 
 namespace server {
 
