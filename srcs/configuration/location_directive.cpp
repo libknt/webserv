@@ -121,6 +121,7 @@ int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>&
 		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;
 	}
+	client_max_body_size_ = tokens.front();
 	return 0;
 }
 
