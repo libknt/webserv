@@ -74,14 +74,6 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 	return 0;
 }
 
-int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 1) {
-		return -1;
-	}
-	default_error_page_ = tokens.front();
-	return 0;
-}
-
 int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 	if (tokens.empty()) {
 		std::cerr << "Parse Error: parseListenDirective1" << std::endl;
@@ -95,17 +87,49 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 		return -1;
 	}
 
-	std::string port = token.substr(found + 1);
-	for (size_t i = 0; i < port.size(); ++i) {
-		if (!isdigit(port[i])) {
-			std::cerr << "Parse Error: parseListenDirective3" << std::endl;
-			return -1;
-		}
+	ip_address_ = token.substr(0, found);
+	if (!isValidIPv4(ip_address_)) {
+		std::cerr << "Parse Error: Invalid IP address" << std::endl;
+		return -1;
 	}
 
-	ip_address_ = tokens.front();
-	port_ = tokens.back();
+	port_ = token.substr(found + 1);
+	if (!isValidPort(port_)) {
+		std::cerr << "Invalid port." << std::endl;
+		return -1;
+	}
 	return 0;
+}
+
+bool ServerDirective::isValidIPv4(const std::string& ip_address) const {
+	std::stringstream stringstream(ip_address);
+	int segment1, segment2, segment3, segment4;
+	char dot1, dot2, dot3;
+
+	stringstream >> segment1 >> dot1 >> segment2 >> dot2 >> segment3 >> dot3 >> segment4;
+	if (stringstream.fail() || !stringstream.eof()) {
+		return false;
+	}
+
+	return dot1 == '.' && dot2 == '.' && dot3 == '.' && isValidIPSegment(segment1) &&
+		   isValidIPSegment(segment2) && isValidIPSegment(segment3) && isValidIPSegment(segment4);
+}
+
+bool ServerDirective::isValidIPSegment(int num) const {
+	return 0 <= num && num <= 255;
+}
+
+bool ServerDirective::isValidPort(const std::string& port_string) {
+	std::stringstream stringstream(port_string);
+	int port_number;
+	const int max_port = 65535;
+	const int min_port = 0;
+
+	stringstream >> port_number;
+	if (stringstream.fail() || !stringstream.eof()) {
+		return false;
+	}
+	return port_number >= min_port && port_number <= max_port;
 }
 
 int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) {
@@ -114,6 +138,14 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 		return -1;
 	}
 	server_name_ = tokens.front();
+	return 0;
+}
+
+int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() != 1) {
+		return -1;
+	}
+	default_error_page_ = tokens.front();
 	return 0;
 }
 
