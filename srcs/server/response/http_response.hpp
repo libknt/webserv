@@ -2,8 +2,8 @@
 #define HTTP_RESPONSE_HPP
 
 #include "struct.hpp"
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 namespace server {
 
