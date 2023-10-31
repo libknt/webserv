@@ -74,11 +74,31 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 	return 0;
 }
 
-int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 1) {
+int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
+	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseListenDirective1" << std::endl;
 		return -1;
 	}
-	default_error_page_ = tokens.front();
+
+	std::string token = tokens.front();
+	size_t found = token.find(":");
+	if (found == std::string::npos || found == 0 || found == token.size() - 1) {
+		std::cerr << "Parse Error: parseListenDirective2" << std::endl;
+		return -1;
+	}
+
+	ip_address_ = token.substr(0, found);
+	std::cout << ip_address_ << std::endl;
+	if (!isValidIPv4(ip_address_)) {
+		std::cerr << "Invalid IP address." << std::endl;
+		return -1;
+	}
+	port_ = token.substr(found + 1);
+	std::cout << port_ << std::endl;
+	if (!isValidPort(port_)) {
+		std::cerr << "Invalid port." << std::endl;
+		return -1;
+	}
 	return 0;
 }
 
@@ -127,40 +147,20 @@ bool ServerDirective::isValidPort(const std::string& port_string) {
 	return remainder.empty() && port_number >= min_port && port_number <= max_port;
 }
 
-int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
-	if (tokens.empty()) {
-		std::cerr << "Parse Error: parseListenDirective1" << std::endl;
-		return -1;
-	}
-
-	std::string token = tokens.front();
-	size_t found = token.find(":");
-	if (found == std::string::npos || found == 0 || found == token.size() - 1) {
-		std::cerr << "Parse Error: parseListenDirective2" << std::endl;
-		return -1;
-	}
-
-	ip_address_ = token.substr(0, found);
-	std::cout << ip_address_ << std::endl;
-	if (!isValidIPv4(ip_address_)) {
-		std::cerr << "Invalid IP address." << std::endl;
-		return -1;
-	}
-	port_ = token.substr(found + 1);
-	std::cout << port_ << std::endl;
-	if (!isValidPort(port_)) {
-		std::cerr << "Invalid port." << std::endl;
-		return -1;
-	}
-	return 0;
-}
-
 int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		std::cerr << "Parse Error: parseServerNameDirective" << std::endl;
 		return -1;
 	}
 	server_name_ = tokens.front();
+	return 0;
+}
+
+int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() != 1) {
+		return -1;
+	}
+	default_error_page_ = tokens.front();
 	return 0;
 }
 
