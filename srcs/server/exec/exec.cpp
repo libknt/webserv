@@ -24,7 +24,7 @@ HttpResponse    executeGet(HttpRequest const &request)
     memset(buffer, '\0', 256);
     getcwd(buffer, 256);
     std::string file_path(buffer);
-    file_path += "template/index.html";
+    file_path += "/template/index.html";
     //ここまでダミーデータのパス生成。
     response.setFilePath(file_path);
     if (stat(file_path.c_str(), &file_info) != 0)
@@ -32,6 +32,7 @@ HttpResponse    executeGet(HttpRequest const &request)
     //ここからresponseのヘッダーを入れていく。今は最小限実装だが、対応したいヘッダーは順次ここで設定する。
     //TODO to_stringはC++11なはず。
     response.setHeaderValue("Content-Length", std::to_string(file_info.st_size));
+    response.setHeaderValue("Content-Type", "text/html; charset=UTF-8");
     //最後にステータスコードを設定する。
     response.setStatusCode(200);
     //stream_にこれらのデータを流し込む。
@@ -49,14 +50,15 @@ HttpResponse    executeError(HttpRequest const &request)
     memset(buffer, '\0', 256);
     getcwd(buffer, 256);
     std::string file_path(buffer);
-    file_path += "template/error.html";
+    file_path += "/template/error.html";
     //ここまでダミーデータのパス生成。
     response.setFilePath(file_path);
-    if (stat(file_path.c_str(), &file_info) != 0)
-        return (executeError(request));
+	//ここでエラーが生じたら一環の終わり。
+    stat(file_path.c_str(), &file_info);
     //ここからresponseのヘッダーを入れていく。今は最小限実装だが、対応したいヘッダーは順次ここで設定する。
     //TODO to_stringはC++11なはず。
     response.setHeaderValue("Content-Length", std::to_string(file_info.st_size));
+    response.setHeaderValue("Content-Type", "text/html; charset=UTF-8");
     //最後にステータスコードを設定する。
     response.setStatusCode(400);
     //stream_にこれらのデータを流し込む。

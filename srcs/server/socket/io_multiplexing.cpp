@@ -177,6 +177,7 @@ int IoMultiplexing::send(int sd) {
 		memset(buffer, '\0', BUFFER_SIZE);
 		std::string line;
 		ofs_[sd].read(buffer, BUFFER_SIZE);
+		std::cout << "add: " << buffer << std::endl;
 		response_[sd].addStream(buffer);
 	}
 	//request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
