@@ -23,8 +23,11 @@ public:
 	void setHeaderValue(std::string  const key, std::string const value);
 	void setStatusCode(int status_code);
 	void setFilePath(std::string const &file_path);
+	std::string const &getFilePath(void);
 	void insertStream(HttpRequest const &request);
+	void addStream(std::string const &buf);
 	RequestProcessStatus setSendBuffer(char* buffer, size_t max_buffer_size); //後で書き直す。
+	RequestProcessStatus setSendBuffer2(char* buffer, size_t max_buffer_size);
 	std::string substr_response(size_t size); //後で消す
 };
 

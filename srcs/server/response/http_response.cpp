@@ -65,11 +65,38 @@ void	HttpResponse::setFilePath(std::string const &file_path)
 {
 	file_path_ = file_path;
 }
+
+std::string const &HttpResponse::getFilePath(void)
+{
+	return (file_path_);
+}
+
 void	HttpResponse::insertStream(HttpRequest const &request)
 {
 	stream_ = request.getServerProtocol() + " " + std::to_string(status_code_) + " " + "OK" + "\r\n";
 	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end(); iter++)
 		stream_ += (iter->first + ": " + iter->second + "\r\n");
 	stream_ += "\r\n";
+}
+
+void	HttpResponse::addStream(std::string const &buf)
+{
+	stream_ += buf;
+}
+
+RequestProcessStatus HttpResponse::setSendBuffer2(char* buffer, size_t max_buffer_size) {
+	std::memset(buffer, 0, max_buffer_size);
+	if (stream_.size() <= max_buffer_size)
+	{
+		std::memcpy(buffer, stream_.c_str(), stream_.size());
+		return FINISH;
+	}
+	else
+	{
+		std::string temp = stream_.substr(0, max_buffer_size);		
+		std::memcpy(buffer, stream_.c_str(), max_buffer_size);
+		stream_ = stream_.substr(max_buffer_size);
+		return (SEND);
+	}
 }
 } // namespace server
