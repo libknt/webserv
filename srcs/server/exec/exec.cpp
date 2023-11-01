@@ -57,7 +57,7 @@ HttpResponse    executeError(HttpRequest const &request)
     stat(file_path.c_str(), &file_info);
     //ここからresponseのヘッダーを入れていく。今は最小限実装だが、対応したいヘッダーは順次ここで設定する。
     //TODO to_stringはC++11なはず。
-    response.setHeaderValue("Content-Length", std::to_string(file_info.st_size));
+    response.setHeaderValue("Content-Length", std::to_string(file_info.st_size - 1));
     response.setHeaderValue("Content-Type", "text/html; charset=UTF-8");
     //最後にステータスコードを設定する。
     response.setStatusCode(400);

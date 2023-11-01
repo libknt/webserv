@@ -175,10 +175,9 @@ int IoMultiplexing::send(int sd) {
 	if (!ofs_[sd].eof())
 	{
 		memset(buffer, '\0', BUFFER_SIZE);
-		std::string line;
 		ofs_[sd].read(buffer, BUFFER_SIZE);
 		std::cout << "add: " << buffer << std::endl;
-		response_[sd].addStream(buffer);
+		response_[sd].addStream(std::string(buffer));
 	}
 	//request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
 	request_process_status_[sd] = it->second.setSendBuffer2(buffer, BUFFER_SIZE);
@@ -226,10 +225,12 @@ int IoMultiplexing::createResponse(int sd) {
 	if (request_process_status_[sd] == RESPONSE) {
 		// ここではrequestを用いて適切なreponseの構築と対象ファイルのオープンを行う。
 		HttpRequest const request = http_request_parse_.getHttpRequest(sd);
-		HttpResponse response = executeRequest(request);
+		response_[sd] = executeRequest(request);
 		//TODO ファイルが開かなかった時のエラー処理が必要。多分開くけど。
-		ofs_[sd].open(response.getFilePath().c_str(), std::ios::binary);
-		response_[sd] = response;
+		ofs_[sd].open(response_[sd].getFilePath().c_str());
+		std::cout << response_[sd].getFilePath() << std::endl;
+		if (!ofs_[sd])
+			std::cout << "out" << std::endl;
 	} else if (request_process_status_[sd] == CGI) {
 	}
 	request_process_status_[sd] = SEND;
