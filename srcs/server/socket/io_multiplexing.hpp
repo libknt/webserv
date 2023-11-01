@@ -5,7 +5,9 @@
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"
+#include "exec.hpp"
 #include <algorithm>
+#include <fstream>
 #include <map>
 #include <vector>
 
@@ -30,6 +32,8 @@ private:
 	IoMultiplexing();
 	ParseHttpRequest http_request_parse_;
 	std::map<int, HttpResponse> response_;
+	//各sdが開いているファイルディスクリプターを保存する。 (*1つのsdが2つ以上のファイルを同時に操作する可能性があるなら、別の方法を考える。)
+	std::map<int, std::fstream> ofs_;
 
 public:
 	explicit IoMultiplexing(std::vector<socket_conf>& conf);

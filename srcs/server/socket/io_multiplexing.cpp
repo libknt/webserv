@@ -171,6 +171,8 @@ int IoMultiplexing::send(int sd) {
 
 	std::map<int, HttpResponse>::iterator it = response_.find(sd);
 
+	// ここでresponseで返すファイルをreadしながら、stream_に投げて、stream_からBUFFER_SIZEだけbufferに書き込む。
+	// request_process_status_[sd] = it->second.setSendBuffer2(buffer, BUFFER_SIZE);
 	request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
 
 	std::cout << buffer << std::endl;
@@ -216,7 +218,9 @@ void IoMultiplexing::setResponseStatus(int sd) {
 
 int IoMultiplexing::createResponse(int sd) {
 	if (request_process_status_[sd] == RESPONSE) {
-		HttpResponse response;
+		// ここではrequestを用いて適切なreponseの構築と対象ファイルのオープンを行う。
+		HttpRequest const request = http_request_parse_.getHttpRequest(sd);
+		HttpResponse response = executeRequest(request);
 		response_[sd] = response;
 	} else if (request_process_status_[sd] == CGI) {
 	}

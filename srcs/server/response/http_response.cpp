@@ -27,9 +27,6 @@ HttpResponse::HttpResponse()
 
 HttpResponse::~HttpResponse() {}
 
-int HttpResponse::initialize() {
-	return 0;
-}
 
 RequestProcessStatus HttpResponse::setSendBuffer(char* buffer, size_t max_buffer_size) {
 	std::memset(buffer, 0, max_buffer_size);
@@ -54,4 +51,12 @@ std::string HttpResponse::substr_response(size_t size) {
 	return ans;
 }
 
+void	HttpResponse::setHeaderValue(std::string const key, std::string const value)
+{
+	header_.insert(std::make_pair(key, value));
+}
+void	HttpResponse::setStatusCode(int status_code)
+{
+	status_code_ = status_code;
+}
 } // namespace server
