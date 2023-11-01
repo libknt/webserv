@@ -55,8 +55,21 @@ void	HttpResponse::setHeaderValue(std::string const key, std::string const value
 {
 	header_.insert(std::make_pair(key, value));
 }
+
 void	HttpResponse::setStatusCode(int status_code)
 {
 	status_code_ = status_code;
+}
+
+void	HttpResponse::setFilePath(std::string const &file_path)
+{
+	file_path_ = file_path;
+}
+void	HttpResponse::insertStream(HttpRequest const &request)
+{
+	stream_ = request.getServerProtocol() + " " + std::to_string(status_code_) + " " + "OK" + "\r\n";
+	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end(); iter++)
+		stream_ += (iter->first + ": " + iter->second + "\r\n");
+	stream_ += "\r\n";
 }
 } // namespace server

@@ -1,4 +1,5 @@
 #include "exec.hpp"
+
 namespace server {
 
 // confが出来次第、対応するconfも引数として受け取る。
@@ -25,6 +26,7 @@ HttpResponse    executeGet(HttpRequest const &request)
     std::string file_path(buffer);
     file_path += "template/index.html";
     //ここまでダミーデータのパス生成。
+    response.setFilePath(file_path);
     if (stat(file_path.c_str(), &file_info) != 0)
         return (executeError(request));
     //ここからresponseのヘッダーを入れていく。今は最小限実装だが、対応したいヘッダーは順次ここで設定する。
@@ -32,6 +34,8 @@ HttpResponse    executeGet(HttpRequest const &request)
     response.setHeaderValue("Content-Length", std::to_string(file_info.st_size));
     //最後にステータスコードを設定する。
     response.setStatusCode(200);
+    //stream_にこれらのデータを流し込む。
+    response.insertStream(request);
     return (response);
 }
 
@@ -47,6 +51,7 @@ HttpResponse    executeError(HttpRequest const &request)
     std::string file_path(buffer);
     file_path += "template/error.html";
     //ここまでダミーデータのパス生成。
+    response.setFilePath(file_path);
     if (stat(file_path.c_str(), &file_info) != 0)
         return (executeError(request));
     //ここからresponseのヘッダーを入れていく。今は最小限実装だが、対応したいヘッダーは順次ここで設定する。
@@ -54,6 +59,8 @@ HttpResponse    executeError(HttpRequest const &request)
     response.setHeaderValue("Content-Length", std::to_string(file_info.st_size));
     //最後にステータスコードを設定する。
     response.setStatusCode(400);
+    //stream_にこれらのデータを流し込む。
+    response.insertStream(request);
     return (response);
 }
 
