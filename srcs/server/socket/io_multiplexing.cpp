@@ -176,13 +176,13 @@ int IoMultiplexing::send(int sd) {
 	{
 		memset(buffer, '\0', BUFFER_SIZE);
 		ofs_[sd].read(buffer, BUFFER_SIZE);
-		std::cout << "add: " << buffer << std::endl;
+		//std::cout << "add: " << buffer << std::endl;
 		response_[sd].addStream(std::string(buffer));
 	}
 	//request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
 	request_process_status_[sd] = it->second.setSendBuffer2(buffer, BUFFER_SIZE);
-	std::cout << buffer << std::endl;
-	int result = ::send(sd, buffer, sizeof(buffer), 0);
+	//std::cout << buffer << std::endl;
+	int result = ::send(sd, buffer, std::strlen(buffer), 0);
 	if (result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
@@ -196,6 +196,9 @@ int IoMultiplexing::send(int sd) {
 
 	if (request_process_status_[sd] == FINISH) {
 		disconnect(sd);
+		http_request_parse_.httpRequestErase(sd);
+		response_.erase(sd);
+		ofs_[sd].close();
 	}
 
 	std::cout << sd << "  " << sizeof(buffer) << " bytes sended\n" << std::endl;
@@ -216,7 +219,8 @@ void IoMultiplexing::setResponseStatus(int sd) {
 	// if (isCgi) {
 	// request_process_status_[sd] = CGI;
 	// } else {
-	request_process_status_[sd] = RESPONSE;
+	if (request_process_status_[sd] == REQUESTFINISH)
+		request_process_status_[sd] = RESPONSE;
 	// }
 	return;
 }
@@ -228,7 +232,6 @@ int IoMultiplexing::createResponse(int sd) {
 		response_[sd] = executeRequest(request);
 		//TODO ファイルが開かなかった時のエラー処理が必要。多分開くけど。
 		ofs_[sd].open(response_[sd].getFilePath().c_str());
-		std::cout << response_[sd].getFilePath() << std::endl;
 		if (!ofs_[sd])
 			std::cout << "out" << std::endl;
 	} else if (request_process_status_[sd] == CGI) {
@@ -269,12 +272,14 @@ int IoMultiplexing::select() {
 					if (accept(sd) < 0)
 						should_stop_server_ = true;
 				} else {
-					if (recv(sd) < 0) {
+					if (request_process_status_[sd] == RECV && recv(sd) < 0) {
 						--desc_ready;
 						continue;
 					}
 					if (request_process_status_[sd] == REQUESTFINISH) {
 						setResponseStatus(sd);
+						//TODO sdがmax_sdなら、二番目に小さいものをmax_sdにせっていするべき。
+						FD_CLR(sd, &read_fds_);
 						if (createResponse(sd) < 0) {
 							--desc_ready;
 							continue;

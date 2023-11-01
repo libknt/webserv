@@ -69,6 +69,7 @@ void ParseHttpRequest::getInfo() {
 
 void ParseHttpRequest::httpRequestErase(int sd) {
 	http_request_map_.erase(sd);
+	http_line_stream_.erase(sd);
 }
 
 }

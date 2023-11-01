@@ -107,14 +107,14 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 int HttpRequest::parseHttpMethod(std::string const& line) {
 	std::vector<std::string> method_vector;
 	if (parseSentense(line, "%s %s %s", method_vector) == -1 || method_vector.size() != 3) {
-		std::cerr << "Http Method Parse Error" << std::endl;
+		std::cerr << "Http Method Parse Error1" << std::endl;
 		setStatus(http_request_status::ERROR);
 		setErrorStatus(http_error_status::BAD_REQUEST);
 		return (-1);
 	}
 	if (setMethod(method_vector[0]) < 0 || setRequestPath(method_vector[1]) < 0 ||
 		setVersion(method_vector[2]) < 0) {
-		std::cerr << "Http Method Parse Error" << std::endl;
+		std::cerr << "Http Method Parse Error2" << std::endl;
 		setStatus(http_request_status::ERROR);
 		setErrorStatus(http_error_status::BAD_REQUEST);
 		return (-1);
@@ -270,13 +270,13 @@ std::string HttpRequest::getServerProtocol() const {
 	std::string protocol;
 	switch (version_) {
 		case http_version::HTTP_1_0:
-			protocol = "HTTP_1_0";
+			protocol = "HTTP/1.0";
 			break;
 		case http_version::HTTP_1_1:
-			protocol = "HTTP_1_1";
+			protocol = "HTTP/1.1";
 			break;
 		case http_version::HTTP_2_0:
-			protocol = "HTTP_2_0";
+			protocol = "HTTP/2.0";
 			break;
 		default:
 			protocol = "";
