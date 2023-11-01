@@ -29,7 +29,10 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		exit(-1);
 	}
 	if (it->second.getHttpBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
+	{
 		it->second.parseHttpRequest(http_line_stream_[socketfd]);
+		http_line_stream_[socketfd] = "";
+	}
 	else {
 		while ((index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
 			std::string line = http_line_stream_[socketfd].substr(0, index);

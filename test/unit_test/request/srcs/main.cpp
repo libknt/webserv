@@ -1,3 +1,6 @@
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 2
+#endif
 #include "http_request.hpp"
 #include "parse_http_request.hpp"
 #include <fcntl.h>
@@ -7,9 +10,6 @@
 #include <unistd.h>
 #include <vector>
 
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1024
-#endif
 
 int main(int argc, char* argv[]) {
 	server::ParseHttpRequest parse_http_request;
