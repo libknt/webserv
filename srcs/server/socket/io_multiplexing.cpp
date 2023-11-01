@@ -168,6 +168,7 @@ int IoMultiplexing::recv(int sd) {
 int IoMultiplexing::send(int sd) {
 
 	char buffer[BUFFER_SIZE];
+	size_t	buffer_size;
 
 	std::map<int, HttpResponse>::iterator it = response_.find(sd);
 
@@ -175,14 +176,16 @@ int IoMultiplexing::send(int sd) {
 	if (!ofs_[sd].eof())
 	{
 		memset(buffer, '\0', BUFFER_SIZE);
-		ofs_[sd].read(buffer, BUFFER_SIZE);
+		ofs_[sd].read(buffer, BUFFER_SIZE - 1);
 		//std::cout << "add: " << buffer << std::endl;
 		response_[sd].addStream(std::string(buffer));
 	}
+	std::cout << "fafa" << std::endl;
+	if (!ofs_[sd].eof())
 	//request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
-	request_process_status_[sd] = it->second.setSendBuffer2(buffer, BUFFER_SIZE);
+	request_process_status_[sd] = it->second.setSendBuffer2(buffer, buffer_size, BUFFER_SIZE);
 	//std::cout << buffer << std::endl;
-	int result = ::send(sd, buffer, std::strlen(buffer), 0);
+	int result = ::send(sd, buffer, buffer_size, 0);
 	if (result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);

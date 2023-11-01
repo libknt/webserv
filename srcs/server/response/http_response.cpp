@@ -84,17 +84,19 @@ void	HttpResponse::addStream(std::string const &buf)
 	stream_ += buf;
 }
 
-RequestProcessStatus HttpResponse::setSendBuffer2(char* buffer, size_t const &max_buffer_size) {
+RequestProcessStatus HttpResponse::setSendBuffer2(char* buffer, size_t &buffer_size, size_t const &max_buffer_size) {
 	std::memset(buffer, 0, max_buffer_size);
 	if (stream_.size() <= max_buffer_size)
 	{
 		std::memcpy(buffer, stream_.c_str(), stream_.size());
+		buffer_size = stream_.size();
 		return FINISH;
 	}
 	else
 	{
 		std::string temp = stream_.substr(0, max_buffer_size);		
 		std::memcpy(buffer, stream_.c_str(), max_buffer_size);
+		buffer_size = max_buffer_size;
 		stream_ = stream_.substr(max_buffer_size);
 		return (SEND);
 	}
