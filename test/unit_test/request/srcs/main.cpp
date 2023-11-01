@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <vector>
 
-
 int main(int argc, char* argv[]) {
 	server::ParseHttpRequest parse_http_request;
 	std::vector<int> fd(argc);
