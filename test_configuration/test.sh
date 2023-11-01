@@ -1,21 +1,27 @@
-
 #!/bin/bash
 
 make -C ../
-cp ../server ./
-error_occurred=false
 
-for i in $(seq 1 23); do
-    output=$(./server test${i}.conf 2>&1 > /dev/null)
+run_test() {
+    local dir="$1"
+    echo "=================================================="
+    echo "Testing: $dir"
+    echo "=================================================="
+    cd "$dir" && bash test.sh
+    cd - > /dev/null
+    echo -e "\n\n"
+}
 
-    if [[ -z "$output" ]]; then
-        echo "test${i}.conf: エラーです"
-        error_occurred=true
-    fi
-done
+run_test default_error_page
+run_test listen
 
-if $error_occurred; then
-    echo "何らかの設定ファイルでエラーが発生しました。"
-fi
+run_test location
+run_test location/allow_methods
+run_test location/autoindex
+run_test location/chunked_transfer_encoding
+run_test location/client_max_body_size
+run_test location/error_page
+run_test location/index
 
-rm -f server
+run_test server_name
+run_test simple
