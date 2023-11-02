@@ -9,6 +9,7 @@ namespace server {
 
     HttpResponse    executeRequest(HttpRequest const &request);
     HttpResponse    executeGet(HttpRequest const &request);
+	HttpResponse    executePost(HttpRequest const &request);
     HttpResponse    executeError(HttpRequest const &request);
 }
 #endif

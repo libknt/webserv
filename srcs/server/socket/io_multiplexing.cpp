@@ -167,7 +167,7 @@ int IoMultiplexing::recv(int sd) {
 
 int IoMultiplexing::send(int sd) {
 
-	char buffer[BUFFER_SIZE];
+	char	buffer[BUFFER_SIZE];
 	size_t	buffer_size = 0;
 
 	std::map<int, HttpResponse>::iterator it = response_.find(sd);
@@ -195,7 +195,6 @@ int IoMultiplexing::send(int sd) {
 	}
 
 	if (request_process_status_[sd] == FINISH) {
-		std::cout << "debug: hello" << std::endl;
 		disconnect(sd);
 		http_request_parse_.httpRequestErase(sd);
 		response_.erase(sd);
