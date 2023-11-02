@@ -208,8 +208,7 @@ int HttpRequest::parseChunkedBody(std::string const& line) {
 	} else if (line == "" && chunked_size_ == 0) {
 		setStatus(http_request_status::FINISHED);
 	} else {
-		if (chunked_size_ != line.size())
-		{
+		if (chunked_size_ != line.size()) {
 			setStatus(http_request_status::ERROR);
 			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
