@@ -31,7 +31,7 @@ IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
 	FD_ZERO(&read_fds_);
 	FD_ZERO(&master_write_fds_);
 	FD_ZERO(&write_fds_);
-	timeout_.tv_sec = 60;
+	timeout_.tv_sec = 6;
 	timeout_.tv_usec = 0;
 }
 
@@ -168,7 +168,7 @@ int IoMultiplexing::recv(int sd) {
 int IoMultiplexing::send(int sd) {
 
 	char buffer[BUFFER_SIZE];
-	size_t	buffer_size;
+	size_t	buffer_size = 0;
 
 	std::map<int, HttpResponse>::iterator it = response_.find(sd);
 
@@ -177,11 +177,8 @@ int IoMultiplexing::send(int sd) {
 	{
 		memset(buffer, '\0', BUFFER_SIZE);
 		ofs_[sd].read(buffer, BUFFER_SIZE - 1);
-		//std::cout << "add: " << buffer << std::endl;
 		response_[sd].addStream(std::string(buffer));
 	}
-	std::cout << "fafa" << std::endl;
-	if (!ofs_[sd].eof())
 	//request_process_status_[sd] = it->second.setSendBuffer(buffer, BUFFER_SIZE);
 	request_process_status_[sd] = it->second.setSendBuffer2(buffer, buffer_size, BUFFER_SIZE);
 	//std::cout << buffer << std::endl;
@@ -198,6 +195,7 @@ int IoMultiplexing::send(int sd) {
 	}
 
 	if (request_process_status_[sd] == FINISH) {
+		std::cout << "debug: hello" << std::endl;
 		disconnect(sd);
 		http_request_parse_.httpRequestErase(sd);
 		response_.erase(sd);
