@@ -180,7 +180,7 @@ int HttpRequest::setHeaderValue(std::string const& key, std::string const& value
 }
 
 std::string HttpRequest::getHeaderValue(std::string const& key) {
-	if (header_.count(key) == 0)
+	if (header_.empty())
 		return (std::string(""));
 	else
 		return (header_[key]);
