@@ -9,6 +9,9 @@
 #include <string>
 #include <unistd.h>
 #include <vector>
+#include <cstring>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 namespace server {
 

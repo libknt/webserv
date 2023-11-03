@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cstring>
 
 class HttpRequest;
 enum URL_META_VARIABLES {

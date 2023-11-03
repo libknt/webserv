@@ -98,6 +98,10 @@ int Cgi::execCgi() {
 		std::memset(buffer, '\0', sizeof(buffer));
 		ssize_t bytes_read;
 		bytes_read = read(1, buffer, sizeof(buffer));
+		if (bytes_read < 0) {
+			std::cerr << "read faile(): " << strerror(errno) << " " << __FILE__ << std::endl;
+			std::exit(1);
+		}
 		std::string ss(buffer);
 		char* exec_argv[] = {
 			(char*)path_.c_str(), (char*)script_.c_str(), (char*)ss.c_str(), NULL
