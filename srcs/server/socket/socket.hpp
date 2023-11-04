@@ -18,7 +18,7 @@ namespace server {
 
 class Socket {
 private:
-	const char* server_addr_;
+	const char* server_address_;
 	int port_;
 	int listen_sd_;
 	int backlog_; // macOs sysctl kern.ipc.somaxconn
@@ -37,8 +37,8 @@ private:
 	bool isValid();
 
 public:
-	Socket(const char* server_addr, int port);
-	Socket(const char* server_addr, int port, int backlog);
+	Socket(const char* server_address, int port);
+	Socket(const char* server_address, int port, int backlog);
 	Socket(const Socket& other);
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();

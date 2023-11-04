@@ -45,12 +45,12 @@ protected:
 
 // MAX_SERVERS分のサーバーオブジェクトが正しく初期化できるか
 // 各サーバーオブジェクトが持っているリッスン用のファイルディスクリプタが有効かどうか
-TEST_F(SocketTest, CheckValidListenSd) {
+TEST_F(SocketTest, CheckValidvectorenSd) {
 	for (int i = 0; i < MAX_SERVERS; ++i) {
 		// EXPECT_GE(servers[i]->initialize(), 0) << "Failed to initialize server at index " << i;
 		servers[i]->initialize();
-		EXPECT_GE(servers[i]->getListenSd(), 0)
-			<< "Server at index " << i << " has invalid listen_sd_";
+		EXPECT_GE(servers[i]->getvectorenSd(), 0)
+			<< "Server at index " << i << " has invalid vectoren_sd_";
 	}
 }
 
@@ -103,7 +103,7 @@ TEST(SocketParamsTest, ZeroPort) {
 
 	struct sockaddr_in sin;
 	socklen_t len = sizeof(sin);
-	int result = getsockname(server.getListenSd(), (struct sockaddr*)&sin, &len);
+	int result = getsockname(server.getvectorenSd(), (struct sockaddr*)&sin, &len);
 
 	ASSERT_NE(result, -1) << "Failed to get socket name.";
 	EXPECT_GT(ntohs(sin.sin_port), 0) << "Expected a valid port number after initialization";
