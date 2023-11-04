@@ -224,8 +224,7 @@ int HttpRequest::parseContentLengthBody(std::string const& line) {
 	body_ += line;
 	if (body_.size() == content_length_)
 		setStatus(http_request_status::FINISHED);
-	else if (content_length_ < body_.size())
-	{
+	else if (content_length_ < body_.size()) {
 		std::cout << "error: " << line << std::endl;
 		setStatus(http_request_status::ERROR);
 		setErrorStatus(http_error_status::BAD_REQUEST);
