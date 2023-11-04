@@ -2,8 +2,20 @@
 #include "parse_http_request.hpp"
 
 namespace server {
-IoMultiplexing::IoMultiplexing()
-	: socket_conf_(std::vector<socket_conf>())
+// IoMultiplexing::IoMultiplexing()
+// 	: socket_(std::vector<server::Socket>())
+// 	, activity_times_(std::map<int, time_t>())
+// 	, max_sd_(-1)
+// 	, max_clients_(-1)
+// 	, should_stop_server_(false) {
+// 	FD_ZERO(&master_read_fds_);
+// 	FD_ZERO(&read_fds__);
+// 	timeout_.tv_sec = 10;
+// 	timeout_.tv_usec = 0;
+// }
+
+IoMultiplexing::IoMultiplexing(Configuration& configuration)
+	: configuration_(configuration)
 	, socket_(std::vector<server::Socket>())
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
@@ -15,23 +27,23 @@ IoMultiplexing::IoMultiplexing()
 	timeout_.tv_usec = 0;
 }
 
-IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
-	: socket_conf_(conf)
-	, socket_(std::vector<server::Socket>())
-	, activity_times_(std::map<int, time_t>())
-	, max_sd_(-1)
-	, max_clients_(-1)
-	, should_stop_server_(false) {
-	FD_ZERO(&master_read_fds_);
-	FD_ZERO(&read_fds__);
-	timeout_.tv_sec = 10;
-	timeout_.tv_usec = 0;
-}
+// IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
+// 	: socket_conf_(conf)
+// 	, socket_(std::vector<server::Socket>())
+// 	, activity_times_(std::map<int, time_t>())
+// 	, max_sd_(-1)
+// 	, max_clients_(-1)
+// 	, should_stop_server_(false) {
+// 	FD_ZERO(&master_read_fds_);
+// 	FD_ZERO(&read_fds__);
+// 	timeout_.tv_sec = 10;
+// 	timeout_.tv_usec = 0;
+// }
 
 IoMultiplexing::~IoMultiplexing() {}
 
 IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
-	: socket_conf_(other.socket_conf_)
+	: configuration_(other.configuration_)
 	, socket_(other.socket_)
 	, activity_times_(other.activity_times_)
 	, max_sd_(other.max_sd_)
@@ -42,9 +54,8 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, should_stop_server_(other.should_stop_server_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
-
 	if (this != &other) {
-		socket_conf_ = other.socket_conf_;
+		configuration_ = other.configuration_;
 		socket_ = other.socket_;
 		activity_times_ = other.activity_times_;
 		max_sd_ = other.max_sd_;
@@ -58,18 +69,17 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 }
 
 int IoMultiplexing::initialize() {
-	for (std::vector<socket_conf>::iterator conf_it = socket_conf_.begin();
-		 conf_it != socket_conf_.end();
-		 ++conf_it) {
-		socket_.push_back(server::Socket(conf_it->addr, conf_it->port));
+	std::vector<ServerDirective> servers = configuration_.getServers();
+	for (std::vector<ServerDirective>::iterator it = servers.begin(); it != servers.end(); ++it) {
+		std::cout << it->getIpAddress() << " " << it->getPort() << std::endl;
+		socket_.push_back(server::Socket(it->getIpAddress(), it->getPort()));
 	}
 
-	for (std::vector<server::Socket>::iterator socket_it = socket_.begin();
-		 socket_it != socket_.end();) {
-		if (socket_it->initialize() < 0) {
-			socket_it = socket_.erase(socket_it);
+	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end();) {
+		if (it->initialize() < 0) {
+			it = socket_.erase(it);
 		} else {
-			++socket_it;
+			++it;
 		}
 	}
 
@@ -112,8 +122,6 @@ int IoMultiplexing::accept(int listen_sd) {
 			max_sd_ = new_sd;
 
 	} while (new_sd != -1);
-	std::cout << "TEST" << std::endl;
-	http_request_parse_.getInfo();
 	return 0;
 }
 
@@ -206,7 +214,7 @@ int IoMultiplexing::select() {
 	return 0;
 }
 
-int IoMultiplexing::server_start() {
+int IoMultiplexing::run_server() {
 	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->getListenSd() > max_sd_) {

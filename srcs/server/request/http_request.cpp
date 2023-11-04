@@ -222,6 +222,7 @@ int HttpRequest::parseContentLengthBody(std::string const& line) {
 	return (0);
 }
 
+// TODO: operatorにする
 void HttpRequest::getInfo(void) {
 	std::cout << "method: " << method_ << std::endl;
 	std::cout << "status: " << status_ << std::endl;

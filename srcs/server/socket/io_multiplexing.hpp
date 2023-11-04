@@ -1,6 +1,7 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
+#include "../../configuration/configuration.hpp"
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"
@@ -22,7 +23,9 @@ enum SERVER_STATUS {
 class IoMultiplexing {
 
 private:
-	std::vector<socket_conf> socket_conf_;
+	// std::vector<socket_conf> socket_conf_;
+	IoMultiplexing();
+	Configuration& configuration_;
 	std::vector<server::Socket> socket_;
 	std::map<int, time_t> activity_times_;
 	int max_sd_;
@@ -32,16 +35,16 @@ private:
 	fd_set read_fds__;
 	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
-	IoMultiplexing();
 	ParseHttpRequest http_request_parse_;
 
 public:
+	IoMultiplexing(Configuration& configuration);
 	explicit IoMultiplexing(std::vector<socket_conf>& conf);
 	virtual ~IoMultiplexing();
 	explicit IoMultiplexing(const IoMultiplexing& other);
 	IoMultiplexing& operator=(const IoMultiplexing& other);
 	int initialize();
-	int server_start();
+	int run_server();
 	int select();
 	int accept(int listen_sd);
 	int request(int sd);

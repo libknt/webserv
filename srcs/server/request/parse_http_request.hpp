@@ -28,7 +28,7 @@ public:
 	int handleBuffer(int socketfd, char* buf);
 	HttpRequest& getHttpRequest(int sd);
 	void addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
-	void getInfo();
+	void print_accepted_fds();
 };
 
 }
