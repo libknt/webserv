@@ -2,17 +2,6 @@
 #include "parse_http_request.hpp"
 
 namespace server {
-// IoMultiplexing::IoMultiplexing()
-// 	: socket_(std::vector<server::Socket>())
-// 	, activity_times_(std::map<int, time_t>())
-// 	, max_sd_(-1)
-// 	, max_clients_(-1)
-// 	, should_stop_server_(false) {
-// 	FD_ZERO(&master_read_fds_);
-// 	FD_ZERO(&read_fds__);
-// 	timeout_.tv_sec = 10;
-// 	timeout_.tv_usec = 0;
-// }
 
 IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	: configuration_(configuration)
@@ -26,19 +15,6 @@ IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
-
-// IoMultiplexing::IoMultiplexing(std::vector<socket_conf>& conf)
-// 	: socket_conf_(conf)
-// 	, socket_(std::vector<server::Socket>())
-// 	, activity_times_(std::map<int, time_t>())
-// 	, max_sd_(-1)
-// 	, max_clients_(-1)
-// 	, should_stop_server_(false) {
-// 	FD_ZERO(&master_read_fds_);
-// 	FD_ZERO(&read_fds__);
-// 	timeout_.tv_sec = 10;
-// 	timeout_.tv_usec = 0;
-// }
 
 IoMultiplexing::~IoMultiplexing() {}
 

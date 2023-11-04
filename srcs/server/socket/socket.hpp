@@ -38,7 +38,7 @@ private:
 
 public:
 	Socket(std::string server_address, std::string port);
-	// Socket(const char* server_address, int port, int backlog);
+	Socket(std::string server_address, std::string port, int backlog);
 	Socket(const Socket& other);
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();

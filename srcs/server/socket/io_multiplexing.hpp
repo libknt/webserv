@@ -1,7 +1,7 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
-#include "../../configuration/configuration.hpp"
+#include "configuration.hpp"
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"
@@ -23,7 +23,6 @@ enum SERVER_STATUS {
 class IoMultiplexing {
 
 private:
-	// std::vector<socket_conf> socket_conf_;
 	IoMultiplexing();
 	Configuration& configuration_;
 	std::vector<server::Socket> socket_;
@@ -39,7 +38,6 @@ private:
 
 public:
 	IoMultiplexing(Configuration& configuration);
-	explicit IoMultiplexing(std::vector<socket_conf>& conf);
 	virtual ~IoMultiplexing();
 	explicit IoMultiplexing(const IoMultiplexing& other);
 	IoMultiplexing& operator=(const IoMultiplexing& other);

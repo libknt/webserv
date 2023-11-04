@@ -9,13 +9,13 @@ Socket::Socket(std::string server_address, std::string port)
 	std::memset(&addr_, 0, sizeof(addr_));
 }
 
-// Socket::Socket(const char* server_address, int port, int backlog)
-// 	: server_address_(server_address)
-// 	, port_(port)
-// 	, listen_sd_(-1)
-// 	, backlog_(backlog) {
-// 	std::memset(&addr_, 0, sizeof(addr_));
-// }
+Socket::Socket(std::string server_address, std::string port, int backlog)
+	: server_address_(server_address)
+	, port_(port)
+	, listen_sd_(-1)
+	, backlog_(backlog) {
+	std::memset(&addr_, 0, sizeof(addr_));
+}
 
 Socket::Socket(const Socket& other)
 	: server_address_(other.server_address_)
