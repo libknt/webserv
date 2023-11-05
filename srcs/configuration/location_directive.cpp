@@ -89,7 +89,7 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 		return -1;
 	}
 	for (size_t i = 0; i < tokens.size() - 1; ++i) {
-		for (size_t j = 0; j < tokens[j].size(); ++j) {
+		for (size_t j = 0; j < tokens[i].size(); ++j) {
 			if (!std::isdigit(tokens[i][j])) {
 				std::cout << tokens[i][j] << std::endl;
 				std::cerr << "Parse Error: parseErrorPageDirective2" << std::endl;
