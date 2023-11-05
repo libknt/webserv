@@ -74,9 +74,9 @@ private:
 	std::string body_;
 	sockaddr_in client_address_;
 	sockaddr_in server_address_;
-	int parseHttpMethod(std::string const& line);
-	int parseHttpHeader(std::string const& line);
-	int parseHttpBody(std::string const& line);
+	int parseMethod(std::string const& line);
+	int parseHeader(std::string const& line);
+	int parseBody(std::string const& line);
 	int parseContentLengthBody(std::string const& line);
 	int parseChunkedBody(std::string const& line);
 	int checkHeaderValue();

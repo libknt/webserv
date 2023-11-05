@@ -87,13 +87,13 @@ int HttpRequest::setVersion(std::string const& version) {
 int HttpRequest::parseHttpRequest(std::string const& line) {
 	switch (status_) {
 		case http_request_status::METHOD:
-			parseHttpMethod(line);
+			parseMethod(line);
 			break;
 		case http_request_status::HEADER:
-			parseHttpHeader(line);
+			parseHeader(line);
 			break;
 		case http_request_status::BODY:
-			parseHttpBody(line);
+			parseBody(line);
 			break;
 		default:
 			setStatus(http_request_status::ERROR);
@@ -104,7 +104,7 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 	return (0);
 }
 
-int HttpRequest::parseHttpMethod(std::string const& line) {
+int HttpRequest::parseMethod(std::string const& line) {
 	std::vector<std::string> method_vector;
 	if (parseSentense(line, "%s %s %s", method_vector) == -1 || method_vector.size() != 3) {
 		std::cerr << "Http Method Parse Error" << std::endl;
@@ -123,7 +123,7 @@ int HttpRequest::parseHttpMethod(std::string const& line) {
 	return (0);
 }
 
-int HttpRequest::parseHttpHeader(std::string const& line) {
+int HttpRequest::parseHeader(std::string const& line) {
 	std::vector<std::string> header_vector;
 	if (line == "\0") {
 		if (checkHeaderValue() < 0) {
@@ -186,7 +186,7 @@ std::string HttpRequest::getHeaderValue(std::string const& key) {
 		return (header_[key]);
 }
 
-int HttpRequest::parseHttpBody(std::string const& line) {
+int HttpRequest::parseBody(std::string const& line) {
 	switch (body_message_type_) {
 		case http_body_message_type::CHUNK_ENCODING:
 			return (parseChunkedBody(line));
