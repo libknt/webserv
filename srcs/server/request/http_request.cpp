@@ -6,9 +6,9 @@ namespace server {
 
 HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	: status_(http_request_status::METHOD)
+	, error_status_(http_error_status::UNDEFINED)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
-	, error_status_(http_error_status::UNDEFINED)
 	, body_message_type_(http_body_message_type::UNDEFINED)
 	, content_length_(0)
 	, chunked_status_(chunked_status::CHUNKED_SIZE)
@@ -18,82 +18,50 @@ HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 
 HttpRequest::~HttpRequest(){};
 
-HttpRequest::HttpRequest(HttpRequest const& request) {
-	*this = request;
-}
+HttpRequest::HttpRequest(HttpRequest const& other)
+	: status_(other.status_)
+	, error_status_(other.error_status_)
+	, method_(other.method_)
+	, request_path_(other.request_path_)
+	, version_(other.version_)
+	, header_(other.header_)
+	, body_message_type_(other.body_message_type_)
+	, content_length_(other.content_length_)
+	, chunked_status_(other.chunked_status_)
+	, chunked_size_(other.chunked_size_)
+	, body_(other.body_)
+	, client_address_(other.client_address_)
+	, server_address_(other.server_address_) {}
 
-HttpRequest& HttpRequest::operator=(HttpRequest const& request) {
-	if (this != &request) {
-		status_ = request.status_;
-		method_ = request.method_;
-		version_ = request.version_;
-		error_status_ = request.error_status_;
-		body_message_type_ = request.body_message_type_;
-		content_length_ = request.content_length_;
-		chunked_status_ = request.chunked_status_;
-		chunked_size_ = request.chunked_size_;
-		request_path_ = request.request_path_;
-		header_ = request.header_;
-		body_ = request.body_;
-		client_address_ = request.client_address_;
-		server_address_ = request.server_address_;
+HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
+	if (this != &other) {
+		status_ = other.status_;
+		error_status_ = other.error_status_;
+		method_ = other.method_;
+		request_path_ = other.request_path_;
+		version_ = other.version_;
+		header_ = other.header_;
+		body_message_type_ = other.body_message_type_;
+		content_length_ = other.content_length_;
+		chunked_status_ = other.chunked_status_;
+		chunked_size_ = other.chunked_size_;
+		body_ = other.body_;
+		client_address_ = other.client_address_;
+		server_address_ = other.server_address_;
 	}
 	return (*this);
-}
-
-void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
-	status_ = status;
-}
-
-void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
-	error_status_ = error_status;
-}
-
-int HttpRequest::setMethod(std::string const& method) {
-	if (method == "GET")
-		method_ = http_method::GET;
-	else if (method == "POST")
-		method_ = http_method::POST;
-	else if (method == "DELETE")
-		method_ = http_method::DELETE;
-	else {
-		setStatus(http_request_status::ERROR);
-		return (-1);
-	}
-	return (0);
-}
-
-int HttpRequest::setRequestPath(std::string const& request_path) {
-	if (request_path == "\0") {
-		setStatus(http_request_status::ERROR);
-		return (-1);
-	}
-	request_path_ = request_path;
-	return (0);
-}
-
-int HttpRequest::setVersion(std::string const& version) {
-	if (version == "HTTP/1.0")
-		version_ = http_version::HTTP_1_0;
-	else if (version == "HTTP/1.1")
-		version_ = http_version::HTTP_1_1;
-	else {
-		setStatus(http_request_status::ERROR);
-		return (-1);
-	}
-	return (0);
 }
 
 int HttpRequest::parseHttpRequest(std::string const& line) {
 	switch (status_) {
 		case http_request_status::METHOD:
-			parseHttpMethod(line);
+			parseMethod(line);
 			break;
 		case http_request_status::HEADER:
-			parseHttpHeader(line);
+			parseHeader(line);
 			break;
 		case http_request_status::BODY:
-			parseHttpBody(line);
+			parseBody(line);
 			break;
 		default:
 			setStatus(http_request_status::ERROR);
@@ -104,7 +72,86 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 	return (0);
 }
 
-int HttpRequest::parseHttpMethod(std::string const& line) {
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getStatus(void) const {
+	return (status_);
+}
+
+std::string HttpRequest::getMethod() const {
+	std::string method;
+	switch (method_) {
+		case http_method::GET:
+			method = "GET";
+			break;
+		case http_method::POST:
+			method = "POST";
+			break;
+		case http_method::DELETE:
+			method = "DELETE";
+			break;
+		default:
+			method = std::string("");
+	}
+	return method;
+}
+
+std::string HttpRequest::getVersion() const {
+	std::string protocol;
+	switch (version_) {
+		case http_version::HTTP_1_0:
+			protocol = "HTTP_1_0";
+			break;
+		case http_version::HTTP_1_1:
+			protocol = "HTTP_1_1";
+			break;
+		case http_version::HTTP_2_0:
+			protocol = "HTTP_2_0";
+			break;
+		default:
+			protocol = "";
+	}
+	return protocol;
+}
+
+std::string HttpRequest::getRequestPath() const {
+	return request_path_;
+}
+
+std::string HttpRequest::getHeaderValue(std::string const& key) {
+	if (header_.empty())
+		return (std::string(""));
+	else
+		return (header_[key]);
+}
+
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getBodyMessageType(void) {
+	return (body_message_type_);
+}
+
+std::map<std::string, std::string> HttpRequest::getHeader() const {
+	return header_;
+}
+
+std::string HttpRequest::getBody() const {
+	return body_;
+}
+
+sockaddr_in HttpRequest::getClientAddress() const {
+	return client_address_;
+}
+
+sockaddr_in HttpRequest::getServerAddress() const {
+	return server_address_;
+}
+
+void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
+	status_ = status;
+}
+
+void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
+	error_status_ = error_status;
+}
+
+int HttpRequest::parseMethod(std::string const& line) {
 	std::vector<std::string> method_vector;
 	if (parseSentense(line, "%s %s %s", method_vector) == -1 || method_vector.size() != 3) {
 		std::cerr << "Http Method Parse Error" << std::endl;
@@ -123,7 +170,7 @@ int HttpRequest::parseHttpMethod(std::string const& line) {
 	return (0);
 }
 
-int HttpRequest::parseHttpHeader(std::string const& line) {
+int HttpRequest::parseHeader(std::string const& line) {
 	std::vector<std::string> header_vector;
 	if (line == "\0") {
 		if (checkHeaderValue() < 0) {
@@ -174,19 +221,8 @@ int HttpRequest::checkHeaderValue() {
 	}
 	return (0);
 }
-int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
-	header_.insert(std::make_pair(key, value));
-	return (0);
-}
 
-std::string HttpRequest::getHeaderValue(std::string const& key) {
-	if (header_.empty())
-		return (std::string(""));
-	else
-		return (header_[key]);
-}
-
-int HttpRequest::parseHttpBody(std::string const& line) {
+int HttpRequest::parseBody(std::string const& line) {
 	switch (body_message_type_) {
 		case http_body_message_type::CHUNK_ENCODING:
 			return (parseChunkedBody(line));
@@ -197,6 +233,14 @@ int HttpRequest::parseHttpBody(std::string const& line) {
 			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
 	}
+}
+
+int HttpRequest::parseContentLengthBody(std::string const& line) {
+	// TODO  no error handling
+	body_ += line;
+	if (body_.size() == content_length_)
+		setStatus(http_request_status::FINISHED);
+	return (0);
 }
 
 int HttpRequest::parseChunkedBody(std::string const& line) {
@@ -214,82 +258,58 @@ int HttpRequest::parseChunkedBody(std::string const& line) {
 	return (0);
 }
 
-int HttpRequest::parseContentLengthBody(std::string const& line) {
-	// TODO  no error handling
-	body_ += line;
-	if (body_.size() == content_length_)
-		setStatus(http_request_status::FINISHED);
+int HttpRequest::setMethod(std::string const& method) {
+	if (method == "GET")
+		method_ = http_method::GET;
+	else if (method == "POST")
+		method_ = http_method::POST;
+	else if (method == "DELETE")
+		method_ = http_method::DELETE;
+	else {
+		setStatus(http_request_status::ERROR);
+		return (-1);
+	}
 	return (0);
 }
 
-void HttpRequest::getInfo(void) {
-	std::cout << "method: " << method_ << std::endl;
-	std::cout << "status: " << status_ << std::endl;
-	std::cout << "version: " << version_ << std::endl;
-	std::cout << "header" << std::endl;
-	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
-		 ++iter)
-		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
-}
-
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) const {
-	return (status_);
-}
-
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void) {
-	return (body_message_type_);
-}
-
-sockaddr_in HttpRequest::getClientAddress() const {
-	return client_address_;
-}
-
-sockaddr_in HttpRequest::getServerAddress() const {
-	return server_address_;
-}
-
-std::string HttpRequest::getHttpMethod() const {
-	std::string method;
-	switch (method_) {
-		case http_method::GET:
-			method = "GET";
-			break;
-		case http_method::POST:
-			method = "POST";
-			break;
-		case http_method::DELETE:
-			method = "DELETE";
-			break;
-		default:
-			method = std::string("");
+int HttpRequest::setRequestPath(std::string const& request_path) {
+	if (request_path == "\0") {
+		setStatus(http_request_status::ERROR);
+		return (-1);
 	}
-	return method;
+	request_path_ = request_path;
+	return (0);
 }
 
-std::string HttpRequest::getServerProtocol() const {
-	std::string protocol;
-	switch (version_) {
-		case http_version::HTTP_1_0:
-			protocol = "HTTP_1_0";
-			break;
-		case http_version::HTTP_1_1:
-			protocol = "HTTP_1_1";
-			break;
-		case http_version::HTTP_2_0:
-			protocol = "HTTP_2_0";
-			break;
-		default:
-			protocol = "";
+int HttpRequest::setVersion(std::string const& version) {
+	if (version == "HTTP/1.0")
+		version_ = http_version::HTTP_1_0;
+	else if (version == "HTTP/1.1")
+		version_ = http_version::HTTP_1_1;
+	else {
+		setStatus(http_request_status::ERROR);
+		return (-1);
 	}
-	return protocol;
+	return (0);
 }
 
-std::string HttpRequest::getRequestPath() const {
-	return request_path_;
+int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
+	header_.insert(std::make_pair(key, value));
+	return (0);
 }
 
-std::string HttpRequest::getBody() const {
-	return body_;
+std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
+	out << "method: " << request.getMethod() << std::endl;
+	out << "status: " << request.getStatus() << std::endl;
+	out << "version: " << request.getVersion() << std::endl;
+	out << "header" << std::endl;
+
+	std::map<std::string, std::string> header = request.getHeader();
+	for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end();
+		 ++it) {
+		std::cout << "key: " << it->first << " value: " << it->second << std::endl;
+	}
+	return out;
 }
 
 }

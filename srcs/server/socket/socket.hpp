@@ -18,8 +18,8 @@ namespace server {
 
 class Socket {
 private:
-	const char* server_address_;
-	int port_;
+	std::string server_address_;
+	std::string port_;
 	int listen_sd_;
 	int backlog_; // macOs sysctl kern.ipc.somaxconn
 	struct sockaddr_in addr_;
@@ -37,8 +37,8 @@ private:
 	bool isValid();
 
 public:
-	Socket(const char* server_address, int port);
-	Socket(const char* server_address, int port, int backlog);
+	Socket(std::string server_address, std::string port);
+	Socket(std::string server_address, std::string port, int backlog);
 	Socket(const Socket& other);
 	Socket& operator=(const Socket& other);
 	virtual ~Socket();

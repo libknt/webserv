@@ -14,6 +14,7 @@ Configuration& Configuration::operator=(const Configuration& other) {
 	return *this;
 }
 
+// TODO: 関数切り分けか命名変更
 int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
 	std::ifstream conf_file(path.c_str());
