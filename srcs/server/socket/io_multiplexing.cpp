@@ -190,7 +190,7 @@ int IoMultiplexing::select() {
 	return 0;
 }
 
-int IoMultiplexing::run_server() {
+int IoMultiplexing::runServer() {
 	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->getListenSd() > max_sd_) {

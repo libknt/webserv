@@ -42,7 +42,7 @@ public:
 	explicit IoMultiplexing(const IoMultiplexing& other);
 	IoMultiplexing& operator=(const IoMultiplexing& other);
 	int initialize();
-	int run_server();
+	int runServer();
 	int select();
 	int accept(int listen_sd);
 	int request(int sd);

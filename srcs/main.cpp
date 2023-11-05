@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
 		std::cerr << "Server initialize failed" << std::endl;
 		return -1;
 	}
-	server.run_server();
+	server.runServer();
 	// start();
 	return 0;
 }
