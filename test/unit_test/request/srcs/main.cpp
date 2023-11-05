@@ -8,7 +8,7 @@
 #include <vector>
 
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1
+#define BUFFER_SIZE 1024
 #endif
 
 int main(int argc, char* argv[]) {
