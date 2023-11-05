@@ -28,7 +28,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
 		exit(-1);
 	}
-	if (it->second.getHttpBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
+	if (it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
 		it->second.parseHttpRequest(http_line_stream_[socketfd]);
 	else {
 		while ((index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
@@ -40,7 +40,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 		}
 	}
 
-	if (http_request_status::FINISHED == it->second.getHttpRequestStatus()) {
+	if (http_request_status::FINISHED == it->second.getStatus()) {
 		return 1;
 	}
 	return (0);

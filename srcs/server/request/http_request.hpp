@@ -97,14 +97,19 @@ public:
 	int parseHttpRequest(std::string const& line);
 	std::string getHeaderValue(std::string const& key);
 	void getInfo(void);
-	http_request_status::HTTP_REQUEST_STATUS getHttpRequestStatus(void) const;
-	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getHttpBodyMessageType(void);
+	http_request_status::HTTP_REQUEST_STATUS getStatus(void) const;
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getBodyMessageType(void);
 	sockaddr_in getClientAddress() const;
 	sockaddr_in getServerAddress() const;
-	std::string getHttpMethod() const;
-	std::string getServerProtocol() const;
+	std::string getMethod() const;
+	std::string getVersion() const;
 	std::string getRequestPath() const;
+	std::map<std::string, std::string> HttpRequest::getHeader() const;
 	std::string getBody() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const HttpRequest& request);
+
 }
+
 #endif

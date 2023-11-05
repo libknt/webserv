@@ -222,22 +222,11 @@ int HttpRequest::parseContentLengthBody(std::string const& line) {
 	return (0);
 }
 
-// TODO: operatorにする
-void HttpRequest::getInfo(void) {
-	std::cout << "method: " << method_ << std::endl;
-	std::cout << "status: " << status_ << std::endl;
-	std::cout << "version: " << version_ << std::endl;
-	std::cout << "header" << std::endl;
-	for (std::map<std::string, std::string>::iterator iter = header_.begin(); iter != header_.end();
-		 ++iter)
-		std::cout << "key: " << iter->first << " value: " << iter->second << std::endl;
-}
-
-http_request_status::HTTP_REQUEST_STATUS HttpRequest::getHttpRequestStatus(void) const {
+http_request_status::HTTP_REQUEST_STATUS HttpRequest::getStatus(void) const {
 	return (status_);
 }
 
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getHttpBodyMessageType(void) {
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getBodyMessageType(void) {
 	return (body_message_type_);
 }
 
@@ -249,7 +238,7 @@ sockaddr_in HttpRequest::getServerAddress() const {
 	return server_address_;
 }
 
-std::string HttpRequest::getHttpMethod() const {
+std::string HttpRequest::getMethod() const {
 	std::string method;
 	switch (method_) {
 		case http_method::GET:
@@ -267,7 +256,7 @@ std::string HttpRequest::getHttpMethod() const {
 	return method;
 }
 
-std::string HttpRequest::getServerProtocol() const {
+std::string HttpRequest::getVersion() const {
 	std::string protocol;
 	switch (version_) {
 		case http_version::HTTP_1_0:
@@ -289,8 +278,24 @@ std::string HttpRequest::getRequestPath() const {
 	return request_path_;
 }
 
+std::map<std::string, std::string> HttpRequest::getHeader() const {
+	return header_;
+}
+
 std::string HttpRequest::getBody() const {
 	return body_;
+}
+
+std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
+	out << "method: " << request.getMethod() << std::endl;
+	out << "status: " << request.getStatus() << std::endl;
+	out << "version: " << request.getVersion() << std::endl;
+	out << "header" << std::endl;
+
+	std::map<std::string, std::string> header = request.getHeader();
+	for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); ++it) {
+		std::cout << "key: " << it->first << " value: " << it->second << std::endl;
+	}
 }
 
 }
