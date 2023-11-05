@@ -305,7 +305,8 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 	out << "header" << std::endl;
 
 	std::map<std::string, std::string> header = request.getHeader();
-	for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); ++it) {
+	for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end();
+		 ++it) {
 		std::cout << "key: " << it->first << " value: " << it->second << std::endl;
 	}
 	return out;
