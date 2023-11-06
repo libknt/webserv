@@ -216,7 +216,9 @@ std::string LocationDirective::getChunkedTransferEncoding() const {
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 	out << "ErrorPages: " << std::endl;
-	for (std::map<std::string, std::string>::iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+	for (std::map<std::string, std::string>::iterator it = error_pages.begin();
+		 it != error_pages.end();
+		 ++it) {
 		out << it->first << ":" << it->second << ", ";
 	}
 	std::cout << std::endl;
