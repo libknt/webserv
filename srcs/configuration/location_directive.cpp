@@ -65,6 +65,7 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 				return -1;
 			}
 		} else if (tokens.front() == "allow_methods") {
+			allow_methods_.clear();
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseAllowMethodsDirective(args) == -1) {
 				return -1;
@@ -96,7 +97,6 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 				return -1;
 			}
 		}
-		std::cout << "test: " << tokens[i] << " : " << tokens[tokens.size() - 1] << std::endl;
 		error_pages_[tokens[i]] = tokens[tokens.size() - 1];
 	}
 	return 0;
