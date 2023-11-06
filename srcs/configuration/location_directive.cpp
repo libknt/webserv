@@ -280,8 +280,15 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	out << "Root: " << location_directive.getRoot() << std::endl;
 	out << "Index: " << location_directive.getIndex() << std::endl;
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
-	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding()
-		<< std::endl;
+	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding() << std::endl;
+	out << "CGI: " << location_directive.getCgi() << std::endl;
+
+	std::vector<std::string> cgi_extensions = location_directive.getCgiExtensions();
+	out << "CGIExtensions: ";
+	for (size_t i = 0; i < cgi_extensions.size(); ++i) {
+		out << cgi_extensions[i] << ", ";
+	}
+	out << std::endl;
 
 	return out;
 }
