@@ -218,7 +218,8 @@ int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tok
 		return -1;
 	}
 	for (size_t i = 0; i < tokens.size(); ++i) {
-		if (tokens[i] != ".cgi" && tokens[i] != ".pl" && tokens[i] != ".py" && tokens[i] != ".php" && tokens[i] != ".sh") {
+		if (tokens[i] != ".cgi" && tokens[i] != ".pl" && tokens[i] != ".py" &&
+			tokens[i] != ".php" && tokens[i] != ".sh") {
 			std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
 			return -1;
 		}
@@ -280,7 +281,8 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	out << "Root: " << location_directive.getRoot() << std::endl;
 	out << "Index: " << location_directive.getIndex() << std::endl;
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
-	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding() << std::endl;
+	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding()
+		<< std::endl;
 	out << "CGI: " << location_directive.getCgi() << std::endl;
 
 	std::vector<std::string> cgi_extensions = location_directive.getCgiExtensions();
