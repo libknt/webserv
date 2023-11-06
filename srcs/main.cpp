@@ -5,10 +5,14 @@ int main(int argc, char** argv) {
 
 	switch (argc) {
 		case 1:
-			configuration.init("configuration/default.conf");
+			if (configuration.init("configuration/default.conf") == -1) {
+				return 1;
+			}
 			break;
 		case 2:
-			configuration.init(argv[1]);
+			if (configuration.init(argv[1]) == -1) {
+				return 1;
+			}
 			break;
 		default:
 			return 1;
