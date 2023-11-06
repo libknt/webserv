@@ -176,9 +176,7 @@ std::ostream& operator<<(std::ostream& out, const ServerDirective& server_direct
 
 	std::map<std::string, LocationDirective> locations = server_directive.getLocations();
 	size_t i = 0;
-	for (std::map<std::string, LocationDirective>::iterator it = locations.begin();
-		 it != locations.end();
-		 ++it) {
+	for (std::map<std::string, LocationDirective>::iterator it = locations.begin(); it != locations.end(); ++it) {
 		out << "===== location" << i << " =====" << std::endl;
 		out << "LocationPath: " << it->first << std::endl;
 		out << it->second << std::endl;
