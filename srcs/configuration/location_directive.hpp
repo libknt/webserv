@@ -43,6 +43,8 @@ public:
 	std::string getIndex() const;
 	std::string getAutoindex() const;
 	std::string getChunkedTransferEncoding() const;
+	std::string getCgi() const;
+	std::vector<std::string> getCgiExtensions() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive);

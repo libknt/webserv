@@ -255,6 +255,14 @@ std::string LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
 
+std::string LocationDirective::getCgi() const {
+	return cgi_;
+}
+
+std::vector<std::string> LocationDirective::getCgiExtensions() const {
+	return cgi_extensions_;
+}
+
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
 	std::vector<std::string> error_pages = location_directive.getErrorPage();
 	out << "ErrorPages: " << std::endl;
