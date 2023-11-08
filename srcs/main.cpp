@@ -1,16 +1,31 @@
-#include "server.hpp"
-
-int conf_setting() {
-	return false;
-}
+#include "io_multiplexing.hpp"
 
 int main(int argc, char** argv) {
-	(void)argc;
-	(void)argv;
+	Configuration configuration;
 
-	if (conf_setting()) {
-		return 1;
+	switch (argc) {
+		case 1:
+			if (configuration.init("configuration/default.conf") == -1) {
+				return 1;
+			}
+			break;
+		case 2:
+			if (configuration.init(argv[1]) == -1) {
+				return 1;
+			}
+			break;
+		default:
+			return 1;
 	}
-	start();
+
+	std::cout << configuration << std::endl;
+
+	server::IoMultiplexing server(configuration);
+	if (server.initialize() < 0) {
+		std::cerr << "Server initialize failed" << std::endl;
+		return -1;
+	}
+	server.runServer();
+	// start();
 	return 0;
 }

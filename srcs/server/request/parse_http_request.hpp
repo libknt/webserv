@@ -31,6 +31,7 @@ public:
 	void addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
 	void getInfo();
 	void httpRequestErase(int sd);
+	void printAcceptedFds();
 };
 
 }
