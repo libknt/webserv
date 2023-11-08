@@ -197,7 +197,7 @@ void IoMultiplexing::setResponseStatus(int sd) {
 
 int IoMultiplexing::createResponse(int sd) {
 	if (request_process_status_[sd] == RESPONSE) {
-		response_[sd] = execResponse(http_request_parse_.getHttpRequest(sd));
+		response_[sd] = execResponse(http_request_parse_.getHttpRequest(sd), configuration_);
 	} else if (request_process_status_[sd] == CGI) {
 	}
 	request_process_status_[sd] = SEND;
