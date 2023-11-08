@@ -115,41 +115,22 @@ int IoMultiplexing::disconnect(int sd) {
 	return 0;
 }
 
-int IoMultiplexing::request(int sd) {
-	bool should_close_connection;
-	char buffer[BUFFER_SIZE];
+int IoMultiplexing::recv(int sd) {
+	char recv_buffer[BUFFER_SIZE];
+	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	std::cout << "  Descriptor " << sd << " is readable" << std::endl;
-	should_close_connection = false;
-	while (1) {
-		int result = recv(sd, buffer, sizeof(buffer), 0);
-		if (result < 0) {
-			std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-			should_close_connection = true;
-			break;
-		}
-		http_request_parse_.handleBuffer(sd, buffer);
-		if (result == 0) {
-			std::cout << "  Connection closed" << std::endl;
-			should_close_connection = true;
-			break;
-		}
-
-		int len = result;
-		std::cout << "  " << len << " bytes received\n" << std::endl;
-
-		result = send(sd, buffer, len, 0);
-		if (result < 0) {
-			std::cerr << "send() failed: " << strerror(errno) << std::endl;
-			should_close_connection = true;
-			break;
-		}
-		std::memset(buffer, '\0', sizeof(buffer));
-	};
-
-	if (should_close_connection) {
+	int recv_result = ::recv(sd, recv_buffer, sizeof(recv_buffer), 0);
+	if (recv_result < 0) {
+		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
+		return -1;
 	}
+	if (recv_result == 0) {
+		std::cout << "  Connection closed" << std::endl;
+		disconnect(sd);
+		return 0;
+	}
+	http_request_parse_.handleBuffer(sd, recv_buffer);
 
 	return 0;
 }
@@ -172,7 +153,10 @@ int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
 				if (acceptIncomingConnection(descriptor) < 0)
 					server_is_running_ = false;
 			} else {
-				request(descriptor);
+				if (recv(descriptor) < 0) {
+					server_is_running_ = false;
+					return -1;
+				}
 			}
 
 			--readyDescriptors;

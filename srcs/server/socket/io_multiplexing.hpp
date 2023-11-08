@@ -47,7 +47,7 @@ public:
 	int runServer();
 	int monitorSocketEvents();
 	int acceptIncomingConnection(int listen_sd);
-	int request(int sd);
+	int recv(int sd);
 	int disconnect(int sd);
 	bool isListeningSocket(int sd);
 };

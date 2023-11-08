@@ -94,6 +94,6 @@ Temporary Items
 
 # webserv
 .vscode
-server
+server.out
 third_party
 log
