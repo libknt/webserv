@@ -2,6 +2,10 @@
 #include "parse_http_request.hpp"
 
 namespace server {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 662fa52561099b9e539c263f5c7a4c4b4869f6e3
 IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	: configuration_(configuration)
 	, socket_(std::vector<server::Socket>())
@@ -21,6 +25,7 @@ IoMultiplexing::~IoMultiplexing() {}
 
 IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	: configuration_(other.configuration_)
+	: request_process_status_(other.request_process_status_)
 	, socket_(other.socket_)
 	, activity_times_(other.activity_times_)
 	, max_sd_(other.max_sd_)
@@ -34,6 +39,10 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 	if (this != &other) {
+<<<<<<< HEAD
+=======
+		request_process_status_ = other.request_process_status_;
+>>>>>>> 662fa52561099b9e539c263f5c7a4c4b4869f6e3
 		configuration_ = other.configuration_;
 		socket_ = other.socket_;
 		activity_times_ = other.activity_times_;

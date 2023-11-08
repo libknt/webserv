@@ -1,8 +1,8 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
-#include "http_response.hpp"
 #include "configuration.hpp"
+#include "http_response.hpp"
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"
@@ -16,7 +16,6 @@ class IoMultiplexing {
 
 private:
 	std::map<int, RequestProcessStatus> request_process_status_;
-	std::vector<socket_conf> socket_conf_;
 	IoMultiplexing();
 	Configuration& configuration_;
 	std::vector<server::Socket> socket_;
