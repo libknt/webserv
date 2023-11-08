@@ -16,6 +16,8 @@ private:
 	std::string index_;
 	std::string autoindex_;
 	std::string chunked_transfer_encoding_;
+	std::string cgi_;
+	std::vector<std::string> cgi_extensions_;
 
 	int parseErrorPageDirective(std::vector<std::string>& tokens);
 	int parseClientMaxBodySizeDirective(std::vector<std::string>& tokens);
@@ -24,6 +26,8 @@ private:
 	int parseAutoindexDirective(std::vector<std::string>& tokens);
 	int parseAllowMethodsDirective(std::vector<std::string>& tokens);
 	int parseChunkedTransferEncodingDirective(std::vector<std::string>& tokens);
+	int parseCgiDirective(std::vector<std::string>& tokens);
+	int parseCgiExtensionsDirective(std::vector<std::string>& tokens);
 
 public:
 	LocationDirective();
@@ -39,6 +43,8 @@ public:
 	std::string getIndex() const;
 	std::string getAutoindex() const;
 	std::string getChunkedTransferEncoding() const;
+	std::string getCgi() const;
+	std::vector<std::string> getCgiExtensions() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive);

@@ -4,12 +4,12 @@ LocationDirective::LocationDirective() {
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
-
 	client_max_body_size_ = "1M";
 	root_ = "html";
 	index_ = "index.html";
 	autoindex_ = "off";
 	chunked_transfer_encoding_ = "off";
+	cgi_ = "off";
 }
 
 LocationDirective::~LocationDirective() {}
@@ -21,7 +21,9 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 	, root_(other.root_)
 	, index_(other.index_)
 	, autoindex_(other.autoindex_)
-	, chunked_transfer_encoding_(other.chunked_transfer_encoding_) {}
+	, chunked_transfer_encoding_(other.chunked_transfer_encoding_)
+	, cgi_(other.cgi_)
+	, cgi_extensions_(other.cgi_extensions_) {}
 
 LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
@@ -32,6 +34,8 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 		index_ = other.index_;
 		autoindex_ = other.autoindex_;
 		chunked_transfer_encoding_ = other.chunked_transfer_encoding_;
+		cgi_ = other.cgi_;
+		cgi_extensions_ = other.cgi_extensions_;
 	}
 	return *this;
 }
@@ -73,6 +77,17 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 		} else if (tokens.front() == "chunked_transfer_encoding") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseChunkedTransferEncodingDirective(args) == -1) {
+				return -1;
+			}
+		} else if (tokens.front() == "cgi") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			if (parseCgiDirective(args) == -1) {
+				return -1;
+			}
+		} else if (tokens.front() == "cgi_extensions") {
+			cgi_extensions_.clear();
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			if (parseCgiExtensionsDirective(args) == -1) {
 				return -1;
 			}
 		} else {
@@ -146,11 +161,11 @@ int LocationDirective::parseIndexDirective(std::vector<std::string>& tokens) {
 
 int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
-		std::cerr << "Parse Error: parseAutondexDirective" << std::endl;
+		std::cerr << "Parse Error: parseAutoindexDirective" << std::endl;
 		return -1;
 	}
 	if (tokens.front() != "on" && tokens.front() != "off") {
-		std::cerr << "Parse Error: parseAutondexDirective" << std::endl;
+		std::cerr << "Parse Error: parseAutoindexDirective" << std::endl;
 		return -1;
 	}
 	autoindex_ = tokens.front();
@@ -189,6 +204,35 @@ std::map<std::string, std::string> LocationDirective::getErrorPages() const {
 	return error_pages_;
 }
 
+int LocationDirective::parseCgiDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
+		return -1;
+	}
+	if (tokens.front() != "on" && tokens.front() != "off") {
+		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
+		return -1;
+	}
+	cgi_ = tokens.front();
+	return 0;
+}
+
+int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tokens) {
+	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
+		return -1;
+	}
+	for (size_t i = 0; i < tokens.size(); ++i) {
+		if (tokens[i] != ".cgi" && tokens[i] != ".pl" && tokens[i] != ".py" &&
+			tokens[i] != ".php" && tokens[i] != ".sh") {
+			std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
+			return -1;
+		}
+		cgi_extensions_.push_back(tokens[i]);
+	}
+	return 0;
+}
+
 std::vector<std::string> LocationDirective::getAllowMethods() const {
 	return allow_methods_;
 }
@@ -211,6 +255,14 @@ std::string LocationDirective::getAutoindex() const {
 
 std::string LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
+}
+
+std::string LocationDirective::getCgi() const {
+	return cgi_;
+}
+
+std::vector<std::string> LocationDirective::getCgiExtensions() const {
+	return cgi_extensions_;
 }
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
@@ -236,6 +288,14 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
 	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding()
 		<< std::endl;
+	out << "CGI: " << location_directive.getCgi() << std::endl;
+
+	std::vector<std::string> cgi_extensions = location_directive.getCgiExtensions();
+	out << "CGIExtensions: ";
+	for (size_t i = 0; i < cgi_extensions.size(); ++i) {
+		out << cgi_extensions[i] << ", ";
+	}
+	out << std::endl;
 
 	return out;
 }
