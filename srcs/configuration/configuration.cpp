@@ -16,12 +16,17 @@ Configuration& Configuration::operator=(const Configuration& other) {
 
 // TODO: 関数切り分けか命名変更
 int Configuration::init(const std::string& path) {
-	std::vector<std::string> tokens;
+	if (path.size() < 5 || path.find(".conf", path.size() - 5) == std::string::npos) {
+		std::cerr << "File Error: The path contains an incorrect file extension" << std::endl;
+	}
+
 	std::ifstream conf_file(path.c_str());
 	if (conf_file.fail()) {
 		std::cerr << "File Error: Open conf file failed" << std::endl;
 		return -1;
 	}
+
+	std::vector<std::string> tokens;
 	tokens = tokenize_file_content(conf_file);
 	if (parseConfiguration(tokens) == -1) {
 		return -1;
