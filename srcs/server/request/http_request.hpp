@@ -1,10 +1,10 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
+#include <arpa/inet.h>
 #include <iostream>
 #include <map>
 #include <netinet/in.h>
 #include <string>
-#include <arpa/inet.h>
 
 namespace server {
 namespace http_request_status {

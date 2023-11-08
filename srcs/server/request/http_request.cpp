@@ -299,13 +299,13 @@ int HttpRequest::setHeaderValue(std::string const& key, std::string const& value
 }
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
-	
+
 	sockaddr_in client_address = request.getClientAddress();
 	sockaddr_in server_address = request.getServerAddress();
 	char* client_ip = inet_ntoa(client_address.sin_addr);
-    unsigned short client_port = ntohs(client_address.sin_port);
+	unsigned short client_port = ntohs(client_address.sin_port);
 	char* server_ip = inet_ntoa(server_address.sin_addr);
-    unsigned short server_port = ntohs(server_address.sin_port);
+	unsigned short server_port = ntohs(server_address.sin_port);
 	out << "client ip: " << client_ip << std::endl;
 	out << "client port: " << client_port << std::endl;
 	out << "server ip: " << server_ip << std::endl;
