@@ -3,7 +3,7 @@
 
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
-#include "socket.hpp"
+#include "tcp_socket.hpp"
 #include "struct.hpp"
 #include <algorithm>
 #include <map>
@@ -25,7 +25,7 @@ class IoMultiplexing {
 private:
 	IoMultiplexing();
 	Configuration& configuration_;
-	std::vector<server::Socket> socket_;
+	std::vector<server::TcpSocket> socket_;
 	std::map<int, time_t> activity_times_;
 	int max_sd_;
 	int max_clients_;
@@ -55,7 +55,7 @@ public:
 	explicit IsListeningSocketPredicate(int sd)
 		: sd_(sd) {}
 
-	bool operator()(const server::Socket& s) const { return s.getListenSd() == sd_; }
+	bool operator()(const server::TcpSocket& s) const { return s.getListenSd() == sd_; }
 
 private:
 	int sd_;
