@@ -35,7 +35,8 @@ private:
 	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	ParseHttpRequest http_request_parse_;
-	int dispatchSocketEvents(int ready_descriptors);
+	int dispatchSocketEvents(int ready_descriptors);	
+	int setupSelectReadFds();
 
 public:
 	IoMultiplexing(Configuration& configuration);

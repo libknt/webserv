@@ -177,27 +177,23 @@ int IoMultiplexing::monitorSocketEvents() {
 		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int result = select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		int select_result = select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
 
-		if (result < 0) {
+		if (select_result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
 			break;
 		}
 
-		if (result == 0) {
+		if (select_result == 0) {
 			std::cout << "select() timed out.  End program." << std::endl;
 			continue;
 		}
-		dispatchSocketEvents(result);
+		dispatchSocketEvents(select_result);
 	}
 	return 0;
 }
 
-int IoMultiplexing::runServer() {
-	if (setUpServerSockets() < 0) {
-		std::cerr << "setupServerSocket() failed" << std::endl;
-		return -1;
-	}
+int IoMultiplexing::setupSelectReadFds() {
 	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->getListenSd() > max_sd_) {
@@ -205,6 +201,14 @@ int IoMultiplexing::runServer() {
 		}
 		FD_SET(it->getListenSd(), &master_read_fds_);
 	}
+}
+
+int IoMultiplexing::runServer() {
+	if (setUpServerSockets() < 0) {
+		std::cerr << "setupServerSocket() failed" << std::endl;
+		return -1;
+	}
+	setupSelectReadFds();
 	return monitorSocketEvents();
 }
 }
