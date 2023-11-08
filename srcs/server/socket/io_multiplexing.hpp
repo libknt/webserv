@@ -27,15 +27,15 @@ private:
 	Configuration& configuration_;
 	std::vector<server::Socket> socket_;
 	std::map<int, time_t> activity_times_;
-	int max_sd_;
+	int highest_socket_descriptor_;
 	int max_clients_;
 	struct timeval timeout_;
 	fd_set master_read_fds_;
 	fd_set read_fds__;
-	bool should_stop_server_;
+	bool server_is_running_;
 	static const time_t CONNECTION_TIMEOUT = 10;
 	ParseHttpRequest http_request_parse_;
-	int dispatchSocketEvents(int ready_descriptors);	
+	int dispatchSocketEvents(int ready_descriptors);
 	int setupSelectReadFds();
 
 public:
@@ -46,7 +46,7 @@ public:
 	int setUpServerSockets();
 	int runServer();
 	int monitorSocketEvents();
-	int accept(int listen_sd);
+	int acceptIncomingConnection(int listen_sd);
 	int request(int sd);
 	int disconnect(int sd);
 	bool isListeningSocket(int sd);

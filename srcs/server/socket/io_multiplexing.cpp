@@ -7,9 +7,9 @@ IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	: configuration_(configuration)
 	, socket_(std::vector<server::Socket>())
 	, activity_times_(std::map<int, time_t>())
-	, max_sd_(-1)
+	, highest_socket_descriptor_(-1)
 	, max_clients_(-1)
-	, should_stop_server_(false) {
+	, server_is_running_(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds__);
 	timeout_.tv_sec = 10;
@@ -22,24 +22,24 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	: configuration_(other.configuration_)
 	, socket_(other.socket_)
 	, activity_times_(other.activity_times_)
-	, max_sd_(other.max_sd_)
+	, highest_socket_descriptor_(other.highest_socket_descriptor_)
 	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds__(other.read_fds__)
-	, should_stop_server_(other.should_stop_server_) {}
+	, server_is_running_(other.server_is_running_) {}
 
 IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 	if (this != &other) {
 		configuration_ = other.configuration_;
 		socket_ = other.socket_;
 		activity_times_ = other.activity_times_;
-		max_sd_ = other.max_sd_;
+		highest_socket_descriptor_ = other.highest_socket_descriptor_;
 		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
 		read_fds__ = other.read_fds__;
-		should_stop_server_ = other.should_stop_server_;
+		server_is_running_ = other.server_is_running_;
 	}
 	return *this;
 }
@@ -66,47 +66,51 @@ int IoMultiplexing::setUpServerSockets() {
 	return 0;
 }
 
-int IoMultiplexing::accept(int listen_sd) {
+int IoMultiplexing::acceptIncomingConnection(int listen_sd) {
 
-	int new_sd;
+	int client_socket_descriptor;
 	std::cout << "  Listening socket is readable" << std::endl;
 	do {
-		sockaddr_in client_address;
-		socklen_t addr_len = sizeof(client_address);
-		memset(&client_address, 0, sizeof(client_address));
-		new_sd = ::accept(listen_sd, (sockaddr*)&client_address, &addr_len);
-		if (new_sd < 0) {
+		sockaddr_in client_socket_address;
+		socklen_t client_socket_address_len = sizeof(client_socket_address);
+		memset(&client_socket_address, 0, sizeof(client_socket_address));
+		client_socket_descriptor =
+			accept(listen_sd, (sockaddr*)&client_socket_address, &client_socket_address_len);
+		if (client_socket_descriptor < 0) {
 			if (errno != EWOULDBLOCK) {
 				std::cerr << "accept() failed: " << strerror(errno) << std::endl;
 				return -1;
 			}
 			break;
 		}
-		sockaddr_in server_address;
-		addr_len = sizeof(server_address);
+		sockaddr_in connected_server_address;
+		socklen_t server_socket_address_len = sizeof(connected_server_address);
 
-		if (getsockname(new_sd, (struct sockaddr*)&server_address, &addr_len) == -1) {
-			std::cerr << strerror(errno) << std::endl;
+		if (getsockname(client_socket_descriptor,
+				(struct sockaddr*)&connected_server_address,
+				&server_socket_address_len) == -1) {
+			std::cerr << "getsockname(): " << strerror(errno) << std::endl;
 			return -1;
 		}
 
-		http_request_parse_.addAcceptClientInfo(new_sd, client_address, server_address);
+		http_request_parse_.addAcceptClientInfo(
+			client_socket_descriptor, client_socket_address, connected_server_address);
 
-		std::cout << "  New incoming connection -  " << new_sd << std::endl;
-		FD_SET(new_sd, &master_read_fds_);
-		if (new_sd > max_sd_)
-			max_sd_ = new_sd;
+		std::cout << "  New incoming connection -  " << client_socket_descriptor << std::endl;
+		FD_SET(client_socket_descriptor, &master_read_fds_);
+		if (client_socket_descriptor > highest_socket_descriptor_)
+			highest_socket_descriptor_ = client_socket_descriptor;
 
-	} while (new_sd != -1);
+	} while (client_socket_descriptor != -1);
 	return 0;
 }
 
 int IoMultiplexing::disconnect(int sd) {
 	close(sd);
 	FD_CLR(sd, &master_read_fds_);
-	if (sd == max_sd_) {
-		while (!FD_ISSET(max_sd_, &master_read_fds_))
-			--max_sd_;
+	if (sd == highest_socket_descriptor_) {
+		while (!FD_ISSET(highest_socket_descriptor_, &master_read_fds_))
+			--highest_socket_descriptor_;
 	}
 	return 0;
 }
@@ -151,7 +155,7 @@ int IoMultiplexing::request(int sd) {
 }
 
 bool IoMultiplexing::isListeningSocket(int sd) {
-	for ( size_t i=0; i<socket_.size(); ++i) {
+	for (size_t i = 0; i < socket_.size(); ++i) {
 		if (sd == socket_[i].getListenSd()) {
 			return true;
 		}
@@ -160,12 +164,13 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 }
 
 int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
-	
-	for (int descriptor = 0; descriptor <= max_sd_ && readyDescriptors > 0; ++descriptor) {
+
+	for (int descriptor = 0; descriptor <= highest_socket_descriptor_ && readyDescriptors > 0;
+		 ++descriptor) {
 		if (FD_ISSET(descriptor, &read_fds__)) {
 			if (isListeningSocket(descriptor)) {
-				if (accept(descriptor) < 0)
-					should_stop_server_ = true;
+				if (acceptIncomingConnection(descriptor) < 0)
+					server_is_running_ = false;
 			} else {
 				request(descriptor);
 			}
@@ -177,11 +182,13 @@ int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
 }
 
 int IoMultiplexing::monitorSocketEvents() {
-	while (should_stop_server_ == false) {
+	server_is_running_ = true;
+	while (server_is_running_) {
 		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int select_result = select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		int select_result =
+			select(highest_socket_descriptor_ + 1, &read_fds__, NULL, NULL, &timeout_);
 
 		if (select_result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -200,8 +207,8 @@ int IoMultiplexing::monitorSocketEvents() {
 int IoMultiplexing::setupSelectReadFds() {
 	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
-		if (it->getListenSd() > max_sd_) {
-			max_sd_ = it->getListenSd();
+		if (it->getListenSd() > highest_socket_descriptor_) {
+			highest_socket_descriptor_ = it->getListenSd();
 		}
 		FD_SET(it->getListenSd(), &master_read_fds_);
 	}
