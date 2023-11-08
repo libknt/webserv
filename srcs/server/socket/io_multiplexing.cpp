@@ -44,7 +44,7 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 	return *this;
 }
 
-int IoMultiplexing::initialize() {
+int IoMultiplexing::setUpServerSockets() {
 	std::vector<ServerDirective> servers = configuration_.getServers();
 	for (std::vector<ServerDirective>::iterator it = servers.begin(); it != servers.end(); ++it) {
 		std::cout << it->getIpAddress() << " " << it->getPort() << std::endl;
@@ -191,6 +191,10 @@ int IoMultiplexing::select() {
 }
 
 int IoMultiplexing::runServer() {
+	if (setUpServerSockets() < 0) {
+		std::cerr << "setupServerSocket() failed" << std::endl;
+		return -1;
+	}
 	FD_ZERO(&master_read_fds_);
 	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
 		if (it->getListenSd() > max_sd_) {

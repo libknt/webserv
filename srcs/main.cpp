@@ -21,10 +21,9 @@ int main(int argc, char** argv) {
 	std::cout << configuration << std::endl;
 
 	server::IoMultiplexing server(configuration);
-	if (server.initialize() < 0) {
-		std::cerr << "Server initialize failed" << std::endl;
+	if (server.runServer() != -1) {
+		std::cerr << "runServer() failed" << std::endl;
 		return -1;
 	}
-	server.runServer();
 	return 0;
 }
