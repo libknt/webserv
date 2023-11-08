@@ -155,12 +155,29 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 		   socket_.end();
 }
 
-int IoMultiplexing::select() {
+int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
+	
+	for (int descriptor = 0; descriptor <= max_sd_ && readyDescriptors > 0; ++descriptor) {
+		if (FD_ISSET(descriptor, &read_fds__)) {
+			if (isListeningSocket(descriptor)) {
+				if (accept(descriptor) < 0)
+					should_stop_server_ = true;
+			} else {
+				request(descriptor);
+			}
+
+			--readyDescriptors;
+		}
+	}
+	return 0;
+}
+
+int IoMultiplexing::monitorSocketEvents() {
 	while (should_stop_server_ == false) {
 		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int result = ::select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		int result = select(max_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
 
 		if (result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -171,21 +188,7 @@ int IoMultiplexing::select() {
 			std::cout << "select() timed out.  End program." << std::endl;
 			continue;
 		}
-
-		int desc_ready = result;
-
-		for (int sd = 0; sd <= max_sd_ && desc_ready > 0; ++sd) {
-			if (FD_ISSET(sd, &read_fds__)) {
-				if (isListeningSocket(sd)) {
-					if (accept(sd) < 0)
-						should_stop_server_ = true;
-				} else {
-					request(sd);
-				}
-
-				--desc_ready;
-			}
-		}
+		dispatchSocketEvents(result);
 	}
 	return 0;
 }
@@ -202,6 +205,6 @@ int IoMultiplexing::runServer() {
 		}
 		FD_SET(it->getListenSd(), &master_read_fds_);
 	}
-	return select();
+	return monitorSocketEvents();
 }
 }
