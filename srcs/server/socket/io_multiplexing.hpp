@@ -2,6 +2,7 @@
 #define IO_MULTIPLEXING_HPP
 
 #include "http_response.hpp"
+#include "configuration.hpp"
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"
@@ -15,7 +16,8 @@ class IoMultiplexing {
 
 private:
 	std::map<int, RequestProcessStatus> request_process_status_;
-	std::vector<socket_conf> socket_conf_;
+	IoMultiplexing();
+	Configuration& configuration_;
 	std::vector<server::Socket> socket_;
 	std::map<int, time_t> activity_times_;
 	int max_sd_;
@@ -27,17 +29,16 @@ private:
 	fd_set write_fds_;
 	bool should_stop_server_;
 	static const time_t CONNECTION_TIMEOUT = 10;
-	IoMultiplexing();
 	ParseHttpRequest http_request_parse_;
 	std::map<int, HttpResponse> response_;
 
 public:
-	explicit IoMultiplexing(std::vector<socket_conf>& conf);
+	IoMultiplexing(Configuration& configuration);
 	virtual ~IoMultiplexing();
 	explicit IoMultiplexing(const IoMultiplexing& other);
 	IoMultiplexing& operator=(const IoMultiplexing& other);
 	int initialize();
-	int server_start();
+	int runServer();
 	int select();
 	int accept(int listen_sd);
 	int recv(int sd);
