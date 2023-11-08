@@ -36,12 +36,11 @@ int main(int argc, char* argv[]) {
 	}
 	for (int i = 1; i < argc; i++) {
 		if (0 < fd[i]) {
-			server::HttpRequest request = parse_http_request.getHttpRequest(fd[i]);
-			if (request.getHttpRequestStatus() == server::http_request_status::FINISHED)
+			server::HttpRequest& request = parse_http_request.getHttpRequest(fd[i]);
+			if (request.getStatus() == server::http_request_status::FINISHED)
 				std::cerr << "TEST" << argv[i] << ": OK" << std::endl;
 			else
-				std::cerr << "TEST" << argv[i] << ": NG" << request.getHttpRequestStatus()
-						  << std::endl;
+				std::cerr << "TEST" << argv[i] << ": NG" << request.getStatus() << std::endl;
 		}
 	}
 }

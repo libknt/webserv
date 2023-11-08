@@ -168,7 +168,7 @@ int CgiMetaVariables::remoteUser() {
 }
 
 int CgiMetaVariables::requestMethod() {
-	std::string method = request_.getHttpMethod();
+	std::string method = request_.getMethod();
 	meta_variables_.insert(std::make_pair("REQUEST_METHOD", method));
 	return 0;
 }
@@ -204,7 +204,7 @@ int CgiMetaVariables::serverPort() {
 }
 
 int CgiMetaVariables::serverProtocol() {
-	std::string protocol = request_.getServerProtocol();
+	std::string protocol = request_.getVersion();
 	meta_variables_.insert(std::make_pair("SERVER_PROTOCOL", protocol));
 	return 0;
 }

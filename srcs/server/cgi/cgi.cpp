@@ -9,10 +9,6 @@ Cgi::Cgi(HttpRequest& request)
 	, request_(request) {}
 Cgi::~Cgi(){};
 
-void Cgi::getInfo() {
-	this->request_.getInfo();
-}
-
 std::string Cgi::getFileExtension(const std::string& filename) {
 	size_t pos = filename.find_last_of('.');
 	if (pos != std::string::npos) {
