@@ -151,8 +151,12 @@ int IoMultiplexing::request(int sd) {
 }
 
 bool IoMultiplexing::isListeningSocket(int sd) {
-	return std::find_if(socket_.begin(), socket_.end(), IsListeningSocketPredicate(sd)) !=
-		   socket_.end();
+	for ( size_t i=0; i<socket_.size(); ++i) {
+		if (sd == socket_[i].getListenSd()) {
+			return true;
+		}
+	}
+	return false;
 }
 
 int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
@@ -201,6 +205,7 @@ int IoMultiplexing::setupSelectReadFds() {
 		}
 		FD_SET(it->getListenSd(), &master_read_fds_);
 	}
+	return 0;
 }
 
 int IoMultiplexing::runServer() {

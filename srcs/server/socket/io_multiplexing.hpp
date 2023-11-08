@@ -52,17 +52,6 @@ public:
 	bool isListeningSocket(int sd);
 };
 
-class IsListeningSocketPredicate {
-public:
-	explicit IsListeningSocketPredicate(int sd)
-		: sd_(sd) {}
-
-	bool operator()(const server::Socket& s) const { return s.getListenSd() == sd_; }
-
-private:
-	int sd_;
-};
-
 } // namespace server
 
 #endif
