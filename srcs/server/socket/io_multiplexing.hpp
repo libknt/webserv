@@ -3,8 +3,8 @@
 
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
-#include "tcp_socket.hpp"
 #include "struct.hpp"
+#include "tcp_socket.hpp"
 #include <algorithm>
 #include <map>
 #include <vector>
