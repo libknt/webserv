@@ -111,7 +111,7 @@ bool ServerDirective::isValidIPv4(const std::string& ip_address) const {
 		return false;
 	}
 	return dot1 == '.' && dot2 == '.' && dot3 == '.' && isValidIPSegment(segment1) &&
-		isValidIPSegment(segment2) && isValidIPSegment(segment3) && isValidIPSegment(segment4);
+		   isValidIPSegment(segment2) && isValidIPSegment(segment3) && isValidIPSegment(segment4);
 }
 
 bool ServerDirective::isValidIPSegment(int num) const {
