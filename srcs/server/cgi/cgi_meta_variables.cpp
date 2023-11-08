@@ -215,8 +215,8 @@ int CgiMetaVariables::serverSoftware() {
 }
 
 int CgiMetaVariables::createMetaVariables() {
-	for (std::vector<MetaFuncPtr>::iterator it = metaFuncArray.begin(); it != metaFuncArray.end();
-		 ++it) {
+	typedef std::vector<MetaFuncPtr>::iterator itr;
+	for (itr it = metaFuncArray.begin(); it != metaFuncArray.end(); ++it) {
 		if ((this->**it)() < 0)
 			return -1;
 	}

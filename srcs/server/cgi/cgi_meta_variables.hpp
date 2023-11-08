@@ -2,6 +2,7 @@
 #define CGI_MRTA_VARIABLES_HPP
 
 #include "http_request.hpp"
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <netinet/in.h>
@@ -9,7 +10,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <cstring>
 
 class HttpRequest;
 enum URL_META_VARIABLES {

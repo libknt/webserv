@@ -2,16 +2,16 @@
 #define CGI_HPP
 #include "cgi_meta_variables.hpp"
 #include "http_request.hpp"
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <signal.h>
 #include <string>
-#include <unistd.h>
-#include <vector>
-#include <cstring>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
 
 namespace server {
 

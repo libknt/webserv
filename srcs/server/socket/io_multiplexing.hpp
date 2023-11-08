@@ -1,8 +1,8 @@
 #ifndef IO_MULTIPLEXING_HPP
 #define IO_MULTIPLEXING_HPP
 
-#include "http_response.hpp"
 #include "../../configuration/configuration.hpp"
+#include "http_response.hpp"
 #include "parse_http_request.hpp"
 #include "socket.hpp"
 #include "struct.hpp"

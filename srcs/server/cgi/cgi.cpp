@@ -2,8 +2,8 @@
 #include <cstdlib>
 extern char** environ;
 namespace server {
-//clsoe signal がミスってcloseできない場合がある。signalが来るとcloseされない場合がある。
-// Cgi::Cgi(){};
+// clsoe signal がミスってcloseできない場合がある。signalが来るとcloseされない場合がある。
+//  Cgi::Cgi(){};
 Cgi::Cgi(HttpRequest& request)
 	: meta_(CgiMetaVariables(request))
 	, request_(request) {}
@@ -109,7 +109,7 @@ int Cgi::execCgi() {
 
 	write(sv[0], body_.c_str(), body_.length());
 
- //TODO timeoutの設定をする
+	// TODO timeoutの設定をする
 	bool b = false;
 	for (;;) {
 		int status;
