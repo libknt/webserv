@@ -142,6 +142,7 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 
 int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseDefaultErrorPageDirective" << std::endl;
 		return -1;
 	}
 	default_error_page_ = tokens.front();
