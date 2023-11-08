@@ -19,7 +19,7 @@ int Configuration::init(const std::string& path) {
 	std::vector<std::string> tokens;
 	std::ifstream conf_file(path.c_str());
 	if (conf_file.fail()) {
-		std::cerr << "Open conf file failed" << std::endl;
+		std::cerr << "File Error: Open conf file failed" << std::endl;
 		return -1;
 	}
 	tokens = tokenize_file_content(conf_file);
@@ -82,7 +82,7 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 			}
 			servers_.push_back(server_directive);
 		} else {
-			std::cerr << "Configration file error: invalid main directive." << std::endl;
+			std::cerr << "Parse Error: Invalid main directive" << std::endl;
 			return -1;
 		}
 	}
