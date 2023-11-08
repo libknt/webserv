@@ -1,5 +1,6 @@
 #include "io_multiplexing.hpp"
 #include "parse_http_request.hpp"
+#include "exec_request.hpp"
 
 namespace server {
 IoMultiplexing::IoMultiplexing(Configuration& configuration)
@@ -196,8 +197,7 @@ void IoMultiplexing::setResponseStatus(int sd) {
 
 int IoMultiplexing::createResponse(int sd) {
 	if (request_process_status_[sd] == RESPONSE) {
-		HttpResponse response;
-		response_[sd] = response;
+		response_[sd] = execResponse(http_request_parse_.getHttpRequest(sd));
 	} else if (request_process_status_[sd] == CGI) {
 	}
 	request_process_status_[sd] = SEND;
