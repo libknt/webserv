@@ -192,11 +192,11 @@ int IoMultiplexing::select() {
 
 int IoMultiplexing::runServer() {
 	FD_ZERO(&master_read_fds_);
-	for (std::vector<server::TcpSocket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
-		if (it->getListenSd() > max_sd_) {
-			max_sd_ = it->getListenSd();
+	for (size_t i=0; i<socket_.size(); i++) {
+		if (socket_[i].getListenSd() == max_sd_) {
+			max_sd_ = socket_[i].getListenSd();
 		}
-		FD_SET(it->getListenSd(), &master_read_fds_);
+		FD_SET(socket_[i].getListenSd(), &master_read_fds_);
 	}
 	return select();
 }
