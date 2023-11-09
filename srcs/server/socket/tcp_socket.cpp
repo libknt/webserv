@@ -91,16 +91,17 @@ int TcpSocket::setSocketToNonBlocking() {
 }
 
 int TcpSocket::configureSocketAddress() {
-	struct addrinfo addr_info_hints, *address_info_results, *address_iterator;
+	struct addrinfo address_info_hints, *address_info_results, *address_iterator;
 	int address_info_status;
 
-	std::memset(&addr_info_hints, 0, sizeof(addr_info_hints));
-	addr_info_hints.ai_family = AF_INET;
-	addr_info_hints.ai_socktype = SOCK_STREAM;
-	addr_info_hints.ai_flags = AI_PASSIVE;
+	std::memset(&address_info_hints, 0, sizeof(address_info_hints));
+	address_info_hints.ai_family = AF_INET;
+	address_info_hints.ai_socktype = SOCK_STREAM;
+	address_info_hints.ai_flags = AI_PASSIVE;
 
 	if ((address_info_status = getaddrinfo(
-			 ip_address_.c_str(), port_.c_str(), &addr_info_hints, &address_info_results)) != 0) {
+			 ip_address_.c_str(), port_.c_str(), &address_info_hints, &address_info_results)) !=
+		0) {
 		std::cerr << "getaddrinfo() failed: " << gai_strerror(address_info_status) << std::endl;
 		return -1;
 	}
