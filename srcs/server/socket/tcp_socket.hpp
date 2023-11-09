@@ -16,7 +16,7 @@ private:
 	std::string ip_address_;
 	std::string port_;
 	int listen_sd_;
-	int backlog_; // macOs sysctl kern.ipc.somaxconn
+	int backlog_;
 	struct sockaddr_in socket_address_;
 
 	TcpSocket();
