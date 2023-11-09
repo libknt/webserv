@@ -35,6 +35,15 @@ TcpSocket::~TcpSocket() {
 	}
 }
 
+bool TcpSocket::isSocketConfigValid() {
+	struct sockaddr_in socket_address;
+	int inet_pton_result = inet_pton(AF_INET, ip_address_.c_str(), &(socket_address.sin_addr));
+	if (inet_pton_result <= 0)
+		return false;
+
+	return backlog_ > 0 && backlog_ <= SOMAXCONN;
+}
+
 int TcpSocket::createTcpSocket() {
 	const struct protoent* protocol_info = getprotobyname("tcp");
 	if (!protocol_info) {
@@ -133,15 +142,6 @@ int TcpSocket::startListening() {
 		return -1;
 	}
 	return 0;
-}
-
-bool TcpSocket::isSocketConfigValid() {
-	struct sockaddr_in socket_address;
-	int inet_pton_result = inet_pton(AF_INET, ip_address_.c_str(), &(socket_address.sin_addr));
-	if (inet_pton_result <= 0)
-		return false;
-
-	return backlog_ > 0 && backlog_ <= SOMAXCONN;
 }
 
 int TcpSocket::setupSocketForListening() {

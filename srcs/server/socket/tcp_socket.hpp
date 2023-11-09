@@ -20,13 +20,13 @@ private:
 	struct sockaddr_in socket_address_;
 
 	TcpSocket();
+	bool isSocketConfigValid();
 	int createTcpSocket();
 	int setSocketOption();
 	int setSocketToNonBlocking();
 	int configureSocketAddress();
 	int bindAddressToSocket();
 	int startListening();
-	bool isSocketConfigValid();
 
 public:
 	TcpSocket(std::string server_address, std::string port);
