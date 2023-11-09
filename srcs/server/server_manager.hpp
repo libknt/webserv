@@ -1,5 +1,5 @@
-#ifndef IO_MULTIPLEXING_HPP
-#define IO_MULTIPLEXING_HPP
+#ifndef SERVER_MANAGER_HPP
+#define SERVER_MANAGER_HPP
 
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
@@ -19,10 +19,10 @@ enum SERVER_STATUS {
 	UNDEFINED,
 };
 
-class IoMultiplexing {
+class ServerManager {
 
 private:
-	IoMultiplexing();
+	ServerManager();
 	Configuration& configuration_;
 	std::vector<server::Socket> socket_;
 	int highest_socket_descriptor_;
@@ -41,10 +41,10 @@ private:
 	bool isListeningSocket(int sd);
 
 public:
-	IoMultiplexing(Configuration& configuration);
-	virtual ~IoMultiplexing();
-	explicit IoMultiplexing(const IoMultiplexing& other);
-	IoMultiplexing& operator=(const IoMultiplexing& other);
+	ServerManager(Configuration& configuration);
+	virtual ~ServerManager();
+	explicit ServerManager(const ServerManager& other);
+	ServerManager& operator=(const ServerManager& other);
 	int runServer();
 };
 

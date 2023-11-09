@@ -1,9 +1,9 @@
-#include "io_multiplexing.hpp"
+#include "server_manager.hpp"
 #include "parse_http_request.hpp"
 
 namespace server {
 
-IoMultiplexing::IoMultiplexing(Configuration& configuration)
+ServerManager::ServerManager(Configuration& configuration)
 	: configuration_(configuration)
 	, socket_(std::vector<server::Socket>())
 	, highest_socket_descriptor_(-1)
@@ -14,9 +14,9 @@ IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	timeout_.tv_usec = 0;
 }
 
-IoMultiplexing::~IoMultiplexing() {}
+ServerManager::~ServerManager() {}
 
-IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
+ServerManager::ServerManager(const ServerManager& other)
 	: configuration_(other.configuration_)
 	, socket_(other.socket_)
 	, highest_socket_descriptor_(other.highest_socket_descriptor_)
@@ -25,7 +25,7 @@ IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	, read_fds__(other.read_fds__)
 	, server_is_running_(other.server_is_running_) {}
 
-IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
+ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
 		configuration_ = other.configuration_;
 		socket_ = other.socket_;
@@ -38,7 +38,7 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 	return *this;
 }
 
-int IoMultiplexing::setUpServerSockets() {
+int ServerManager::setUpServerSockets() {
 	std::vector<ServerDirective> servers = configuration_.getServers();
 	for (size_t i = 0; i < servers.size(); ++i) {
 		socket_.push_back(server::Socket(servers[i].getIpAddress(), servers[i].getPort()));
@@ -59,7 +59,7 @@ int IoMultiplexing::setUpServerSockets() {
 	return 0;
 }
 
-int IoMultiplexing::acceptIncomingConnection(int listen_sd) {
+int ServerManager::acceptIncomingConnection(int listen_sd) {
 
 	int client_socket_descriptor;
 	std::cout << "  Listening socket is readable" << std::endl;
@@ -98,7 +98,7 @@ int IoMultiplexing::acceptIncomingConnection(int listen_sd) {
 	return 0;
 }
 
-int IoMultiplexing::disconnect(int sd) {
+int ServerManager::disconnect(int sd) {
 	close(sd);
 	FD_CLR(sd, &master_read_fds_);
 	if (sd == highest_socket_descriptor_) {
@@ -108,7 +108,7 @@ int IoMultiplexing::disconnect(int sd) {
 	return 0;
 }
 
-int IoMultiplexing::receiveAndParseHttpRequest(int sd) {
+int ServerManager::receiveAndParseHttpRequest(int sd) {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
@@ -128,7 +128,7 @@ int IoMultiplexing::receiveAndParseHttpRequest(int sd) {
 	return 0;
 }
 
-bool IoMultiplexing::isListeningSocket(int sd) {
+bool ServerManager::isListeningSocket(int sd) {
 	for (size_t i = 0; i < socket_.size(); ++i) {
 		if (sd == socket_[i].getListenSd()) {
 			return true;
@@ -137,7 +137,7 @@ bool IoMultiplexing::isListeningSocket(int sd) {
 	return false;
 }
 
-int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
+int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 
 	for (int descriptor = 0; descriptor <= highest_socket_descriptor_ && readyDescriptors > 0;
 		 ++descriptor) {
@@ -158,7 +158,7 @@ int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
 	return 0;
 }
 
-int IoMultiplexing::monitorSocketEvents() {
+int ServerManager::monitorSocketEvents() {
 	server_is_running_ = true;
 	while (server_is_running_) {
 		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
@@ -183,7 +183,7 @@ int IoMultiplexing::monitorSocketEvents() {
 	return 0;
 }
 
-int IoMultiplexing::setupSelectReadFds() {
+int ServerManager::setupSelectReadFds() {
 	FD_ZERO(&master_read_fds_);
 	for (size_t i = 0; i < socket_.size(); ++i) {
 		if (socket_[i].getListenSd() > highest_socket_descriptor_) {
@@ -194,7 +194,7 @@ int IoMultiplexing::setupSelectReadFds() {
 	return 0;
 }
 
-int IoMultiplexing::runServer() {
+int ServerManager::runServer() {
 	if (setUpServerSockets() < 0) {
 		std::cerr << "setupServerSocket() failed" << std::endl;
 		return -1;
