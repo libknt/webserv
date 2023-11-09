@@ -1,6 +1,7 @@
 #include "tcp_socket.hpp"
 
 namespace server {
+
 TcpSocket::TcpSocket(std::string server_address, std::string port)
 	: ip_address_(server_address)
 	, port_(port)

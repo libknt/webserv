@@ -36,6 +36,7 @@ public:
 	int setupSocketForListening();
 	int getListenSd() const;
 };
+
 }
 
 #endif
