@@ -94,12 +94,12 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 	return 0;
 }
 
-std::vector<ServerDirective> Configuration::getServers() const {
+std::vector<ServerDirective> Configuration::getServerConfigurations() const {
 	return servers_;
 }
 
 std::ostream& operator<<(std::ostream& out, const Configuration& configuration) {
-	std::vector<ServerDirective> servers = configuration.getServers();
+	std::vector<ServerDirective> servers = configuration.getServerConfigurations();
 	for (size_t i = 0; i < servers.size(); ++i) {
 		out << "===== server" << i << " =====" << std::endl;
 		out << servers[i] << std::endl;
