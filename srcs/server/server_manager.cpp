@@ -7,7 +7,7 @@ ServerManager::ServerManager(Configuration& configuration)
 	: configuration_(configuration)
 	, sockets_(std::vector<server::Socket>())
 	, highest_socket_descriptor_(-1)
-	, server_is_running_(false) {
+	, is_running(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds__);
 	timeout_.tv_sec = 10;
@@ -23,7 +23,7 @@ ServerManager::ServerManager(const ServerManager& other)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds__(other.read_fds__)
-	, server_is_running_(other.server_is_running_) {}
+	, is_running(other.is_running) {}
 
 ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
@@ -33,7 +33,7 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
 		read_fds__ = other.read_fds__;
-		server_is_running_ = other.server_is_running_;
+		is_running = other.is_running;
 	}
 	return *this;
 }
@@ -144,12 +144,12 @@ int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 		if (FD_ISSET(descriptor, &read_fds__)) {
 			if (isListeningSocket(descriptor)) {
 				if (acceptIncomingConnection(descriptor) < 0) {
-					server_is_running_ = false;
+					is_running = false;
 					return -1;
 				}
 			} else {
 				if (receiveAndParseHttpRequest(descriptor) < 0) {
-					server_is_running_ = false;
+					is_running = false;
 					return -1;
 				}
 			}
@@ -160,8 +160,8 @@ int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 }
 
 int ServerManager::monitorSocketEvents() {
-	server_is_running_ = true;
-	while (server_is_running_) {
+	is_running = true;
+	while (is_running) {
 		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;

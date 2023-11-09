@@ -29,7 +29,7 @@ private:
 	struct timeval timeout_;
 	fd_set master_read_fds_;
 	fd_set read_fds__;
-	bool server_is_running_;
+	bool is_running;
 	ParseHttpRequest http_request_parse_;
 	int dispatchSocketEvents(int ready_descriptors);
 	int setupSelectReadFds();
