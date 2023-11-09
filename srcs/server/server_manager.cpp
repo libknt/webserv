@@ -143,15 +143,16 @@ int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 		 ++descriptor) {
 		if (FD_ISSET(descriptor, &read_fds__)) {
 			if (isListeningSocket(descriptor)) {
-				if (acceptIncomingConnection(descriptor) < 0)
+				if (acceptIncomingConnection(descriptor) < 0) {
 					server_is_running_ = false;
+					return -1;
+				}
 			} else {
 				if (receiveAndParseHttpRequest(descriptor) < 0) {
 					server_is_running_ = false;
 					return -1;
 				}
 			}
-
 			--readyDescriptors;
 		}
 	}
