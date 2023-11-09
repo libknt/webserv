@@ -185,11 +185,11 @@ int IoMultiplexing::monitorSocketEvents() {
 
 int IoMultiplexing::setupSelectReadFds() {
 	FD_ZERO(&master_read_fds_);
-	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
-		if (it->getListenSd() > highest_socket_descriptor_) {
-			highest_socket_descriptor_ = it->getListenSd();
+	for (size_t i = 0; i < socket_.size(); ++i) {
+		if (socket_[i].getListenSd() > highest_socket_descriptor_) {
+			highest_socket_descriptor_ = socket_[i].getListenSd();
 		}
-		FD_SET(it->getListenSd(), &master_read_fds_);
+		FD_SET(socket_[i].getListenSd(), &master_read_fds_);
 	}
 	return 0;
 }
