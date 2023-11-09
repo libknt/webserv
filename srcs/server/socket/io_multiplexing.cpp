@@ -192,7 +192,7 @@ int IoMultiplexing::select() {
 
 int IoMultiplexing::runServer() {
 	FD_ZERO(&master_read_fds_);
-	for (size_t i=0; i<socket_.size(); i++) {
+	for (size_t i = 0; i < socket_.size(); i++) {
 		if (socket_[i].getListenSd() == max_sd_) {
 			max_sd_ = socket_[i].getListenSd();
 		}
