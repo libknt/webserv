@@ -95,7 +95,7 @@ int TcpSocket::configureSocketAddress() {
 	int address_info_status;
 
 	std::memset(&addr_info_hints, 0, sizeof(addr_info_hints));
-	addr_info_hints.ai_family = AF_UNSPEC;
+	addr_info_hints.ai_family = AF_INET;
 	addr_info_hints.ai_socktype = SOCK_STREAM;
 	addr_info_hints.ai_flags = AI_PASSIVE;
 
@@ -107,7 +107,7 @@ int TcpSocket::configureSocketAddress() {
 
 	for (address_iterator = address_info_results; address_iterator != NULL;
 		 address_iterator = address_iterator->ai_next) {
-		if (address_iterator->ai_family == AF_INET || address_iterator->ai_family == AF_INET6) {
+		if (address_iterator->ai_family == AF_INET) {
 			std::memcpy(&socket_address_, address_iterator->ai_addr, address_iterator->ai_addrlen);
 			break;
 		}
