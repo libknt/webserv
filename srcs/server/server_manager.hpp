@@ -24,7 +24,7 @@ class ServerManager {
 private:
 	ServerManager();
 	Configuration& configuration_;
-	std::vector<server::Socket> socket_;
+	std::vector<server::Socket> sockets_;
 	int highest_socket_descriptor_;
 	struct timeval timeout_;
 	fd_set master_read_fds_;

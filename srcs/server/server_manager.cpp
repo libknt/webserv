@@ -5,7 +5,7 @@ namespace server {
 
 ServerManager::ServerManager(Configuration& configuration)
 	: configuration_(configuration)
-	, socket_(std::vector<server::Socket>())
+	, sockets_(std::vector<server::Socket>())
 	, highest_socket_descriptor_(-1)
 	, server_is_running_(false) {
 	FD_ZERO(&master_read_fds_);
@@ -18,7 +18,7 @@ ServerManager::~ServerManager() {}
 
 ServerManager::ServerManager(const ServerManager& other)
 	: configuration_(other.configuration_)
-	, socket_(other.socket_)
+	, sockets_(other.sockets_)
 	, highest_socket_descriptor_(other.highest_socket_descriptor_)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
@@ -28,7 +28,7 @@ ServerManager::ServerManager(const ServerManager& other)
 ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
 		configuration_ = other.configuration_;
-		socket_ = other.socket_;
+		sockets_ = other.sockets_;
 		highest_socket_descriptor_ = other.highest_socket_descriptor_;
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
@@ -41,18 +41,18 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 int ServerManager::setUpServerSockets() {
 	std::vector<ServerDirective> servers = configuration_.getServers();
 	for (size_t i = 0; i < servers.size(); ++i) {
-		socket_.push_back(server::Socket(servers[i].getIpAddress(), servers[i].getPort()));
+		sockets_.push_back(server::Socket(servers[i].getIpAddress(), servers[i].getPort()));
 	}
 
-	for (size_t i = 0; i < socket_.size();) {
-		if (socket_[i].initialize() < 0) {
-			socket_.erase(socket_.begin() + i);
+	for (size_t i = 0; i < sockets_.size();) {
+		if (sockets_[i].initialize() < 0) {
+			sockets_.erase(sockets_.begin() + i);
 		} else {
 			++i;
 		}
 	}
 
-	if (socket_.empty()) {
+	if (sockets_.empty()) {
 		std::cerr << "Initialization of all addresses failed" << std::endl;
 		return -1;
 	}
@@ -129,8 +129,8 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 }
 
 bool ServerManager::isListeningSocket(int sd) {
-	for (size_t i = 0; i < socket_.size(); ++i) {
-		if (sd == socket_[i].getListenSd()) {
+	for (size_t i = 0; i < sockets_.size(); ++i) {
+		if (sd == sockets_[i].getListenSd()) {
 			return true;
 		}
 	}
@@ -186,11 +186,11 @@ int ServerManager::monitorSocketEvents() {
 
 int ServerManager::setupSelectReadFds() {
 	FD_ZERO(&master_read_fds_);
-	for (size_t i = 0; i < socket_.size(); ++i) {
-		if (socket_[i].getListenSd() > highest_socket_descriptor_) {
-			highest_socket_descriptor_ = socket_[i].getListenSd();
+	for (size_t i = 0; i < sockets_.size(); ++i) {
+		if (sockets_[i].getListenSd() > highest_socket_descriptor_) {
+			highest_socket_descriptor_ = sockets_[i].getListenSd();
 		}
-		FD_SET(socket_[i].getListenSd(), &master_read_fds_);
+		FD_SET(sockets_[i].getListenSd(), &master_read_fds_);
 	}
 	return 0;
 }
