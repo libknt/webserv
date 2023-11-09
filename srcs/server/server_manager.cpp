@@ -38,7 +38,7 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 	return *this;
 }
 
-int ServerManager::setUpServerSockets() {
+int ServerManager::setupServerSockets() {
 	std::vector<ServerDirective> servers = configuration_.getServers();
 	for (size_t i = 0; i < servers.size(); ++i) {
 		sockets_.push_back(server::Socket(servers[i].getIpAddress(), servers[i].getPort()));
@@ -196,7 +196,7 @@ int ServerManager::setupSelectReadFds() {
 }
 
 int ServerManager::runServer() {
-	if (setUpServerSockets() < 0) {
+	if (setupServerSockets() < 0) {
 		std::cerr << "setupServerSocket() failed" << std::endl;
 		return -1;
 	}

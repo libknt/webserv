@@ -33,7 +33,7 @@ private:
 	ParseHttpRequest http_request_parse_;
 	int dispatchSocketEvents(int ready_descriptors);
 	int setupSelectReadFds();
-	int setUpServerSockets();
+	int setupServerSockets();
 	int monitorSocketEvents();
 	int acceptIncomingConnection(int listen_sd);
 	int receiveAndParseHttpRequest(int sd);
