@@ -36,7 +36,7 @@ private:
 	int setUpServerSockets();
 	int monitorSocketEvents();
 	int acceptIncomingConnection(int listen_sd);
-	int receiveAndProcessData(int sd);
+	int receiveAndParseHttpRequest(int sd);
 	int disconnect(int sd);
 	bool isListeningSocket(int sd);
 

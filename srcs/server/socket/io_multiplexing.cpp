@@ -108,7 +108,7 @@ int IoMultiplexing::disconnect(int sd) {
 	return 0;
 }
 
-int IoMultiplexing::receiveAndProcessData(int sd) {
+int IoMultiplexing::receiveAndParseHttpRequest(int sd) {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
@@ -146,7 +146,7 @@ int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
 				if (acceptIncomingConnection(descriptor) < 0)
 					server_is_running_ = false;
 			} else {
-				if (receiveAndProcessData(descriptor) < 0) {
+				if (receiveAndParseHttpRequest(descriptor) < 0) {
 					server_is_running_ = false;
 					return -1;
 				}
