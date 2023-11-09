@@ -6,9 +6,7 @@ namespace server {
 IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	: configuration_(configuration)
 	, socket_(std::vector<server::Socket>())
-	, activity_times_(std::map<int, time_t>())
 	, highest_socket_descriptor_(-1)
-	, max_clients_(-1)
 	, server_is_running_(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds__);
@@ -21,9 +19,7 @@ IoMultiplexing::~IoMultiplexing() {}
 IoMultiplexing::IoMultiplexing(const IoMultiplexing& other)
 	: configuration_(other.configuration_)
 	, socket_(other.socket_)
-	, activity_times_(other.activity_times_)
 	, highest_socket_descriptor_(other.highest_socket_descriptor_)
-	, max_clients_(other.max_clients_)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds__(other.read_fds__)
@@ -33,9 +29,7 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 	if (this != &other) {
 		configuration_ = other.configuration_;
 		socket_ = other.socket_;
-		activity_times_ = other.activity_times_;
 		highest_socket_descriptor_ = other.highest_socket_descriptor_;
-		max_clients_ = other.max_clients_;
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
 		read_fds__ = other.read_fds__;
@@ -115,11 +109,11 @@ int IoMultiplexing::disconnect(int sd) {
 	return 0;
 }
 
-int IoMultiplexing::recv(int sd) {
+int IoMultiplexing::receiveAndProcessData(int sd) {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	int recv_result = ::recv(sd, recv_buffer, sizeof(recv_buffer), 0);
+	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer), 0);
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
@@ -153,7 +147,7 @@ int IoMultiplexing::dispatchSocketEvents(int readyDescriptors) {
 				if (acceptIncomingConnection(descriptor) < 0)
 					server_is_running_ = false;
 			} else {
-				if (recv(descriptor) < 0) {
+				if (receiveAndProcessData(descriptor) < 0) {
 					server_is_running_ = false;
 					return -1;
 				}
@@ -183,7 +177,9 @@ int IoMultiplexing::monitorSocketEvents() {
 			std::cout << "select() timed out.  End program." << std::endl;
 			continue;
 		}
-		dispatchSocketEvents(select_result);
+		if (dispatchSocketEvents(select_result) < 0) {
+			continue;
+		}
 	}
 	return 0;
 }
