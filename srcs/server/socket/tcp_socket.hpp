@@ -7,11 +7,6 @@
 #include <fcntl.h>
 #include <iostream>
 #include <netdb.h>
-#include <netinet/in.h>
-#include <sstream>
-#include <string>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 namespace server {
@@ -23,9 +18,6 @@ private:
 	int listen_sd_;
 	int backlog_; // macOs sysctl kern.ipc.somaxconn
 	struct sockaddr_in socket_address_;
-
-	static const int min_port_ = 0;
-	static const int max_port_ = 65535;
 
 	TcpSocket();
 	int createTcpSocket();
