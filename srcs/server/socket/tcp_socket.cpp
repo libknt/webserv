@@ -37,9 +37,9 @@ TcpSocket::~TcpSocket() {
 
 bool TcpSocket::isSocketConfigValid() {
 	struct sockaddr_in socket_address;
-	int inet_pton_result = inet_pton(AF_INET, ip_address_.c_str(), &(socket_address.sin_addr));
-	if (inet_pton_result <= 0)
+	if (inet_pton(AF_INET, ip_address_.c_str(), &(socket_address.sin_addr)) <= 0) {
 		return false;
+	}
 
 	return backlog_ > 0 && backlog_ <= SOMAXCONN;
 }
@@ -51,9 +51,7 @@ int TcpSocket::createTcpSocket() {
 		return -1;
 	}
 
-	int protocol = protocol_info->p_proto;
-
-	listen_sd_ = socket(AF_INET, SOCK_STREAM, protocol);
+	listen_sd_ = socket(AF_INET, SOCK_STREAM, protocol_info->p_proto);
 	if (listen_sd_ < 0) {
 		std::cerr << "socket() failed: " << strerror(errno) << std::endl;
 		return -1;
@@ -63,12 +61,11 @@ int TcpSocket::createTcpSocket() {
 
 int TcpSocket::setSocketOption() {
 	int enable_address_reuse = 1;
-	int rc = setsockopt(listen_sd_,
-		SOL_SOCKET,
-		SO_REUSEADDR,
-		reinterpret_cast<char*>(&enable_address_reuse),
-		sizeof(enable_address_reuse));
-	if (rc < 0) {
+	if (setsockopt(listen_sd_,
+			SOL_SOCKET,
+			SO_REUSEADDR,
+			reinterpret_cast<char*>(&enable_address_reuse),
+			sizeof(enable_address_reuse)) < 0) {
 		std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
 		return -1;
 	}
@@ -76,15 +73,15 @@ int TcpSocket::setSocketOption() {
 }
 
 int TcpSocket::setSocketToNonBlocking() {
-	int rc = fcntl(listen_sd_, F_GETFL, 0);
-	if (rc < 0) {
+	int flags = fcntl(listen_sd_, F_GETFL, 0);
+	if (flags < 0) {
 		std::cerr << "fcntl() get flags failed: " << strerror(errno) << std::endl;
 		return -1;
 	}
 
-	rc |= O_NONBLOCK;
-	rc = fcntl(listen_sd_, F_SETFL, rc);
-	if (rc < 0) {
+	flags |= O_NONBLOCK;
+	flags = fcntl(listen_sd_, F_SETFL, flags);
+	if (flags < 0) {
 		std::cerr << "fcntl() set flags failed: " << strerror(errno) << std::endl;
 		return -1;
 	}
