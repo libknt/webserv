@@ -40,16 +40,15 @@ IoMultiplexing& IoMultiplexing::operator=(const IoMultiplexing& other) {
 
 int IoMultiplexing::setUpServerSockets() {
 	std::vector<ServerDirective> servers = configuration_.getServers();
-	for (std::vector<ServerDirective>::iterator it = servers.begin(); it != servers.end(); ++it) {
-		std::cout << it->getIpAddress() << " " << it->getPort() << std::endl;
-		socket_.push_back(server::Socket(it->getIpAddress(), it->getPort()));
+	for (size_t i = 0; i < servers.size(); ++i) {
+		socket_.push_back(server::Socket(servers[i].getIpAddress(), servers[i].getPort()));
 	}
 
-	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end();) {
-		if (it->initialize() < 0) {
-			it = socket_.erase(it);
+	for (size_t i = 0; i < socket_.size();) {
+		if (socket_[i].initialize() < 0) {
+			socket_.erase(socket_.begin() + i);
 		} else {
-			++it;
+			++i;
 		}
 	}
 
