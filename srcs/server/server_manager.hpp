@@ -41,7 +41,7 @@ private:
 	bool isListeningSocket(int sd);
 
 public:
-	ServerManager(Configuration& configuration);
+	ServerManager(Configuration& const configuration);
 	virtual ~ServerManager();
 	explicit ServerManager(const ServerManager& other);
 	ServerManager& operator=(const ServerManager& other);
