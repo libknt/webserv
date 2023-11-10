@@ -22,7 +22,7 @@ private:
 	TcpSocket();
 	bool isSocketConfigValid();
 	int createTcpSocket();
-	int setSocketOption();
+	int enableSocketAddressReuse();
 	int setSocketToNonBlocking();
 	int configureSocketAddress();
 	int bindAddressToSocket();

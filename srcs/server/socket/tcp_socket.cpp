@@ -60,7 +60,7 @@ int TcpSocket::createTcpSocket() {
 	return 0;
 }
 
-int TcpSocket::setSocketOption() {
+int TcpSocket::enableSocketAddressReuse() {
 	int enable_address_reuse = 1;
 	if (setsockopt(listen_sd_,
 			SOL_SOCKET,
@@ -145,7 +145,7 @@ int TcpSocket::setupSocketForListening() {
 		return -1;
 	if (createTcpSocket() < 0)
 		return -1;
-	if (setSocketOption() < 0)
+	if (enableSocketAddressReuse() < 0)
 		return -1;
 	if (setSocketToNonBlocking() < 0)
 		return -1;
