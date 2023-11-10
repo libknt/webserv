@@ -265,6 +265,15 @@ std::vector<std::string> LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
 }
 
+bool LocationDirective::isValidCgiExtensions(const std::string& extension) const {
+	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
+		if (extension == cgi_extensions_[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 	out << "ErrorPages: " << std::endl;

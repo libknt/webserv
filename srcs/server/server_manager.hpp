@@ -35,7 +35,11 @@ private:
 	int createsServerStatus(int sd);
 	int receiveAndParseHttpRequest(int sd);
 	int determineIfCgiRequest(int sd);
-	int extractParentDirectoryPath(std::string const& path, std::string& directory_path);
+	void removeQuery(std::string& path);
+	void removePathInfo(std::string& path);
+	void decompositionOfCgiUrl(std::string& path, std::string& location, std::string& extension);
+	std::string extractScriptFileName(std::string const& path);
+	std::string extractParentDirectoryPath(std::string const& path);
 	int setWriteFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);

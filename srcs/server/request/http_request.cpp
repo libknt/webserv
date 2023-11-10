@@ -173,6 +173,10 @@ void HttpRequest::setIsCgi(bool is_cgi) {
 	is_cgi_ = is_cgi;
 }
 
+bool HttpRequest::getIsCgi() const {
+	return is_cgi_;
+}
+
 int HttpRequest::parseMethod(std::string const& line) {
 	std::vector<std::string> method_vector;
 	if (parseSentense(line, "%s %s %s", method_vector) == -1 || method_vector.size() != 3) {

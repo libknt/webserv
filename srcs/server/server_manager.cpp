@@ -135,9 +135,14 @@ int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 				}
 				if (server_status_[descriptor] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
-					if (determineIfCgiRequest(descriptor)) {
+					determineIfCgiRequest(descriptor);
+					if (http_request_parse_.getHttpRequest(descriptor).getIsCgi()) {
+						std::cout << "  execute cgi" << std::endl;
+						// TODO cgi実行
+					} else {
+						std::cout << "  create response" << std::endl;
+						setWriteFd(descriptor);
 					}
-					setWriteFd(descriptor);
 				}
 			}
 			--readyDescriptors;
@@ -240,31 +245,67 @@ int ServerManager::determineIfCgiRequest(int sd) {
 	const ServerDirective& server_configuration =
 		configuration_.getServerConfiguration(ip_address, port);
 	std::string directory_path;
-
-	if (extractParentDirectoryPath(request.getRequestPath(), directory_path) < 0) {
-		std::cerr << "extractParentDirectoryPath() failed" << std::endl;
-		return -1;
+	std::string path = request.getRequestPath();
+	if (path.empty()) {
+		return 0;
 	}
-	if (server_configuration.isCgiLocation(directory_path)) {
-		std::cout << "CGI" << std::endl;
+	std::string script_file_name;
+	std::string location;
+	decompositionOfCgiUrl(path, location, script_file_name);
+	if (script_file_name.empty()) {
+		return 0;
+	}
+	if (server_configuration.isCgiLocation(location, script_file_name)) {
 		request.setIsCgi(true);
 	}
 	return 0;
 }
 
-int ServerManager::extractParentDirectoryPath(std::string const& path,
-	std::string& directory_path) {
-	std::size_t found = path.rfind('/');
-	if (found == std::string::npos) {
-		if (path.empty()) {
-			std::cerr << "extractParentDirectoryPath() failed: Path is empty" << std::endl;
-			return -1;
-		}
-		directory_path = "/";
-		return 0;
+void ServerManager::decompositionOfCgiUrl(std::string& path,
+	std::string& location,
+	std::string& extension) {
+	extension = extractScriptFileName(path);
+	if (extension.empty()) {
+		return;
 	}
-	directory_path = path.substr(0, found + 1);
-	return 0;
+	location = extractParentDirectoryPath(path);
+}
+
+void ServerManager::removeQuery(std::string& path) {
+	std::size_t found = path.find('?');
+	if (found != std::string::npos) {
+		path = path.substr(0, found);
+	}
+}
+
+void ServerManager::removePathInfo(std::string& path) {
+	std::size_t found = path.find("/");
+	if (found != std::string::npos) {
+		path = path.substr(0, found);
+	}
+}
+
+std::string ServerManager::extractScriptFileName(std::string const& path) {
+	std::size_t found_extention_dot = path.find('.');
+	if (found_extention_dot == std::string::npos) {
+		return std::string();
+	}
+	std::string tmp = path.substr(found_extention_dot);
+	removeQuery(tmp);
+	removePathInfo(tmp);
+	return tmp;
+}
+
+std::string ServerManager::extractParentDirectoryPath(std::string const& path) {
+	std::size_t found_extention_dot = path.find('.');
+	if (found_extention_dot == std::string::npos) {
+		return path;
+	}
+	std::size_t found = path.rfind('/', found_extention_dot);
+	if (found == std::string::npos) {
+		return path;
+	}
+	return (path.substr(0, found + 1));
 }
 
 int ServerManager::setWriteFd(int sd) {

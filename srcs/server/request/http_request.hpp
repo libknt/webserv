@@ -111,6 +111,7 @@ public:
 	std::string getServerIpAddress() const;
 	std::string getServerPort() const;
 	void setIsCgi(bool is_cgi);
+	bool getIsCgi() const;
 	void cleanup();
 };
 
