@@ -125,9 +125,9 @@ int TcpSocket::configureSocketAddress() {
 }
 
 int TcpSocket::bindAddressToSocket() {
-	int bind_result = bind(
-		listen_sd_, reinterpret_cast<struct sockaddr*>(&socket_address_), sizeof(socket_address_));
-	if (bind_result < 0) {
+	if (bind(listen_sd_,
+			reinterpret_cast<struct sockaddr*>(&socket_address_),
+			sizeof(socket_address_)) < 0) {
 		std::cerr << "bind() failed: " << strerror(errno) << std::endl;
 		return -1;
 	}
@@ -135,8 +135,7 @@ int TcpSocket::bindAddressToSocket() {
 }
 
 int TcpSocket::startListening() {
-	int listen_result = listen(listen_sd_, backlog_);
-	if (listen_result < 0) {
+	if (listen(listen_sd_, backlog_) < 0) {
 		std::cerr << "listen() failed: " << strerror(errno) << std::endl;
 		return -1;
 	}
