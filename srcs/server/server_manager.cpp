@@ -3,10 +3,10 @@
 
 namespace server {
 
-ServerManager::ServerManager(Configuration& const configuration)
+ServerManager::ServerManager(const Configuration& configuration)
 	: configuration_(configuration)
 	, sockets_(std::vector<server::Socket>())
-	, highest_socket_descriptor_(-1)
+	, highest_sd_(-1)
 	, is_running(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&read_fds__);
@@ -19,7 +19,7 @@ ServerManager::~ServerManager() {}
 ServerManager::ServerManager(const ServerManager& other)
 	: configuration_(other.configuration_)
 	, sockets_(other.sockets_)
-	, highest_socket_descriptor_(other.highest_socket_descriptor_)
+	, highest_sd_(other.highest_sd_)
 	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds__(other.read_fds__)
@@ -27,9 +27,8 @@ ServerManager::ServerManager(const ServerManager& other)
 
 ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
-		configuration_ = other.configuration_;
 		sockets_ = other.sockets_;
-		highest_socket_descriptor_ = other.highest_socket_descriptor_;
+		highest_sd_ = other.highest_sd_;
 		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
 		read_fds__ = other.read_fds__;
@@ -62,15 +61,15 @@ int ServerManager::setupServerSockets() {
 
 int ServerManager::acceptIncomingConnection(int listen_sd) {
 
-	int client_socket_descriptor;
+	int client_sd;
 	std::cout << "  Listening socket is readable" << std::endl;
 	do {
 		sockaddr_in client_socket_address;
 		socklen_t client_socket_address_len = sizeof(client_socket_address);
 		std::memset(&client_socket_address, 0, sizeof(client_socket_address));
-		client_socket_descriptor =
+		client_sd =
 			accept(listen_sd, (sockaddr*)&client_socket_address, &client_socket_address_len);
-		if (client_socket_descriptor < 0) {
+		if (client_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				std::cerr << "accept() failed: " << strerror(errno) << std::endl;
 				return -1;
@@ -80,7 +79,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 		sockaddr_in connected_server_address;
 		socklen_t server_socket_address_len = sizeof(connected_server_address);
 
-		if (getsockname(client_socket_descriptor,
+		if (getsockname(client_sd,
 				(struct sockaddr*)&connected_server_address,
 				&server_socket_address_len) == -1) {
 			std::cerr << "getsockname(): " << strerror(errno) << std::endl;
@@ -88,23 +87,23 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 		}
 
 		http_request_parse_.addAcceptClientInfo(
-			client_socket_descriptor, client_socket_address, connected_server_address);
+			client_sd, client_socket_address, connected_server_address);
 
-		std::cout << "  New incoming connection -  " << client_socket_descriptor << std::endl;
-		FD_SET(client_socket_descriptor, &master_read_fds_);
-		if (client_socket_descriptor > highest_socket_descriptor_)
-			highest_socket_descriptor_ = client_socket_descriptor;
+		std::cout << "  New incoming connection -  " << client_sd << std::endl;
+		FD_SET(client_sd, &master_read_fds_);
+		if (client_sd > highest_sd_)
+			highest_sd_ = client_sd;
 
-	} while (client_socket_descriptor != -1);
+	} while (client_sd != -1);
 	return 0;
 }
 
 int ServerManager::disconnect(int sd) {
 	close(sd);
 	FD_CLR(sd, &master_read_fds_);
-	if (sd == highest_socket_descriptor_) {
-		while (!FD_ISSET(highest_socket_descriptor_, &master_read_fds_))
-			--highest_socket_descriptor_;
+	if (sd == highest_sd_) {
+		while (!FD_ISSET(highest_sd_, &master_read_fds_))
+			--highest_sd_;
 	}
 	return 0;
 }
@@ -140,8 +139,7 @@ bool ServerManager::isListeningSocket(int sd) {
 
 int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 
-	for (int descriptor = 0; descriptor <= highest_socket_descriptor_ && readyDescriptors > 0;
-		 ++descriptor) {
+	for (int descriptor = 0; descriptor <= highest_sd_ && readyDescriptors > 0; ++descriptor) {
 		if (FD_ISSET(descriptor, &read_fds__)) {
 			if (isListeningSocket(descriptor)) {
 				if (acceptIncomingConnection(descriptor) < 0) {
@@ -166,8 +164,7 @@ int ServerManager::monitorSocketEvents() {
 		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
 
 		std::cout << "Waiting on select()!" << std::endl;
-		int select_result =
-			select(highest_socket_descriptor_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		int select_result = select(highest_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
 
 		if (select_result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -188,8 +185,8 @@ int ServerManager::monitorSocketEvents() {
 int ServerManager::setupSelectReadFds() {
 	FD_ZERO(&master_read_fds_);
 	for (size_t i = 0; i < sockets_.size(); ++i) {
-		if (sockets_[i].getListenSd() > highest_socket_descriptor_) {
-			highest_socket_descriptor_ = sockets_[i].getListenSd();
+		if (sockets_[i].getListenSd() > highest_sd_) {
+			highest_sd_ = sockets_[i].getListenSd();
 		}
 		FD_SET(sockets_[i].getListenSd(), &master_read_fds_);
 	}

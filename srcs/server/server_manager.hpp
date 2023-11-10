@@ -23,9 +23,9 @@ class ServerManager {
 
 private:
 	ServerManager();
-	Configuration& configuration_;
+	const Configuration& configuration_;
 	std::vector<server::Socket> sockets_;
-	int highest_socket_descriptor_;
+	int highest_sd_;
 	struct timeval timeout_;
 	fd_set master_read_fds_;
 	fd_set read_fds__;
@@ -41,7 +41,7 @@ private:
 	bool isListeningSocket(int sd);
 
 public:
-	ServerManager(Configuration& const configuration);
+	ServerManager(const Configuration& configuration);
 	virtual ~ServerManager();
 	explicit ServerManager(const ServerManager& other);
 	ServerManager& operator=(const ServerManager& other);
