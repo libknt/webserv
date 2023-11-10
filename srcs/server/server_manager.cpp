@@ -3,7 +3,7 @@
 
 namespace server {
 
-ServerManager::ServerManager(Configuration& configuration)
+ServerManager::ServerManager(Configuration& const configuration)
 	: configuration_(configuration)
 	, sockets_(std::vector<server::Socket>())
 	, highest_socket_descriptor_(-1)
