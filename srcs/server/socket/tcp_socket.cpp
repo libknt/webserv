@@ -113,9 +113,7 @@ int TcpSocket::configureSocketAddress() {
 			break;
 		}
 	}
-
 	freeaddrinfo(address_info_results);
-
 	if (address_iterator == NULL) {
 		std::cerr << "Failed to set socket address." << std::endl;
 		return -1;
