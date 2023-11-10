@@ -5,7 +5,7 @@ namespace server {
 
 ServerManager::ServerManager(const Configuration& configuration)
 	: configuration_(configuration)
-	, sockets_(std::vector<server::Socket>())
+	, sockets_(std::vector<server::TcpSocket>())
 	, highest_sd_(-1)
 	, is_running(false) {
 	FD_ZERO(&master_read_fds_);
@@ -22,8 +22,8 @@ ServerManager::ServerManager(const ServerManager& other)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds__(other.read_fds__)
 	, highest_sd_(other.highest_sd_)
-	, is_running(other.is_running) 
-	, timeout_(other.timeout_){}
+	, is_running(other.is_running)
+	, timeout_(other.timeout_) {}
 
 ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
@@ -40,12 +40,12 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 int ServerManager::setupServerSockets() {
 	std::vector<ServerDirective> server_configurations = configuration_.getServerConfigurations();
 	for (size_t i = 0; i < server_configurations.size(); ++i) {
-		sockets_.push_back(server::Socket(
+		sockets_.push_back(server::TcpSocket(
 			server_configurations[i].getIpAddress(), server_configurations[i].getPort()));
 	}
 
 	for (size_t i = 0; i < sockets_.size();) {
-		if (sockets_[i].initialize() < 0) {
+		if (sockets_[i].setupSocketForListening() < 0) {
 			sockets_.erase(sockets_.begin() + i);
 		} else {
 			++i;

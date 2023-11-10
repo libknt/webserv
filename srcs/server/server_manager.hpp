@@ -3,8 +3,8 @@
 
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
-#include "socket.hpp"
 #include "struct.hpp"
+#include "tcp_socket.hpp"
 #include <map>
 #include <vector>
 
@@ -23,7 +23,7 @@ class ServerManager {
 
 private:
 	const Configuration& configuration_;
-	std::vector<server::Socket> sockets_;
+	std::vector<server::TcpSocket> sockets_;
 	fd_set master_read_fds_;
 	fd_set read_fds__;
 	int highest_sd_;
@@ -40,7 +40,6 @@ private:
 	int acceptIncomingConnection(int listen_sd);
 	int receiveAndParseHttpRequest(int sd);
 	int disconnect(int sd);
-
 
 public:
 	ServerManager(const Configuration& configuration);

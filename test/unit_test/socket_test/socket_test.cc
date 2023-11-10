@@ -1,4 +1,4 @@
-#include "socket.hpp"
+#include "tcp_socket.hpp"
 #include <gtest/gtest.h>
 #include <sys/resource.h>
 
@@ -21,17 +21,17 @@ protected:
 	}
 
 	const int MAX_SERVERS;
-	server::Socket** servers;
+	server::TcpSocket** servers;
 	int port = SERVER_PORT;
 
 	SocketTest()
 		: MAX_SERVERS(getMaxFileDescriptors()) {
-		servers = new server::Socket*[MAX_SERVERS];
+		servers = new server::TcpSocket*[MAX_SERVERS];
 	}
 
 	virtual void SetUp() {
 		for (int i = 0; i < MAX_SERVERS; ++i) {
-			servers[i] = new server::Socket(SERVER_ADDR, port++);
+			servers[i] = new server::TcpSocket(SERVER_ADDR, port++);
 		}
 	}
 
@@ -56,49 +56,49 @@ TEST_F(SocketTest, CheckValidvectorenSd) {
 
 // 無効なアドレスによる初期化
 TEST(SocketInvalidParamsTest, InvalidAddress) {
-	server::Socket server("256.256.256.256", 1025);
+	server::TcpSocket server("256.256.256.256", 1025);
 	EXPECT_EQ(server.initialize(), -1) << "Expected failure when using an invalid address";
 }
 
 // 無効なポートによる初期化
 TEST(SocketInvalidParamsTest, InvalidPort) {
 	// port 16bit min 0 max 65535
-	server::Socket server(SERVER_ADDR, 65536);
+	server::TcpSocket server(SERVER_ADDR, 65536);
 	EXPECT_EQ(server.initialize(), -1) << "Expected failure when using an invalid port number";
 }
 
 // ポートが負の値を取らないか
 TEST(SocketInvalidParamsTest, NegativePort) {
-	server::Socket server(SERVER_ADDR, -1);
+	server::TcpSocket server(SERVER_ADDR, -1);
 	EXPECT_EQ(server.initialize(), -1) << "Expected failure when using a negative port number";
 }
 
 // 空のIPアドレスを指定できるか
 TEST(SocketInvalidParamsTest, EmptyAddress) {
-	server::Socket server("", 1027);
+	server::TcpSocket server("", 1027);
 	EXPECT_EQ(server.initialize(), -1) << "Expected failure when using an empty address";
 }
 
 // 既に使用中のポート番号を指定
 TEST(SocketInvalidParamsTest, PortAlreadyInUse) {
-	server::Socket server1(SERVER_ADDR, 1028);
+	server::TcpSocket server1(SERVER_ADDR, 1028);
 	EXPECT_EQ(server1.initialize(), 0) << "Failed to initialize first server.";
 
-	server::Socket server2(SERVER_ADDR, 1028);
+	server::TcpSocket server2(SERVER_ADDR, 1028);
 	EXPECT_EQ(server2.initialize(), -1)
 		<< "Expected failure when using a port that's already in use";
 }
 
 // 存在しないネットワークインターフェースのアドレス
 TEST(SocketInvalidParamsTest, AddressNotAvailable) {
-	server::Socket server("192.0.2.0", 1029); // 使用しないであろうアドレス
+	server::TcpSocket server("192.0.2.0", 1029); // 使用しないであろうアドレス
 	EXPECT_EQ(server.initialize(), -1)
 		<< "Expected failure when using an address that's not available";
 }
 
 // ポート番号0を使用して、サーバーオブジェクトが正しく初期化でき、動的に利用可能なポートが割り当てられるかを確認
 TEST(SocketParamsTest, ZeroPort) {
-	server::Socket server(SERVER_ADDR, 0);
+	server::TcpSocket server(SERVER_ADDR, 0);
 	EXPECT_EQ(server.initialize(), 0) << "Failed to initialize server with port 0";
 
 	struct sockaddr_in sin;
