@@ -175,11 +175,10 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 		}
 
 		if (http_request_parse_.addAcceptClientInfo(
-			client_sd, client_socket_address, connected_server_address) < 0) {
-				std::cerr << "addAcceptClientInfo() failed" << std::endl;
-				return -1;
-			}
-		
+				client_sd, client_socket_address, connected_server_address) < 0) {
+			std::cerr << "addAcceptClientInfo() failed" << std::endl;
+			return -1;
+		}
 
 		std::cout << "  New incoming connection -  " << client_sd << std::endl;
 		FD_SET(client_sd, &master_read_fds_);
