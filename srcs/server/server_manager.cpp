@@ -52,6 +52,14 @@ int ServerManager::setupServerSockets() {
 		}
 	}
 
+	for (size_t i = 0; i < sockets_.size();) {
+		if (sockets_[i].startListening() < 0) {
+			sockets_.erase(sockets_.begin() + i);
+		} else {
+			++i;
+		}
+	}
+
 	if (sockets_.empty()) {
 		std::cerr << "Initialization of all addresses failed" << std::endl;
 		return -1;

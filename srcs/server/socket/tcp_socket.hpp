@@ -7,6 +7,8 @@
 #include <fcntl.h>
 #include <iostream>
 #include <netdb.h>
+#include <sstream>
+#include <string>
 #include <unistd.h>
 
 namespace server {
@@ -26,7 +28,6 @@ private:
 	int setSocketToNonBlocking();
 	int configureSocketAddress();
 	int bindAddressToSocket();
-	int startListening();
 
 public:
 	TcpSocket(std::string server_address, std::string port);
@@ -34,6 +35,7 @@ public:
 	TcpSocket& operator=(const TcpSocket& other);
 	virtual ~TcpSocket();
 	int setupSocketForListening();
+	int startListening();
 	int getListenSd() const;
 };
 

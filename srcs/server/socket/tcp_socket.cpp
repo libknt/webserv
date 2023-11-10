@@ -132,14 +132,6 @@ int TcpSocket::bindAddressToSocket() {
 	return 0;
 }
 
-int TcpSocket::startListening() {
-	if (listen(listen_sd_, backlog_) < 0) {
-		std::cerr << "listen() failed: " << strerror(errno) << std::endl;
-		return -1;
-	}
-	return 0;
-}
-
 int TcpSocket::setupSocketForListening() {
 	if (!isSocketConfigValid())
 		return -1;
@@ -153,10 +145,16 @@ int TcpSocket::setupSocketForListening() {
 		return -1;
 	if (bindAddressToSocket() < 0)
 		return -1;
-	if (startListening() < 0)
+	return 0;
+}
+
+int TcpSocket::startListening() {
+	if (listen(listen_sd_, backlog_) < 0) {
+		std::cerr << "listen() failed: " << strerror(errno) << std::endl;
 		return -1;
-	std::cout << "TcpSocket initialization succeeded!! address: " << ip_address_
-			  << " port: " << port_ << std::endl;
+	}
+	std::cout << "Socket " << listen_sd_ << " started listening on " << ip_address_ << ":" << port_
+			  << std::endl;
 	return 0;
 }
 
