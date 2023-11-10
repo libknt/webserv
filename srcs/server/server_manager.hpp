@@ -3,21 +3,12 @@
 
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
-#include "struct.hpp"
+#include "types.hpp"
 #include "tcp_socket.hpp"
 #include <map>
 #include <vector>
 
 namespace server {
-
-enum SERVER_STATUS {
-	REQUEST,
-	RESPONSE,
-	CGI,
-	FINISHED,
-	ERROR,
-	UNDEFINED,
-};
 
 class ServerManager {
 
