@@ -37,15 +37,15 @@ int main(int argc, char* argv[]) {
 	}
 	for (int i = 1; i < argc; i++) {
 		if (0 < fd[i]) {
-			server::HttpRequest request = parse_http_request.getHttpRequest(fd[i]);
+			server::HttpRequest request = parse_http_request.getRequest(fd[i]);
 			if ((std::string(argv[i]).find("success") != std::string::npos &&
-					request.getHttpRequestStatus() == server::http_request_status::FINISHED) ||
+					request.getStatus() == server::http_request_status::FINISHED) ||
 				(std::string(argv[i]).find("failure") != std::string::npos &&
-					request.getHttpRequestStatus() == server::http_request_status::ERROR))
+					request.getStatus() == server::http_request_status::ERROR))
+
 				std::cerr << "TEST" << argv[i] << ": OK" << std::endl;
 			else
-				std::cerr << "TEST" << argv[i] << ": NG" << request.getHttpRequestStatus()
-						  << std::endl;
+				std::cerr << "TEST" << argv[i] << ": NG" << request.getStatus() << std::endl;
 		}
 	}
 }

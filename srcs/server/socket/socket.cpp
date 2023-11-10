@@ -1,7 +1,7 @@
 #include "socket.hpp"
 
 namespace server {
-Socket::Socket(const char* server_address, int port)
+Socket::Socket(std::string server_address, std::string port)
 	: server_address_(server_address)
 	, port_(port)
 	, listen_sd_(-1)
@@ -9,7 +9,7 @@ Socket::Socket(const char* server_address, int port)
 	std::memset(&addr_, 0, sizeof(addr_));
 }
 
-Socket::Socket(const char* server_address, int port, int backlog)
+Socket::Socket(std::string server_address, std::string port, int backlog)
 	: server_address_(server_address)
 	, port_(port)
 	, listen_sd_(-1)
@@ -97,11 +97,7 @@ int Socket::setSocketAddress() {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	std::ostringstream oss;
-	oss << port_;
-	std::string port_str = oss.str();
-
-	if ((status = getaddrinfo(server_address_, port_str.c_str(), &hints, &res)) != 0) {
+	if ((status = getaddrinfo(server_address_.c_str(), port_.c_str(), &hints, &res)) != 0) {
 		std::cerr << "getaddrinfo() failed: " << gai_strerror(status) << std::endl;
 		return -1;
 	}
@@ -142,11 +138,8 @@ int Socket::listen() {
 }
 
 bool Socket::isValid() {
-	if (port_ < min_port_ || port_ > max_port_)
-		return false;
-
 	struct sockaddr_in sa;
-	int result = inet_pton(AF_INET, server_address_, &(sa.sin_addr));
+	int result = inet_pton(AF_INET, server_address_.c_str(), &(sa.sin_addr));
 	if (result <= 0)
 		return false;
 

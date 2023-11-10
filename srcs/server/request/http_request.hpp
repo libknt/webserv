@@ -1,5 +1,6 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
+#include <arpa/inet.h>
 #include <iostream>
 #include <map>
 #include <netinet/in.h>
@@ -62,49 +63,53 @@ enum HTTP_BODY_MESSAGE_TYPE {
 class HttpRequest {
 private:
 	http_request_status::HTTP_REQUEST_STATUS status_;
-	http_method::HTTP_METHOD method_;
-	http_version::HTTP_VERSION version_;
 	http_error_status::HTTP_ERROR_STATUS error_status_;
+	http_method::HTTP_METHOD method_;
+	std::string request_path_;
+	http_version::HTTP_VERSION version_;
+	std::map<std::string, std::string> header_;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE body_message_type_;
 	size_t content_length_;
 	chunked_status::CHUNKED_STATUS chunked_status_;
 	size_t chunked_size_;
-	std::string request_path_;
-	std::map<std::string, std::string> header_;
 	std::string body_;
 	sockaddr_in client_address_;
 	sockaddr_in server_address_;
-	int parseHttpMethod(std::string const& line);
-	int parseHttpHeader(std::string const& line);
-	int parseHttpBody(std::string const& line);
+	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
+	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
+	int parseMethod(std::string const& line);
+	int parseHeader(std::string const& line);
+	int checkHeaderValue();
+	int parseBody(std::string const& line);
 	int parseContentLengthBody(std::string const& line);
 	int parseChunkedBody(std::string const& line);
-	int checkHeaderValue();
 	int setMethod(std::string const& method);
 	int setRequestPath(std::string const& request_path);
 	int setVersion(std::string const& version);
 	int setHeaderValue(std::string const& key, std::string const& value);
-	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
-	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 
 	HttpRequest();
 
 public:
 	explicit HttpRequest(sockaddr_in client_address, sockaddr_in server_address);
-	HttpRequest(HttpRequest const& request);
+	explicit HttpRequest(HttpRequest const& other);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
+	http_request_status::HTTP_REQUEST_STATUS getStatus(void) const;
+	std::string getMethod() const;
+	std::string getVersion() const;
+	std::string getRequestPath() const;
 	std::string getHeaderValue(std::string const& key);
-	void getInfo(void);
-	http_request_status::HTTP_REQUEST_STATUS getHttpRequestStatus(void) const;
-	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getHttpBodyMessageType(void);
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getBodyMessageType(void);
+	std::map<std::string, std::string> getHeader() const;
+	std::string getBody() const;
 	sockaddr_in getClientAddress() const;
 	sockaddr_in getServerAddress() const;
-	std::string getHttpMethod() const;
-	std::string getServerProtocol() const;
-	std::string getRequestPath() const;
-	std::string getBody() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const HttpRequest& request);
+
 }
+
 #endif
