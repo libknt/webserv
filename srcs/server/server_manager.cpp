@@ -9,7 +9,9 @@ ServerManager::ServerManager(const Configuration& configuration)
 	, highest_sd_(-1)
 	, is_running(false) {
 	FD_ZERO(&master_read_fds_);
-	FD_ZERO(&read_fds__);
+	FD_ZERO(&master_write_fds_);
+	FD_ZERO(&read_fds_);
+	FD_ZERO(&write_fds_);
 	timeout_.tv_sec = 10;
 	timeout_.tv_usec = 0;
 }
@@ -20,7 +22,9 @@ ServerManager::ServerManager(const ServerManager& other)
 	: configuration_(other.configuration_)
 	, sockets_(other.sockets_)
 	, master_read_fds_(other.master_read_fds_)
-	, read_fds__(other.read_fds__)
+	, master_write_fds_(other.master_write_fds_)
+	, read_fds_(other.read_fds_)
+	, write_fds_(other.write_fds_)
 	, highest_sd_(other.highest_sd_)
 	, is_running(other.is_running)
 	, timeout_(other.timeout_) {}
@@ -28,11 +32,13 @@ ServerManager::ServerManager(const ServerManager& other)
 ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
 		sockets_ = other.sockets_;
-		highest_sd_ = other.highest_sd_;
-		timeout_ = other.timeout_;
 		master_read_fds_ = other.master_read_fds_;
-		read_fds__ = other.read_fds__;
+		master_write_fds_ = other.master_write_fds_;
+		read_fds_ = other.read_fds_;
+		write_fds_ = other.write_fds_;
+		highest_sd_ = other.highest_sd_;
 		is_running = other.is_running;
+		timeout_ = other.timeout_;
 	}
 	return *this;
 }
@@ -81,10 +87,19 @@ int ServerManager::setupSelectReadFds() {
 int ServerManager::monitorSocketEvents() {
 	is_running = true;
 	while (is_running) {
-		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
-
+#ifdef FD_COPY
+		std::memset(&read_fds_, 0, sizeof(read_fds_));
+		std::memset(&write_fds_, 0, sizeof(write_fds_));
+		FD_COPY(&master_read_fds_, &read_fds_);
+		FD_COPY(&master_write_fds_, &write_fds_);
+#else
+		std::memset(&read_fds_, 0, sizeof(read_fds_));
+		std::memset(&write_fds_, 0, sizeof(write_fds_));
+		std::memcpy(&read_fds_, &master_read_fds_, sizeof(master_read_fds_));
+		std::memcpy(&write_fds_, &master_write_fds_, sizeof(master_write_fds_));
+#endif
 		std::cout << "Waiting on select()!" << std::endl;
-		int select_result = select(highest_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		int select_result = select(highest_sd_ + 1, &read_fds_, &write_fds_, NULL, &timeout_);
 
 		if (select_result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -105,7 +120,7 @@ int ServerManager::monitorSocketEvents() {
 int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 
 	for (int descriptor = 0; descriptor <= highest_sd_ && readyDescriptors > 0; ++descriptor) {
-		if (FD_ISSET(descriptor, &read_fds__)) {
+		if (FD_ISSET(descriptor, &read_fds_)) {
 			if (isListeningSocket(descriptor)) {
 				if (acceptIncomingConnection(descriptor) < 0) {
 					is_running = false;
@@ -159,8 +174,12 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			return -1;
 		}
 
-		http_request_parse_.addAcceptClientInfo(
-			client_sd, client_socket_address, connected_server_address);
+		if (http_request_parse_.addAcceptClientInfo(
+			client_sd, client_socket_address, connected_server_address) < 0) {
+				std::cerr << "addAcceptClientInfo() failed" << std::endl;
+				return -1;
+			}
+		
 
 		std::cout << "  New incoming connection -  " << client_sd << std::endl;
 		FD_SET(client_sd, &master_read_fds_);
@@ -168,6 +187,14 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			highest_sd_ = client_sd;
 
 	} while (client_sd != -1);
+	return 0;
+}
+
+int ServerManager::createsServerStatus(int sd) {
+	if (server_status_.find(sd) != server_status_.end()) {
+		return -1;
+	}
+	server_status_.insert(std::make_pair(sd, server::RECEIVING_REQUEST));
 	return 0;
 }
 

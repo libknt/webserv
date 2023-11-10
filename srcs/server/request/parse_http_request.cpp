@@ -51,13 +51,15 @@ HttpRequest& ParseHttpRequest::getHttpRequest(int sd) {
 	return it->second;
 }
 
-void ParseHttpRequest::addAcceptClientInfo(int socketfd,
+int ParseHttpRequest::addAcceptClientInfo(int socketfd,
 	sockaddr_in client_address,
 	sockaddr_in server_address) {
-	if (http_request_map_.find(socketfd) == http_request_map_.end()) {
-		HttpRequest request(client_address, server_address);
-		http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
+	if (http_request_map_.find(socketfd) != http_request_map_.end()) {
+		return -1;
 	}
+	HttpRequest request(client_address, server_address);
+	http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
+	return 0;
 }
 
 void ParseHttpRequest::printAcceptedFds() {

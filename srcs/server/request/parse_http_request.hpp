@@ -27,7 +27,7 @@ public:
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	int handleBuffer(int socketfd, char* buf);
 	HttpRequest& getHttpRequest(int sd);
-	void addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
+	int addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
 	void printAcceptedFds();
 };
 
