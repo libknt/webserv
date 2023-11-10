@@ -169,6 +169,17 @@ std::map<std::string, LocationDirective> ServerDirective::getLocations() const {
 	return locations_;
 }
 
+bool ServerDirective::isCgiLocation(const std::string& location) const {
+	for (std::map<std::string, LocationDirective>::const_iterator it = locations_.begin();
+		 it != locations_.end();
+		 ++it) {
+		if (it->first == location && it->second.getCgi() == "on") {
+			return true;
+		}
+	}
+	return false;
+}
+
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;

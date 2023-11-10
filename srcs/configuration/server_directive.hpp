@@ -37,6 +37,7 @@ public:
 	std::string getServerName() const;
 	std::string getDefaultErrorPage() const;
 	std::map<std::string, LocationDirective> getLocations() const;
+	bool isCgiLocation(const std::string& location) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);

@@ -34,6 +34,8 @@ private:
 	int acceptIncomingConnection(int listen_sd);
 	int createsServerStatus(int sd);
 	int receiveAndParseHttpRequest(int sd);
+	int determineIfCgiRequest(int sd);
+	int extractParentDirectoryPath(std::string const& path, std::string& directory_path);
 	int setWriteFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);

@@ -14,7 +14,8 @@ HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	, chunked_status_(chunked_status::CHUNKED_SIZE)
 	, chunked_size_(0)
 	, client_address_(client_address)
-	, server_address_(server_address) {}
+	, server_address_(server_address)
+	, is_cgi_(false) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -31,7 +32,8 @@ HttpRequest::HttpRequest(HttpRequest const& other)
 	, chunked_size_(other.chunked_size_)
 	, body_(other.body_)
 	, client_address_(other.client_address_)
-	, server_address_(other.server_address_) {}
+	, server_address_(other.server_address_)
+	, is_cgi_(other.is_cgi_) {}
 
 HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 	if (this != &other) {
@@ -48,6 +50,7 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 		body_ = other.body_;
 		client_address_ = other.client_address_;
 		server_address_ = other.server_address_;
+		is_cgi_ = other.is_cgi_;
 	}
 	return (*this);
 }
@@ -143,12 +146,31 @@ sockaddr_in HttpRequest::getServerAddress() const {
 	return server_address_;
 }
 
+std::string HttpRequest::getServerIpAddress() const {
+	sockaddr_in server_address = getServerAddress();
+	char* server_ip = inet_ntoa(server_address.sin_addr);
+	return (std::string(server_ip));
+}
+
+std::string HttpRequest::getServerPort() const {
+	sockaddr_in server_address = getServerAddress();
+	unsigned short server_port = ntohs(server_address.sin_port);
+
+	std::stringstream ss;
+	ss << server_port;
+	return ss.str();
+}
+
 void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
 	status_ = status;
 }
 
 void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
 	error_status_ = error_status;
+}
+
+void HttpRequest::setIsCgi(bool is_cgi) {
+	is_cgi_ = is_cgi;
 }
 
 int HttpRequest::parseMethod(std::string const& line) {
@@ -311,6 +333,7 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 	out << "server ip: " << server_ip << std::endl;
 	out << "server port: " << server_port << std::endl;
 	out << "method: " << request.getMethod() << std::endl;
+	out << "request path: " << request.getRequestPath() << std::endl;
 	out << "status: " << request.getStatus() << std::endl;
 	out << "version: " << request.getVersion() << std::endl;
 	out << "header" << std::endl;

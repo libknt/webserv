@@ -25,6 +25,8 @@ public:
 
 	int init(const std::string& path);
 	std::vector<ServerDirective> getServerConfigurations() const;
+	const ServerDirective& getServerConfiguration(std::string const& ip_address,
+		std::string const& port) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const Configuration& configuration);
