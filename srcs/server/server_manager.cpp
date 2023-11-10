@@ -67,7 +67,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 	do {
 		sockaddr_in client_socket_address;
 		socklen_t client_socket_address_len = sizeof(client_socket_address);
-		memset(&client_socket_address, 0, sizeof(client_socket_address));
+		std::memset(&client_socket_address, 0, sizeof(client_socket_address));
 		client_socket_descriptor =
 			accept(listen_sd, (sockaddr*)&client_socket_address, &client_socket_address_len);
 		if (client_socket_descriptor < 0) {
