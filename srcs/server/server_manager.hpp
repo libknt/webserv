@@ -22,23 +22,25 @@ enum SERVER_STATUS {
 class ServerManager {
 
 private:
-	ServerManager();
 	const Configuration& configuration_;
 	std::vector<server::Socket> sockets_;
-	int highest_sd_;
-	struct timeval timeout_;
 	fd_set master_read_fds_;
 	fd_set read_fds__;
+	int highest_sd_;
 	bool is_running;
+	struct timeval timeout_;
 	ParseHttpRequest http_request_parse_;
-	int dispatchSocketEvents(int ready_descriptors);
-	int setupSelectReadFds();
+
+	ServerManager();
 	int setupServerSockets();
+	int setupSelectReadFds();
 	int monitorSocketEvents();
+	int dispatchSocketEvents(int ready_descriptors);
+	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
 	int receiveAndParseHttpRequest(int sd);
 	int disconnect(int sd);
-	bool isListeningSocket(int sd);
+
 
 public:
 	ServerManager(const Configuration& configuration);

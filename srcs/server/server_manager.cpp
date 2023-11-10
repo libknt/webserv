@@ -19,11 +19,11 @@ ServerManager::~ServerManager() {}
 ServerManager::ServerManager(const ServerManager& other)
 	: configuration_(other.configuration_)
 	, sockets_(other.sockets_)
-	, highest_sd_(other.highest_sd_)
-	, timeout_(other.timeout_)
 	, master_read_fds_(other.master_read_fds_)
 	, read_fds__(other.read_fds__)
-	, is_running(other.is_running) {}
+	, highest_sd_(other.highest_sd_)
+	, is_running(other.is_running) 
+	, timeout_(other.timeout_){}
 
 ServerManager& ServerManager::operator=(const ServerManager& other) {
 	if (this != &other) {
@@ -57,6 +57,71 @@ int ServerManager::setupServerSockets() {
 		return -1;
 	}
 	return 0;
+}
+
+int ServerManager::setupSelectReadFds() {
+	FD_ZERO(&master_read_fds_);
+	for (size_t i = 0; i < sockets_.size(); ++i) {
+		if (sockets_[i].getListenSd() > highest_sd_) {
+			highest_sd_ = sockets_[i].getListenSd();
+		}
+		FD_SET(sockets_[i].getListenSd(), &master_read_fds_);
+	}
+	return 0;
+}
+
+int ServerManager::monitorSocketEvents() {
+	is_running = true;
+	while (is_running) {
+		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
+
+		std::cout << "Waiting on select()!" << std::endl;
+		int select_result = select(highest_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+
+		if (select_result < 0) {
+			std::cerr << "select() failed: " << strerror(errno) << std::endl;
+			break;
+		}
+
+		if (select_result == 0) {
+			std::cout << "select() timed out.  End program." << std::endl;
+			continue;
+		}
+		if (dispatchSocketEvents(select_result) < 0) {
+			continue;
+		}
+	}
+	return 0;
+}
+
+int ServerManager::dispatchSocketEvents(int readyDescriptors) {
+
+	for (int descriptor = 0; descriptor <= highest_sd_ && readyDescriptors > 0; ++descriptor) {
+		if (FD_ISSET(descriptor, &read_fds__)) {
+			if (isListeningSocket(descriptor)) {
+				if (acceptIncomingConnection(descriptor) < 0) {
+					is_running = false;
+					return -1;
+				}
+			} else {
+				if (receiveAndParseHttpRequest(descriptor) < 0) {
+					is_running = false;
+					return -1;
+				}
+			}
+			--readyDescriptors;
+		}
+	}
+	return 0;
+}
+
+bool ServerManager::isListeningSocket(int sd) {
+	for (size_t i = 0; i < sockets_.size(); ++i) {
+		if (sd == sockets_[i].getListenSd()) {
+			return true;
+		}
+	}
+	return false;
 }
 
 int ServerManager::acceptIncomingConnection(int listen_sd) {
@@ -98,16 +163,6 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 	return 0;
 }
 
-int ServerManager::disconnect(int sd) {
-	close(sd);
-	FD_CLR(sd, &master_read_fds_);
-	if (sd == highest_sd_) {
-		while (!FD_ISSET(highest_sd_, &master_read_fds_))
-			--highest_sd_;
-	}
-	return 0;
-}
-
 int ServerManager::receiveAndParseHttpRequest(int sd) {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
@@ -128,67 +183,12 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 	return 0;
 }
 
-bool ServerManager::isListeningSocket(int sd) {
-	for (size_t i = 0; i < sockets_.size(); ++i) {
-		if (sd == sockets_[i].getListenSd()) {
-			return true;
-		}
-	}
-	return false;
-}
-
-int ServerManager::dispatchSocketEvents(int readyDescriptors) {
-
-	for (int descriptor = 0; descriptor <= highest_sd_ && readyDescriptors > 0; ++descriptor) {
-		if (FD_ISSET(descriptor, &read_fds__)) {
-			if (isListeningSocket(descriptor)) {
-				if (acceptIncomingConnection(descriptor) < 0) {
-					is_running = false;
-					return -1;
-				}
-			} else {
-				if (receiveAndParseHttpRequest(descriptor) < 0) {
-					is_running = false;
-					return -1;
-				}
-			}
-			--readyDescriptors;
-		}
-	}
-	return 0;
-}
-
-int ServerManager::monitorSocketEvents() {
-	is_running = true;
-	while (is_running) {
-		std::memcpy(&read_fds__, &master_read_fds_, sizeof(master_read_fds_));
-
-		std::cout << "Waiting on select()!" << std::endl;
-		int select_result = select(highest_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
-
-		if (select_result < 0) {
-			std::cerr << "select() failed: " << strerror(errno) << std::endl;
-			break;
-		}
-
-		if (select_result == 0) {
-			std::cout << "select() timed out.  End program." << std::endl;
-			continue;
-		}
-		if (dispatchSocketEvents(select_result) < 0) {
-			continue;
-		}
-	}
-	return 0;
-}
-
-int ServerManager::setupSelectReadFds() {
-	FD_ZERO(&master_read_fds_);
-	for (size_t i = 0; i < sockets_.size(); ++i) {
-		if (sockets_[i].getListenSd() > highest_sd_) {
-			highest_sd_ = sockets_[i].getListenSd();
-		}
-		FD_SET(sockets_[i].getListenSd(), &master_read_fds_);
+int ServerManager::disconnect(int sd) {
+	close(sd);
+	FD_CLR(sd, &master_read_fds_);
+	if (sd == highest_sd_) {
+		while (!FD_ISSET(highest_sd_, &master_read_fds_))
+			--highest_sd_;
 	}
 	return 0;
 }
