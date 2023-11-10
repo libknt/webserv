@@ -251,7 +251,7 @@ int ServerManager::determineIfCgiRequest(int sd) {
 	}
 	std::string script_file_name;
 	std::string location;
-	decompositionOfCgiUrl(path, location, script_file_name);
+	decomposeCgiUrl(path, location, script_file_name);
 	if (script_file_name.empty()) {
 		return 0;
 	}
@@ -261,51 +261,47 @@ int ServerManager::determineIfCgiRequest(int sd) {
 	return 0;
 }
 
-void ServerManager::decompositionOfCgiUrl(std::string& path,
+void ServerManager::decomposeCgiUrl(const std::string& path,
 	std::string& location,
-	std::string& extension) {
-	extension = extractScriptFileName(path);
-	if (extension.empty()) {
-		return;
-	}
-	location = extractParentDirectoryPath(path);
-}
-
-void ServerManager::removeQuery(std::string& path) {
-	std::size_t found = path.find('?');
-	if (found != std::string::npos) {
-		path = path.substr(0, found);
+	std::string& script_file_name) {
+	script_file_name = extractScriptFileName(path);
+	if (!script_file_name.empty()) {
+		location = extractParentDirectoryPath(path);
 	}
 }
 
-void ServerManager::removePathInfo(std::string& path) {
-	std::size_t found = path.find("/");
-	if (found != std::string::npos) {
-		path = path.substr(0, found);
+void ServerManager::sanitizePath(std::string& path) {
+	size_t query_position = path.find('?');
+	if (query_position != std::string::npos) {
+		path = path.substr(0, query_position);
+	}
+
+	size_t path_info_position = path.find('/');
+	if (path_info_position != std::string::npos) {
+		path = path.substr(0, path_info_position);
 	}
 }
 
-std::string ServerManager::extractScriptFileName(std::string const& path) {
-	std::size_t found_extention_dot = path.find('.');
-	if (found_extention_dot == std::string::npos) {
+std::string ServerManager::extractScriptFileName(const std::string& path) {
+	size_t extension_dot_position = path.find('.');
+	if (extension_dot_position == std::string::npos) {
 		return std::string();
 	}
-	std::string tmp = path.substr(found_extention_dot);
-	removeQuery(tmp);
-	removePathInfo(tmp);
-	return tmp;
+
+	std::string script_file_name = path.substr(extension_dot_position);
+	sanitizePath(script_file_name);
+	return script_file_name;
 }
 
-std::string ServerManager::extractParentDirectoryPath(std::string const& path) {
-	std::size_t found_extention_dot = path.find('.');
-	if (found_extention_dot == std::string::npos) {
+std::string ServerManager::extractParentDirectoryPath(const std::string& path) {
+	size_t extension_dot_position = path.find('.');
+	if (extension_dot_position == std::string::npos) {
 		return path;
 	}
-	std::size_t found = path.rfind('/', found_extention_dot);
-	if (found == std::string::npos) {
-		return path;
-	}
-	return (path.substr(0, found + 1));
+
+	size_t last_slash_position = path.rfind('/', extension_dot_position);
+	return last_slash_position == std::string::npos ? path
+													: path.substr(0, last_slash_position + 1);
 }
 
 int ServerManager::setWriteFd(int sd) {
