@@ -34,6 +34,9 @@ private:
 	int acceptIncomingConnection(int listen_sd);
 	int createsServerStatus(int sd);
 	int receiveAndParseHttpRequest(int sd);
+	int setWriteFd(int sd);
+	int sendResponse(int sd);
+	int requestCleanup(int sd);
 	int disconnect(int sd);
 
 public:

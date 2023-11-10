@@ -133,6 +133,9 @@ int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 				}
 			}
 			--readyDescriptors;
+		} else if (FD_ISSET(descriptor, &write_fds_)) {
+			sendResponse(descriptor);
+			--readyDescriptors;
 		}
 	}
 	return 0;
@@ -212,18 +215,81 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 		disconnect(sd);
 		return 0;
 	}
-	http_request_parse_.handleBuffer(sd, recv_buffer);
+	server_status_[sd] = http_request_parse_.handleBuffer(sd, recv_buffer);
+	if (server_status_[sd] == server::PROCESSING_ERROR) {
+		std::cerr << "handleBuffer() failed" << std::endl;
+		disconnect(sd);
+		return -1;
+	}
+
+	if (server_status_[sd] == server::PREPARING_RESPONSE) {
+		std::cout << "  Request received" << std::endl;
+		setWriteFd(sd);
+	}
 
 	return 0;
 }
 
+int ServerManager::setWriteFd(int sd) {
+	FD_SET(sd, &master_write_fds_);
+	return 0;
+}
+
+int ServerManager::sendResponse(int sd) {
+	char send_buffer[BUFFER_SIZE];
+	std::memset(send_buffer, '\0', sizeof(send_buffer));
+	std::string buffer = "HTTP/1.1 200 OK\r\n"
+						 "Date: Wed, 09 Nov 2023 12:00:00 GMT\r\n"
+						 "Server: MyServer\r\n"
+						 "Content-Type: text/html; charset=UTF-8\r\n"
+						 "Content-Length: 97\r\n"
+						 "\r\n"
+						 "<html>\r\n"
+						 "<head>\r\n"
+						 "<title>Simple Page</title>\r\n"
+						 "</head>\r\n"
+						 "<body>\r\n"
+						 "<h1>Hello, World!</h1>\r\n"
+						 "</body>\r\n"
+						 "</html>\r\n";
+	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
+	int send_result = ::send(sd, send_buffer, sizeof(send_buffer), 0);
+	if (send_result < 0) {
+		std::cerr << "send() failed: " << strerror(errno) << std::endl;
+		disconnect(sd);
+		return -1;
+	}
+	if (send_result == 0) {
+		std::cout << "  Connection closed" << std::endl;
+		disconnect(sd);
+		return -1;
+	}
+	server_status_[sd] = COMPLETE;
+	if (server_status_[sd] == COMPLETE) {
+		requestCleanup(sd);
+		std::cout << "  Connection Cleanup" << std::endl;
+	}
+	return 0;
+}
+
+int ServerManager::requestCleanup(int sd) {
+	http_request_parse_.httpRequestCleanup(sd);
+	FD_CLR(sd, &master_write_fds_);
+	server_status_[sd] = RECEIVING_REQUEST;
+	return 0;
+}
+
 int ServerManager::disconnect(int sd) {
-	close(sd);
 	FD_CLR(sd, &master_read_fds_);
+	FD_CLR(sd, &master_write_fds_);
 	if (sd == highest_sd_) {
 		while (!FD_ISSET(highest_sd_, &master_read_fds_))
 			--highest_sd_;
 	}
+	server_status_.erase(sd);
+	http_request_parse_.httpRequestErase(sd);
+	close(sd);
+	std::cout << "  Connection closed - " << sd << std::endl;
 	return 0;
 }
 

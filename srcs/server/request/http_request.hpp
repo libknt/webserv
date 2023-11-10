@@ -106,6 +106,7 @@ public:
 	std::string getBody() const;
 	sockaddr_in getClientAddress() const;
 	sockaddr_in getServerAddress() const;
+	void cleanup();
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);

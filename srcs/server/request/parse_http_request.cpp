@@ -17,7 +17,7 @@ ParseHttpRequest& ParseHttpRequest::operator=(ParseHttpRequest& other) {
 	return (*this);
 }
 
-int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
+SERVER_STATUS ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
@@ -25,8 +25,9 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(socketfd);
 	if (it == http_request_map_.end()) {
-		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		exit(-1);
+		std::cerr << "handleBuffer: find HttpRequest failed: " << __FILE__ << " : " << __LINE__
+				  << std::endl;
+		return PROCESSING_ERROR;
 	}
 	if (it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
 		it->second.parseHttpRequest(http_line_stream_[socketfd]);
@@ -41,9 +42,9 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	}
 
 	if (http_request_status::FINISHED == it->second.getStatus()) {
-		return 1;
+		return PREPARING_RESPONSE;
 	}
-	return (0);
+	return RECEIVING_REQUEST;
 }
 
 HttpRequest& ParseHttpRequest::getHttpRequest(int sd) {
@@ -59,6 +60,20 @@ int ParseHttpRequest::addAcceptClientInfo(int socketfd,
 	}
 	HttpRequest request(client_address, server_address);
 	http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
+	return 0;
+}
+
+int ParseHttpRequest::httpRequestCleanup(int sd) {
+	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
+	if (it == http_request_map_.end()) {
+		return -1;
+	}
+	it->second.cleanup();
+	return 0;
+}
+
+int ParseHttpRequest::httpRequestErase(int sd) {
+	http_request_map_.erase(sd);
 	return 0;
 }
 
