@@ -34,7 +34,7 @@ public:
 	TcpSocket(const TcpSocket& other);
 	TcpSocket& operator=(const TcpSocket& other);
 	virtual ~TcpSocket();
-	int setupSocketForListening();
+	int prepareSocketForListening();
 	int startListening();
 	int getListenSd() const;
 };

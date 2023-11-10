@@ -132,7 +132,7 @@ int TcpSocket::bindAddressToSocket() {
 	return 0;
 }
 
-int TcpSocket::setupSocketForListening() {
+int TcpSocket::prepareSocketForListening() {
 	if (!isSocketConfigValid())
 		return -1;
 	if (createTcpSocket() < 0)

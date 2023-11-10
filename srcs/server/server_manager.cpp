@@ -45,7 +45,7 @@ int ServerManager::setupServerSockets() {
 	}
 
 	for (size_t i = 0; i < sockets_.size();) {
-		if (sockets_[i].setupSocketForListening() < 0) {
+		if (sockets_[i].prepareSocketForListening() < 0) {
 			sockets_.erase(sockets_.begin() + i);
 		} else {
 			++i;
