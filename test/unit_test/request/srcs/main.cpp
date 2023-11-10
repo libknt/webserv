@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 		is_all_read = true;
 		for (int i = 1; i < argc; i++) {
 			memset(buffer, '\0', BUFFER_SIZE);
-			int size = read(fd[i], buffer, BUFFER_SIZE);
+			int size = read(fd[i], buffer, BUFFER_SIZE - 1);
 			if (0 < size) {
 				is_all_read = false;
 				parse_http_request.handleBuffer(fd[i], buffer);
