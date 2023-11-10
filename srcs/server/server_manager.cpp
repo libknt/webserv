@@ -108,6 +108,8 @@ int ServerManager::monitorSocketEvents() {
 
 		if (select_result == 0) {
 			std::cout << "select() timed out.  End program." << std::endl;
+			timeout_.tv_sec = 10;
+			timeout_.tv_usec = 0;
 			continue;
 		}
 		if (dispatchSocketEvents(select_result) < 0) {
@@ -130,6 +132,10 @@ int ServerManager::dispatchSocketEvents(int readyDescriptors) {
 				if (receiveAndParseHttpRequest(descriptor) < 0) {
 					is_running = false;
 					return -1;
+				}
+				if (server_status_[descriptor] == server::PREPARING_RESPONSE) {
+					std::cout << "  Request received" << std::endl;
+					setWriteFd(descriptor);
 				}
 			}
 			--readyDescriptors;
@@ -220,11 +226,6 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 		std::cerr << "handleBuffer() failed" << std::endl;
 		disconnect(sd);
 		return -1;
-	}
-
-	if (server_status_[sd] == server::PREPARING_RESPONSE) {
-		std::cout << "  Request received" << std::endl;
-		setWriteFd(sd);
 	}
 
 	return 0;
