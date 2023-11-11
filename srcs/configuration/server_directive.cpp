@@ -52,21 +52,16 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			}
 		} else if (tokens.front() == "location") {
 			tokens.erase(tokens.begin());
-			if (tokens.size()) {
-				location_path = tokens.front();
-				tokens.erase(tokens.begin());
-			} else {
-				std::cerr << "Parse Error: Invalid Location" << std::endl;
+			if (parseLocationPath(tokens) == -1) {
 				return -1;
 			}
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			if (location_directive.parseLocationDirective(location_tokens) == -1) {
 				return -1;
 			}
-			locations_[location_path] = location_directive;
+			locations_[location_path_] = location_directive;
 		} else {
 			std::cerr << "Parse Error: serverDirective" << std::endl;
-			std::cout << tokens.front() << std::endl;
 			return -1;
 		}
 		args.clear();
@@ -146,6 +141,22 @@ int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& to
 		return -1;
 	}
 	default_error_page_ = tokens.front();
+	return 0;
+}
+
+int ServerDirective::parseLocationPath(std::vector<std::string>& tokens) {
+	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseLocationPath" << std::endl;
+		return -1;
+	}
+
+	std::string token = tokens.front();
+	if (token[token.size() - 1] != '/') {
+		std::cerr << "Parse Error: parseLocationPath" << std::endl;
+		return -1;
+	}
+	location_path_ = token;
+	tokens.erase(tokens.begin());
 	return 0;
 }
 

@@ -15,12 +15,13 @@ private:
 	std::string port_;
 	std::string server_name_;
 	std::string default_error_page_;
+	std::string location_path_;
 	std::map<std::string, LocationDirective> locations_;
 
 	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
 	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
-
+	int parseLocationPath(std::vector<std::string>& tokens);
 	bool isValidIPSegment(int num) const;
 	bool isValidIPv4(const std::string& ip) const;
 	bool isValidPort(const std::string& port_string);
