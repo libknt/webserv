@@ -13,6 +13,7 @@ ServerDirective::ServerDirective(const ServerDirective& other)
 	, port_(other.port_)
 	, server_name_(other.server_name_)
 	, default_error_page_(other.default_error_page_)
+	, location_path_(other.location_path_)
 	, locations_(other.locations_) {}
 
 ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
@@ -21,6 +22,7 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 		ip_address_ = other.ip_address_;
 		server_name_ = other.server_name_;
 		default_error_page_ = other.default_error_page_;
+		location_path_ = other.location_path_;
 		locations_ = other.locations_;
 	}
 	return *this;
