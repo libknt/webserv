@@ -5,7 +5,7 @@ namespace server {
 
 IoMultiplexing::IoMultiplexing(Configuration& configuration)
 	: configuration_(configuration)
-	, socket_(std::vector<server::Socket>())
+	, socket_(std::vector<server::TcpSocket>())
 	, activity_times_(std::map<int, time_t>())
 	, max_sd_(-1)
 	, max_clients_(-1)
@@ -48,11 +48,11 @@ int IoMultiplexing::initialize() {
 	std::vector<ServerDirective> servers = configuration_.getServers();
 	for (std::vector<ServerDirective>::iterator it = servers.begin(); it != servers.end(); ++it) {
 		std::cout << it->getIpAddress() << " " << it->getPort() << std::endl;
-		socket_.push_back(server::Socket(it->getIpAddress(), it->getPort()));
+		socket_.push_back(server::TcpSocket(it->getIpAddress(), it->getPort()));
 	}
 
-	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end();) {
-		if (it->initialize() < 0) {
+	for (std::vector<server::TcpSocket>::iterator it = socket_.begin(); it != socket_.end();) {
+		if (it->setupSocketForListening() < 0) {
 			it = socket_.erase(it);
 		} else {
 			++it;
@@ -192,11 +192,11 @@ int IoMultiplexing::select() {
 
 int IoMultiplexing::runServer() {
 	FD_ZERO(&master_read_fds_);
-	for (std::vector<server::Socket>::iterator it = socket_.begin(); it != socket_.end(); ++it) {
-		if (it->getListenSd() > max_sd_) {
-			max_sd_ = it->getListenSd();
+	for (size_t i = 0; i < socket_.size(); i++) {
+		if (socket_[i].getListenSd() == max_sd_) {
+			max_sd_ = socket_[i].getListenSd();
 		}
-		FD_SET(it->getListenSd(), &master_read_fds_);
+		FD_SET(socket_[i].getListenSd(), &master_read_fds_);
 	}
 	return select();
 }
