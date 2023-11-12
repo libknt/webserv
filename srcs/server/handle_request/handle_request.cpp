@@ -22,7 +22,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 				response = executeDelete(request, servers[i]);
 			} else {
 				// Errorの処理
-				response = executeError(request, servers[i]);
+				response = createErrorResponse(response, servers[i]);
 			}
 		}
 	}
@@ -50,10 +50,7 @@ HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& se
 	return (response);
 }
 
-// requestがなくなってresponseになる
-HttpResponse executeError(const HttpRequest& request, const ServerDirective& server_directive) {
-	HttpResponse response;
-	(void)request;
+HttpResponse createErrorResponse(HttpResponse& response, const ServerDirective& server_directive) {
 	(void)server_directive;
 	return (response);
 }
