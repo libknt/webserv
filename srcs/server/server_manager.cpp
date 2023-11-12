@@ -1,6 +1,6 @@
 #include "server_manager.hpp"
 
-//mergeテスト
+// mergeテスト
 
 namespace server {
 
@@ -152,7 +152,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					} else {
 						std::cout << "  create response" << std::endl;
 						// TODO: Requestの実行, Responseの作成して送る
-						response_[sd] = handle_request::handleRequest(http_request_parse_.getHttpRequest(sd), configuration_);
+						response_[sd] = handle_request::handleRequest(
+							http_request_parse_.getHttpRequest(sd), configuration_);
 						setWriteFd(sd);
 					}
 				}
