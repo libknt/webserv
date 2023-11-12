@@ -111,22 +111,22 @@ int ServerManager::monitorSocketEvents() {
 	return 0;
 }
 
-int ServerManager::dispatchSocketEvents(int readyDescriptors) {
+int ServerManager::dispatchSocketEvents(int ready_sds) {
 
-	for (int descriptor = 0; descriptor <= highest_sd_ && readyDescriptors > 0; ++descriptor) {
-		if (FD_ISSET(descriptor, &read_fds__)) {
-			if (isListeningSocket(descriptor)) {
-				if (acceptIncomingConnection(descriptor) < 0) {
+	for (int sd = 0; sd <= highest_sd_ && ready_sds > 0; ++sd) {
+		if (FD_ISSET(sd, &read_fds__)) {
+			if (isListeningSocket(sd)) {
+				if (acceptIncomingConnection(sd) < 0) {
 					is_running = false;
 					return -1;
 				}
 			} else {
-				if (receiveAndParseHttpRequest(descriptor) < 0) {
+				if (receiveAndParseHttpRequest(sd) < 0) {
 					is_running = false;
 					return -1;
 				}
 			}
-			--readyDescriptors;
+			--ready_sds;
 		}
 	}
 	return 0;

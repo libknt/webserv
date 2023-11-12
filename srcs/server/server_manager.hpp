@@ -26,7 +26,7 @@ private:
 	int setupServerSockets();
 	int setupSelectReadFds();
 	int monitorSocketEvents();
-	int dispatchSocketEvents(int ready_descriptors);
+	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
 	int receiveAndParseHttpRequest(int sd);
