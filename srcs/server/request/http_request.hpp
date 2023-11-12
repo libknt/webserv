@@ -45,13 +45,6 @@ enum HTTP_VERSION {
 };
 }
 
-namespace http_error_status {
-enum HTTP_ERROR_STATUS {
-	BAD_REQUEST = 400,
-	UNDEFINED,
-};
-}
-
 namespace http_body_message_type {
 enum HTTP_BODY_MESSAGE_TYPE {
 	CONTENT_LENGTH,
@@ -64,7 +57,6 @@ enum HTTP_BODY_MESSAGE_TYPE {
 class HttpRequest {
 private:
 	http_request_status::HTTP_REQUEST_STATUS status_;
-	http_error_status::HTTP_ERROR_STATUS error_status_;
 	http_method::HTTP_METHOD method_;
 	std::string request_path_;
 	http_version::HTTP_VERSION version_;
@@ -97,7 +89,6 @@ public:
 	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
-	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	http_request_status::HTTP_REQUEST_STATUS getStatus(void) const;
 	std::string getMethod() const;
 	std::string getVersion() const;

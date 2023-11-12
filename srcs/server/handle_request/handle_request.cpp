@@ -12,17 +12,16 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 		if (servers[i].getPort() == request.getServerPort())
 		{
 			if (method == "GET") {
-				// GETの処理
 				response = executeGet(request, servers[i]);
 			} else if (method == "POST") {
-				// POSTの処理
 				response = executePost(request, servers[i]);
 			} else if (method == "DELETE") {
-				// DELETEの処理
 				response = executeDelete(request, servers[i]);
 			} else {
-				// Errorの処理
-				response = executeError(request, servers[i]);
+				if (request.getStatus() == http_request_status::ERROR) {
+					response.setStatusCode(BAD_REQUEST);
+				}
+				response = createErrorResponse(response, servers[i]);
 			}
 		}
 	}
@@ -66,9 +65,7 @@ HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& se
 	return response;
 }
 
-HttpResponse executeError(const HttpRequest& request, const ServerDirective& server_directive) {
-	HttpResponse response;
-	(void)request;
+HttpResponse createErrorResponse(HttpResponse& response, const ServerDirective& server_directive) {
 	(void)server_directive;
 	return (response);
 }

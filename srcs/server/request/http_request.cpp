@@ -6,7 +6,6 @@ namespace server {
 
 HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	: status_(http_request_status::METHOD)
-	, error_status_(http_error_status::UNDEFINED)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
 	, body_message_type_(http_body_message_type::UNDEFINED)
@@ -21,7 +20,6 @@ HttpRequest::~HttpRequest(){};
 
 HttpRequest::HttpRequest(HttpRequest const& other)
 	: status_(other.status_)
-	, error_status_(other.error_status_)
 	, method_(other.method_)
 	, request_path_(other.request_path_)
 	, version_(other.version_)
@@ -38,7 +36,6 @@ HttpRequest::HttpRequest(HttpRequest const& other)
 HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 	if (this != &other) {
 		status_ = other.status_;
-		error_status_ = other.error_status_;
 		method_ = other.method_;
 		request_path_ = other.request_path_;
 		version_ = other.version_;
@@ -77,10 +74,6 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 
 void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
 	status_ = status;
-}
-
-void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
-	error_status_ = error_status;
 }
 
 http_request_status::HTTP_REQUEST_STATUS HttpRequest::getStatus(void) const {
@@ -182,14 +175,12 @@ int HttpRequest::parseMethod(std::string const& line) {
 	if (parseSentense(line, "%s %s %s", method_vector) == -1 || method_vector.size() != 3) {
 		std::cerr << "Http Method Parse Error" << std::endl;
 		setStatus(http_request_status::ERROR);
-		setErrorStatus(http_error_status::BAD_REQUEST);
 		return (-1);
 	}
 	if (setMethod(method_vector[0]) < 0 || setRequestPath(method_vector[1]) < 0 ||
 		setVersion(method_vector[2]) < 0) {
 		std::cerr << "Http Method Parse Error" << std::endl;
 		setStatus(http_request_status::ERROR);
-		setErrorStatus(http_error_status::BAD_REQUEST);
 		return (-1);
 	}
 	setStatus(http_request_status::HEADER);
@@ -201,7 +192,6 @@ int HttpRequest::parseHeader(std::string const& line) {
 	if (line == "\0") {
 		if (checkHeaderValue() < 0) {
 			setStatus(http_request_status::ERROR);
-			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
 		}
 		if (method_ == http_method::GET || method_ == http_method::DELETE)
@@ -213,12 +203,10 @@ int HttpRequest::parseHeader(std::string const& line) {
 	// TODO Later: http request compromise 0 space between : and value!
 	else if (parseSentense(line, "%s: %s", header_vector) < 0 || header_vector.size() != 2) {
 		setStatus(http_request_status::ERROR);
-		setErrorStatus(http_error_status::BAD_REQUEST);
 		return (-1);
 	}
 	if (setHeaderValue(header_vector[0], header_vector[1]) < 0) {
 		setStatus(http_request_status::ERROR);
-		setErrorStatus(http_error_status::BAD_REQUEST);
 		return (-1);
 	}
 	return (0);
@@ -242,7 +230,6 @@ int HttpRequest::checkHeaderValue() {
 			break;
 		default:
 			setStatus(http_request_status::ERROR);
-			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
 	}
 	return (0);
@@ -256,7 +243,6 @@ int HttpRequest::parseBody(std::string const& line) {
 			return (parseContentLengthBody(line));
 		default:
 			setStatus(http_request_status::ERROR);
-			setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
 	}
 }
@@ -352,7 +338,6 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 
 void HttpRequest::cleanup() {
 	status_ = http_request_status::METHOD;
-	error_status_ = http_error_status::UNDEFINED;
 	method_ = http_method::UNDEFINED;
 	version_ = http_version::UNDEFINED;
 	body_message_type_ = http_body_message_type::UNDEFINED;
