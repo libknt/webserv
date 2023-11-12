@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-NAME		=	server.out
+NAME		=	server
 
 CXX			=	c++
 
