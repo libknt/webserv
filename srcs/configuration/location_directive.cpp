@@ -261,7 +261,7 @@ std::string LocationDirective::getCgi() const {
 	return cgi_;
 }
 
-std::vector<std::string> LocationDirective::getCgiExtensions() const {
+const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
 }
 
