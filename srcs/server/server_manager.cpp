@@ -37,6 +37,15 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 	return *this;
 }
 
+int ServerManager::runServer() {
+	if (setupServerSockets() < 0) {
+		std::cerr << "setupServerSocket() failed" << std::endl;
+		return -1;
+	}
+	setupSelectReadFds();
+	return monitorSocketEvents();
+}
+
 int ServerManager::setupServerSockets() {
 	std::vector<ServerDirective> server_configurations = configuration_.getServerConfigurations();
 	for (size_t i = 0; i < server_configurations.size(); ++i) {
@@ -199,15 +208,6 @@ int ServerManager::disconnect(int sd) {
 			--highest_sd_;
 	}
 	return 0;
-}
-
-int ServerManager::runServer() {
-	if (setupServerSockets() < 0) {
-		std::cerr << "setupServerSocket() failed" << std::endl;
-		return -1;
-	}
-	setupSelectReadFds();
-	return monitorSocketEvents();
 }
 
 }
