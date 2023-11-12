@@ -53,7 +53,7 @@ HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& se
 		return executeError(request, server_directive);
 	}
 
-	if (!(file_status.st_mode & S_IRUSR) && !(file_status.st_mode & S_IWUSR)) {
+	if (!(file_status.st_mode & S_IROTH) || !(file_status.st_mode & S_IWOTH)) {
 		std::cerr << "DELETE Error: Permission denied" << std::endl;
 		return executeError(request, server_directive);
 	}
@@ -62,6 +62,7 @@ HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& se
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
 		return executeError(request, server_directive);
 	}
+
 	return response;
 }
 
