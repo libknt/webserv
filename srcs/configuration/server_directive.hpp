@@ -36,7 +36,7 @@ public:
 	std::string getIpAddress() const;
 	std::string getServerName() const;
 	std::string getDefaultErrorPage() const;
-	std::map<std::string, LocationDirective> getLocations() const;
+	const std::map<std::string, LocationDirective>& getLocations() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);
