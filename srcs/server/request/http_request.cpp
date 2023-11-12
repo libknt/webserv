@@ -75,6 +75,14 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 	return (0);
 }
 
+void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
+	status_ = status;
+}
+
+void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
+	error_status_ = error_status;
+}
+
 http_request_status::HTTP_REQUEST_STATUS HttpRequest::getStatus(void) const {
 	return (status_);
 }
@@ -159,14 +167,6 @@ std::string HttpRequest::getServerPort() const {
 	std::stringstream ss;
 	ss << server_port;
 	return ss.str();
-}
-
-void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
-	status_ = status;
-}
-
-void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
-	error_status_ = error_status;
 }
 
 void HttpRequest::setIsCgi(bool is_cgi) {
