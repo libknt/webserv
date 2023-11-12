@@ -16,6 +16,10 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 	return *this;
 }
 
+void HttpResponse::setStatusCode(const STATUS_CODE& status_code) {
+	status_code_ = status_code;
+}
+
 const std::string& HttpResponse::getResponse() const {
 	return response_;
 }
