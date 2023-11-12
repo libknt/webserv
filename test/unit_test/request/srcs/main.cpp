@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 	}
 	for (int i = 1; i < argc; i++) {
 		if (0 < fd[i]) {
-			server::HttpRequest request(parse_http_request.getRequest(fd[i]));
+			server::HttpRequest const request(parse_http_request.getRequest(fd[i]));
 			if ((std::string(argv[i]).find("success") != std::string::npos &&
 					request.getStatus() == server::http_request_status::FINISHED) ||
 				(std::string(argv[i]).find("failure") != std::string::npos &&
