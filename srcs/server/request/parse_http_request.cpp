@@ -23,7 +23,7 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	std::string::size_type index;
 	http_line_stream_[socketfd] += buffer;
 
-	std::map<int, HttpRequest>::iterator  it = http_request_map_.find(socketfd);
+	std::map<int, HttpRequest>::iterator it = http_request_map_.find(socketfd);
 	if (it == http_request_map_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
 		exit(-1);
@@ -53,8 +53,8 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	return (0);
 }
 
-HttpRequest const &ParseHttpRequest::getRequest(int sd) const {
-	std::map<int, server::HttpRequest>::const_iterator  it = http_request_map_.find(sd);
+HttpRequest const& ParseHttpRequest::getRequest(int sd) const {
+	std::map<int, server::HttpRequest>::const_iterator it = http_request_map_.find(sd);
 	return it->second;
 }
 

@@ -96,16 +96,16 @@ public:
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
-	http_request_status::HTTP_REQUEST_STATUS const &getStatus(void) const;
+	http_request_status::HTTP_REQUEST_STATUS const& getStatus(void) const;
 	std::string const getMethod() const;
 	std::string const getVersion() const;
-	std::string const &getRequestPath() const;
+	std::string const& getRequestPath() const;
 	std::string const getHeaderValue(std::string const& key);
-	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const &getBodyMessageType(void);
-	std::map<std::string, std::string> const &getHeader() const;
-	std::string const &getBody() const;
-	sockaddr_in const &getClientAddress() const;
-	sockaddr_in const &getServerAddress() const;
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType(void);
+	std::map<std::string, std::string> const& getHeader() const;
+	std::string const& getBody() const;
+	sockaddr_in const& getClientAddress() const;
+	sockaddr_in const& getServerAddress() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);

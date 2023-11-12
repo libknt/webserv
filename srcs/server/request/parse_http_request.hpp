@@ -26,7 +26,7 @@ public:
 	virtual ~ParseHttpRequest();
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	int handleBuffer(int socketfd, char* buf);
-	HttpRequest const &getRequest(int sd) const;
+	HttpRequest const& getRequest(int sd) const;
 	void addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
 	void printAcceptedFds();
 };

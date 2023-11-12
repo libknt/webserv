@@ -72,7 +72,7 @@ int HttpRequest::parseHttpRequest(std::string const& line) {
 	return (0);
 }
 
-http_request_status::HTTP_REQUEST_STATUS const &HttpRequest::getStatus(void) const {
+http_request_status::HTTP_REQUEST_STATUS const& HttpRequest::getStatus(void) const {
 	return (status_);
 }
 
@@ -112,7 +112,7 @@ std::string const HttpRequest::getVersion() const {
 	return protocol;
 }
 
-std::string const &HttpRequest::getRequestPath() const {
+std::string const& HttpRequest::getRequestPath() const {
 	return request_path_;
 }
 
@@ -123,23 +123,23 @@ std::string const HttpRequest::getHeaderValue(std::string const& key) {
 		return (header_[key]);
 }
 
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE const &HttpRequest::getBodyMessageType(void) {
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType(void) {
 	return (body_message_type_);
 }
 
-std::map<std::string, std::string> const &HttpRequest::getHeader() const {
+std::map<std::string, std::string> const& HttpRequest::getHeader() const {
 	return header_;
 }
 
-std::string const &HttpRequest::getBody() const {
+std::string const& HttpRequest::getBody() const {
 	return body_;
 }
 
-sockaddr_in const &HttpRequest::getClientAddress() const {
+sockaddr_in const& HttpRequest::getClientAddress() const {
 	return client_address_;
 }
 
-sockaddr_in const &HttpRequest::getServerAddress() const {
+sockaddr_in const& HttpRequest::getServerAddress() const {
 	return server_address_;
 }
 
