@@ -152,6 +152,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						// TODO cgi実行
 					} else {
 						std::cout << "  create response" << std::endl;
+						// TODO: Requestの実行, Responseの作成して送る
+						response_[sd] = handle_request::handleRequest(http_request_parse_.getRequest(sd))
 						setWriteFd(sd);
 					}
 				}
