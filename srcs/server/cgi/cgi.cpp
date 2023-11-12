@@ -27,6 +27,9 @@ int Cgi::setup() {
 		std::cerr << "Cgi::setup(): meta_variables_.setup() failed" << std::endl;
 		return -1;
 	}
+	std::cout << "++++++++++++++++++++++++++++++++" << std::endl;
+	std::cout << meta_variables_ << std::endl;
+	std::cout << "++++++++++++++++++++++++++++++++" << std::endl;
 	return 0;
 }
 

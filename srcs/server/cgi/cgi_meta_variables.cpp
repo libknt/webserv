@@ -37,4 +37,21 @@ void CgiMetaVariables::setMetaVariables(std::string key, std::string value) {
 	meta_variables_.insert(std::make_pair(key, value));
 }
 
+const std::map<std::string, std::string>& CgiMetaVariables::getMetaVariables() const {
+	return meta_variables_;
+}
+
+std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
+	const std::map<std::string, std::string>& meta_variables =
+		cgi_meta_variables.getMetaVariables();
+
+	out << "CgiMetaVariables: " << std::endl;
+	for (std::map<std::string, std::string>::const_iterator it = meta_variables.begin();
+		 it != meta_variables.end();
+		 ++it) {
+		out << it->first << ": " << it->second << std::endl;
+	}
+	return out;
+}
+
 } // namespace server

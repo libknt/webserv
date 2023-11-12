@@ -26,7 +26,10 @@ public:
 	~CgiMetaVariables();
 
 	int setup();
+	const std::map<std::string, std::string>& getMetaVariables() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables);
 
 } // namespace server
 
