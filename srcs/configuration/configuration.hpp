@@ -24,7 +24,7 @@ public:
 	Configuration& operator=(const Configuration& other);
 
 	int init(const std::string& path);
-	const std::vector<ServerDirective>& getServerConfigurations() const;
+	const std::vector<ServerDirective>& getServers() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const Configuration& configuration);
