@@ -44,7 +44,7 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 }
 
 int ServerManager::setupServerSockets() {
-	std::vector<ServerDirective> server_configurations = configuration_.getServerConfigurations();
+	std::vector<ServerDirective> server_configurations = configuration_.getServers();
 	for (size_t i = 0; i < server_configurations.size(); ++i) {
 		sockets_.push_back(server::TcpSocket(
 			server_configurations[i].getIpAddress(), server_configurations[i].getPort()));
