@@ -16,7 +16,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 	return *this;
 }
 
-std::string& HttpResponse::getResponse() const {
+const std::string& HttpResponse::getResponse() const {
 	return response_;
 }
 

@@ -1,7 +1,7 @@
 #ifndef HTTP_RESPONSE_HPP
 #define HTTP_RESPONSE_HPP
 
-#include "struct.hpp"
+#include "types.hpp"
 #include <cstring>
 #include <iostream>
 
@@ -16,7 +16,7 @@ public:
 	~HttpResponse();
 	HttpResponse(const HttpResponse& other);
 	HttpResponse& operator=(const HttpResponse& other);
-	std::string& getResponse() const;
+	const std::string& getResponse() const;
 };
 
 } // namespace server

@@ -5,12 +5,18 @@
 # include <string>
 # include "http_request.hpp"
 # include "http_response.hpp"
+# include "configuration.hpp"
 
-namespace handle_request {
-	HttpResponse& handleRequest(const HttpRequest& request, const Configuration& configuration);
-	HttpResponse& executeGet(const HttpRequest& request, const Configuration& configuration);
-	HttpResponse& executePost(const HttpRequest& request, const Configuration& configuration);
-	HttpResponse& executeDelete(const HttpRequest& request, const Configuration& configuration);
-};
+namespace server {
+
+	namespace handle_request {
+		HttpResponse handleRequest(const HttpRequest& request, const Configuration& configuration);
+		HttpResponse executeGet(const HttpRequest& request, const Configuration& configuration);
+		HttpResponse executePost(const HttpRequest& request, const Configuration& configuration);
+		HttpResponse executeDelete(const HttpRequest& request, const Configuration& configuration);
+		HttpResponse executeError(const HttpRequest& request, const Configuration& configuration);
+	};
+
+}
 
 #endif 

@@ -3,6 +3,7 @@
 
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
+#include "handle_request.hpp"
 #include "tcp_socket.hpp"
 #include "types.hpp"
 #include <map>
@@ -24,6 +25,7 @@ private:
 	struct timeval timeout_;
 	ParseHttpRequest http_request_parse_;
 	std::map<int, SERVER_STATUS> server_status_;
+	std::map<int, HttpResponse> response_;
 
 	ServerManager();
 	int setupServerSockets();
