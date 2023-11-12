@@ -77,8 +77,6 @@ private:
 	sockaddr_in client_address_;
 	sockaddr_in server_address_;
 	bool is_cgi_;
-	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
-	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	int parseMethod(std::string const& line);
 	int parseHeader(std::string const& line);
 	int checkHeaderValue();
@@ -98,6 +96,8 @@ public:
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
 	int parseHttpRequest(std::string const& line);
+	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
+	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	http_request_status::HTTP_REQUEST_STATUS getStatus(void) const;
 	std::string getMethod() const;
 	std::string getVersion() const;
