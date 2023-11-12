@@ -44,8 +44,10 @@ int main(int argc, char* argv[]) {
 					request.getStatus() == server::http_request_status::ERROR))
 
 				std::cerr << "TEST" << argv[i] << ": OK" << std::endl;
-			else
+			else {
 				std::cerr << "TEST" << argv[i] << ": NG" << request.getStatus() << std::endl;
+				exit(1);
+			}
 			close(fd[i]);
 		}
 	}
