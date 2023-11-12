@@ -45,9 +45,24 @@ HttpResponse executePost(const HttpRequest& request, const ServerDirective& serv
 
 HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& server_directive) {
 	HttpResponse response;
-	(void)request;
-	(void)server_directive;
-	return (response);
+	const char* request_path = request.getRequestPath().c_str();
+	struct stat file_status;
+
+	if (stat(request_path, &file_status) == -1) {
+		std::cerr << "DELETE Error: stat() failed" << std::endl;
+		return executeError(request, server_directive);
+	}
+
+	if (!(file_status.st_mode & S_IRUSR) && !(file_status.st_mode & S_IWUSR)) {
+		std::cerr << "DELETE Error: Permission denied" << std::endl;
+		return executeError(request, server_directive);
+	}
+
+	if (remove(request.getRequestPath().c_str()) != 0) {
+		std::cerr << "DELETE Error: remove() falied" << std::endl;
+		return executeError(request, server_directive);
+	}
+	return response;
 }
 
 HttpResponse executeError(const HttpRequest& request, const ServerDirective& server_directive) {
