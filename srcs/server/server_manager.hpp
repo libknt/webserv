@@ -1,6 +1,7 @@
 #ifndef SERVER_MANAGER_HPP
 #define SERVER_MANAGER_HPP
 
+#include "cgi.hpp"
 #include "configuration.hpp"
 #include "parse_http_request.hpp"
 #include "tcp_socket.hpp"
@@ -24,6 +25,7 @@ private:
 	struct timeval timeout_;
 	ParseHttpRequest http_request_parse_;
 	std::map<int, SERVER_STATUS> server_status_;
+	std::map<int, Cgi> cgi_;
 
 	ServerManager();
 	int setupServerSockets();
@@ -45,6 +47,7 @@ private:
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
 	int disconnect(int sd);
+	int createCgi(int sd);
 
 public:
 	ServerManager(const Configuration& configuration);

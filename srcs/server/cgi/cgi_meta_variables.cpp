@@ -2,13 +2,10 @@
 
 namespace server {
 
-cgiMetaVariables::cgiMetaVariables() {}
-
 cgiMetaVariables::~cgiMetaVariables() {}
 
-cgiMetaVariables::cgiMetaVariables(const cgiMetaVariables& other) {
-	(void)other;
-}
+cgiMetaVariables::cgiMetaVariables(const cgiMetaVariables& other)
+	: meta_variables_(other.meta_variables_) {}
 
 cgiMetaVariables& cgiMetaVariables::operator=(const cgiMetaVariables& other) {
 	if (this != &other) {

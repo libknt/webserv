@@ -1,7 +1,7 @@
 #include "server_manager.hpp"
 #include "parse_http_request.hpp"
 
-//mergeテスト
+// mergeテスト
 
 namespace server {
 
@@ -268,6 +268,7 @@ int ServerManager::determineIfCgiRequest(int sd) {
 	}
 	if (server_configuration.isCgiLocation(location, script_file_name)) {
 		request.setIsCgi(true);
+		createCgi(sd);
 	}
 	return 0;
 }
@@ -378,4 +379,13 @@ int ServerManager::disconnect(int sd) {
 	return 0;
 }
 
+int ServerManager::createCgi(int sd) {
+	std::map<int, Cgi>::iterator it = cgi_.find(sd);
+	if (it != cgi_.end()) {
+		cgi_.erase(sd);
+	}
+	cgi_.insert(std::make_pair(sd, Cgi(http_request_parse_.getHttpRequest(sd))));
+	return 0;
 }
+
+} // namespace server
