@@ -149,6 +149,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					determineIfCgiRequest(sd);
 					if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
 						std::cout << "  execute cgi" << std::endl;
+						Cgi& cgi = getCgi(sd);
+						cgi.setup();
 						// TODO cgi実行
 					} else {
 						std::cout << "  create response" << std::endl;
@@ -388,4 +390,8 @@ int ServerManager::createCgi(int sd) {
 	return 0;
 }
 
+Cgi& ServerManager::getCgi(int sd) {
+	std::map<int, server::Cgi>::iterator it = cgi_.find(sd);
+	return it->second;
+}
 } // namespace server

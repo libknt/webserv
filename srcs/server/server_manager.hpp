@@ -55,6 +55,7 @@ public:
 	explicit ServerManager(const ServerManager& other);
 	ServerManager& operator=(const ServerManager& other);
 	int runServer();
+	Cgi& getCgi(int sd);
 };
 
 } // namespace server
