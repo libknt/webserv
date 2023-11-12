@@ -119,36 +119,36 @@ int ServerManager::monitorSocketEvents() {
 	return 0;
 }
 
-int ServerManager::dispatchSocketEvents(int readyDescriptors) {
+int ServerManager::dispatchSocketEvents(int ready_sds) {
 
-	for (int descriptor = 0; descriptor <= highest_sd_ && readyDescriptors > 0; ++descriptor) {
-		if (FD_ISSET(descriptor, &read_fds_)) {
-			if (isListeningSocket(descriptor)) {
-				if (acceptIncomingConnection(descriptor) < 0) {
+	for (int sd = 0; sd <= highest_sd_ && ready_sds > 0; ++sd) {
+		if (FD_ISSET(sd, &read_fds_)) {
+			if (isListeningSocket(sd)) {
+				if (acceptIncomingConnection(sd) < 0) {
 					is_running = false;
 					return -1;
 				}
 			} else {
-				if (receiveAndParseHttpRequest(descriptor) < 0) {
+				if (receiveAndParseHttpRequest(sd) < 0) {
 					is_running = false;
 					return -1;
 				}
-				if (server_status_[descriptor] == server::PREPARING_RESPONSE) {
+				if (server_status_[sd] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
-					determineIfCgiRequest(descriptor);
-					if (http_request_parse_.getHttpRequest(descriptor).getIsCgi()) {
+					determineIfCgiRequest(sd);
+					if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
 						std::cout << "  execute cgi" << std::endl;
 						// TODO cgi実行
 					} else {
 						std::cout << "  create response" << std::endl;
-						setWriteFd(descriptor);
+						setWriteFd(sd);
 					}
 				}
 			}
-			--readyDescriptors;
-		} else if (FD_ISSET(descriptor, &write_fds_)) {
-			sendResponse(descriptor);
-			--readyDescriptors;
+			--ready_sds;
+		} else if (FD_ISSET(sd, &write_fds_)) {
+			sendResponse(sd);
+			--ready_sds;
 		}
 	}
 	return 0;
