@@ -165,7 +165,7 @@ std::string ServerDirective::getDefaultErrorPage() const {
 	return default_error_page_;
 }
 
-std::map<std::string, LocationDirective> ServerDirective::getLocations() const {
+const std::map<std::string, LocationDirective>& ServerDirective::getLocations() const {
 	return locations_;
 }
 

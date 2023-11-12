@@ -36,7 +36,7 @@ public:
 	std::string getIpAddress() const;
 	std::string getServerName() const;
 	std::string getDefaultErrorPage() const;
-	std::map<std::string, LocationDirective> getLocations() const;
+	const std::map<std::string, LocationDirective>& getLocations() const;
 	bool isCgiLocation(const std::string& location, const std::string& script_file_name) const;
 };
 
