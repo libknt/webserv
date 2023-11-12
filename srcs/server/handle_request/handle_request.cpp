@@ -50,6 +50,7 @@ HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& se
 	return (response);
 }
 
+// requestがなくなってresponseになる
 HttpResponse executeError(const HttpRequest& request, const ServerDirective& server_directive) {
 	HttpResponse response;
 	(void)request;
