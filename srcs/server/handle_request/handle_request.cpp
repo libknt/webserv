@@ -13,20 +13,20 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 		{
 			if (method == "GET") {
 				// GETの処理
-				return executeGet(request, servers[i]);
+				response = executeGet(request, servers[i]);
 			} else if (method == "POST") {
 				// POSTの処理
-				return executePost(request, servers[i]);
+				response = executePost(request, servers[i]);
 			} else if (method == "DELETE") {
 				// DELETEの処理
-				return executeDelete(request, servers[i]);
+				response = executeDelete(request, servers[i]);
 			} else {
 				// Errorの処理
-				return executeError(request, configuration);
+				response = executeError(request, servers[i]);
 			}
 		}
 	}
-	return executeError(request, configuration);
+	return response;
 }
 
 HttpResponse executeGet(const HttpRequest& request, const ServerDirective& server_directive) {
@@ -50,10 +50,10 @@ HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& se
 	return (response);
 }
 
-HttpResponse executeError(const HttpRequest& request, const Configuration& configuration) {
+HttpResponse executeError(const HttpRequest& request, const ServerDirective& server_directive) {
 	HttpResponse response;
 	(void)request;
-	(void)configuration;
+	(void)server_directive;
 	return (response);
 }
 };

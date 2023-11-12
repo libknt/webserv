@@ -14,7 +14,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 HttpResponse executeGet(const HttpRequest& request, const ServerDirective& server_directive);
 HttpResponse executePost(const HttpRequest& request, const ServerDirective& server_directive);
 HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& server_directive);
-HttpResponse executeError(const HttpRequest& request, const Configuration& configuration);
+HttpResponse executeError(const HttpRequest& request, const ServerDirective& server_directive);
 };
 
 }
