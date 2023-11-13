@@ -23,6 +23,7 @@ int CgiMetaVariables::setup() {
 	authType();
 	contentLength();
 	contentType();
+	gatewayInterface();
 	return 0;
 }
 
@@ -50,6 +51,11 @@ int CgiMetaVariables::contentLength() {
 
 int CgiMetaVariables::contentType() {
 	setMetaVariables("CONTENT_TYPE", request_.getHeaderValue("Content-Type"));
+	return 0;
+}
+
+int CgiMetaVariables::gatewayInterface() {
+	setMetaVariables("GATEWAY_INTERFACE", "CGI/1.1");
 	return 0;
 }
 

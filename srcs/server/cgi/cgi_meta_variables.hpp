@@ -20,6 +20,7 @@ private:
 	int authType();
 	int contentLength();
 	int contentType();
+	int gatewayInterface();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
