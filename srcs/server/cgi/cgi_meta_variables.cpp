@@ -24,6 +24,7 @@ int CgiMetaVariables::setup() {
 	contentLength();
 	contentType();
 	gatewayInterface();
+	remoteAddr();
 	return 0;
 }
 
@@ -56,6 +57,16 @@ int CgiMetaVariables::contentType() {
 
 int CgiMetaVariables::gatewayInterface() {
 	setMetaVariables("GATEWAY_INTERFACE", "CGI/1.1");
+	return 0;
+}
+
+int CgiMetaVariables::remoteAddr() {
+	sockaddr_in client_addr = request_.getClientAddress();
+	uint32_t addr = ntohl(client_addr.sin_addr.s_addr);
+	std::ostringstream ip_stream;
+	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
+			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
+	meta_variables_.insert(std::make_pair("REMOTE_ADDR", ip_stream.str()));
 	return 0;
 }
 
