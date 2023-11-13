@@ -30,6 +30,7 @@ int CgiMetaVariables::setup() {
 	remoteUser();
 	requestMethod();
 	serverName();
+	serverPort();
 
 	return 0;
 }
@@ -164,6 +165,16 @@ int CgiMetaVariables::serverName() {
 			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
 
 	meta_variables_.insert(std::make_pair("SERVER_NAME", ip_stream.str()));
+	return 0;
+}
+
+int CgiMetaVariables::serverPort() {
+	sockaddr_in server_addr = request_.getServerAddress();
+	int port = ntohs(server_addr.sin_port);
+	std::stringstream ss;
+	ss << port;
+	std::string port_str = ss.str();
+	meta_variables_.insert(std::make_pair("SERVER_PORT", port_str));
 	return 0;
 }
 

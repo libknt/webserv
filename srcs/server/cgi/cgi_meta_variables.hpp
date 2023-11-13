@@ -29,6 +29,7 @@ private:
 	int remoteUser();
 	int requestMethod();
 	int serverName();
+	int serverPort();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
