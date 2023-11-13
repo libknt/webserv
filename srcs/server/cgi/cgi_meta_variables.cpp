@@ -29,6 +29,8 @@ int CgiMetaVariables::setup() {
 	remoteIdet();
 	remoteUser();
 	requestMethod();
+	serverName();
+
 	return 0;
 }
 
@@ -149,6 +151,19 @@ int CgiMetaVariables::remoteUser() {
 int CgiMetaVariables::requestMethod() {
 	std::string method = request_.getMethod();
 	meta_variables_.insert(std::make_pair("REQUEST_METHOD", method));
+	return 0;
+}
+
+int CgiMetaVariables::serverName() {
+	sockaddr_in server_addr = request_.getServerAddress();
+
+	uint32_t addr = ntohl(server_addr.sin_addr.s_addr);
+
+	std::ostringstream ip_stream;
+	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
+			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
+
+	meta_variables_.insert(std::make_pair("SERVER_NAME", ip_stream.str()));
 	return 0;
 }
 

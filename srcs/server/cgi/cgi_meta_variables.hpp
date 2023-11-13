@@ -28,6 +28,7 @@ private:
 	std::string base64Decode(std::string const& encoded_string);
 	int remoteUser();
 	int requestMethod();
+	int serverName();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
