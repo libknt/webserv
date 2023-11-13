@@ -19,6 +19,7 @@ private:
 
 	int authType();
 	int contentLength();
+	int contentType();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
