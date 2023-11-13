@@ -31,6 +31,7 @@ int CgiMetaVariables::setup() {
 	requestMethod();
 	serverName();
 	serverPort();
+	serverProtocol();
 
 	return 0;
 }
@@ -175,6 +176,12 @@ int CgiMetaVariables::serverPort() {
 	ss << port;
 	std::string port_str = ss.str();
 	meta_variables_.insert(std::make_pair("SERVER_PORT", port_str));
+	return 0;
+}
+
+int CgiMetaVariables::serverProtocol() {
+	std::string protocol = request_.getVersion();
+	meta_variables_.insert(std::make_pair("SERVER_PROTOCOL", protocol));
 	return 0;
 }
 
