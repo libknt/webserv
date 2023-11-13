@@ -21,6 +21,7 @@ CgiMetaVariables& CgiMetaVariables::operator=(const CgiMetaVariables& other) {
 
 int CgiMetaVariables::setup() {
 	authType();
+	contentLength();
 	return 0;
 }
 
@@ -38,6 +39,11 @@ int CgiMetaVariables::authType() {
 		auth_type = auth_type.substr(0, auth_type.find(' '));
 	}
 	setMetaVariables("AUTH_TYPE", auth_type);
+	return 0;
+}
+
+int CgiMetaVariables::contentLength() {
+	setMetaVariables("CONTENT_LENGTH", request_.getHeaderValue("Content-Length"));
 	return 0;
 }
 

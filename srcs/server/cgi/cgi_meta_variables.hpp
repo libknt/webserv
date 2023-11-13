@@ -18,6 +18,7 @@ private:
 	std::map<std::string, std::string> meta_variables_;
 
 	int authType();
+	int contentLength();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
