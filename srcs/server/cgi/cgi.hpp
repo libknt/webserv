@@ -16,6 +16,7 @@ private:
 	const HttpRequest& request_;
 	CgiMetaVariables meta_variables_;
 	int socket_vector_[2];
+	bool has_body;
 
 public:
 	Cgi(const HttpRequest& request);
@@ -24,6 +25,7 @@ public:
 	~Cgi();
 	int setup();
 	bool hasBody() const;
+	bool getHasbody() const;
 };
 
 } // namespace cgi

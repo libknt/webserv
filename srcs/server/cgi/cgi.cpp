@@ -6,7 +6,8 @@ Cgi::~Cgi() {}
 
 Cgi::Cgi(const Cgi& other)
 	: request_(other.request_)
-	, meta_variables_(other.meta_variables_) {
+	, meta_variables_(other.meta_variables_)
+	, has_body(false) {
 
 	socket_vector_[0] = other.socket_vector_[0];
 	socket_vector_[1] = other.socket_vector_[1];
@@ -17,13 +18,15 @@ Cgi& Cgi::operator=(const Cgi& other) {
 		meta_variables_ = other.meta_variables_;
 		socket_vector_[0] = other.socket_vector_[0];
 		socket_vector_[1] = other.socket_vector_[1];
+		has_body = other.has_body;
 	}
 	return *this;
 }
 
 Cgi::Cgi(const HttpRequest& request)
 	: request_(request)
-	, meta_variables_(request) {
+	, meta_variables_(request)
+	, has_body(false) {
 	socket_vector_[0] = (-1);
 	socket_vector_[1] = (-1);
 }
@@ -34,9 +37,7 @@ int Cgi::setupInterProcessCommunication() {
 		return -1;
 	}
 	if (hasBody()) {
-		std::cout << "yesBody" << std::endl;
-	} else {
-		std::cout << "noBody" << std::endl;
+		has_body = true;
 	}
 	return 0;
 }
@@ -61,6 +62,10 @@ int Cgi::setup() {
 
 bool Cgi::hasBody() const {
 	return !request_.getBody().empty();
+}
+
+bool Cgi::getHasbody() const {
+	return has_body;
 }
 
 }
