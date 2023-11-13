@@ -31,6 +31,7 @@ private:
 	int serverName();
 	int serverPort();
 	int serverProtocol();
+	int serverSoftware();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
