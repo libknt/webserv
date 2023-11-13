@@ -102,7 +102,7 @@ public:
 	std::string getMethod() const;
 	std::string getVersion() const;
 	std::string getRequestPath() const;
-	std::string getHeaderValue(std::string const& key);
+	const std::string& getHeaderValue(std::string const& key) const;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE getBodyMessageType(void);
 	std::map<std::string, std::string> getHeader() const;
 	std::string getBody() const;

@@ -16,8 +16,8 @@ private:
 
 	const HttpRequest& request_;
 	std::map<std::string, std::string> meta_variables_;
-	typedef int (CgiMetaVariables::*MetaFuncPtr)();
-	std::vector<MetaFuncPtr> metaFuncArray;
+
+	int authType();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);

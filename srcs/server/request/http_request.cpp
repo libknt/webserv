@@ -119,11 +119,17 @@ std::string HttpRequest::getRequestPath() const {
 	return request_path_;
 }
 
-std::string HttpRequest::getHeaderValue(std::string const& key) {
+const std::string& HttpRequest::getHeaderValue(std::string const& key) const {
+	static const std::string empty_string("");
 	if (header_.empty())
-		return (std::string(""));
-	else
-		return (header_[key]);
+		return (empty_string);
+	else {
+		std::map<std::string, std::string>::const_iterator it = header_.find(key);
+		if (it == header_.end())
+			return (empty_string);
+		else
+			return (it->second);
+	}
 }
 
 http_body_message_type::HTTP_BODY_MESSAGE_TYPE HttpRequest::getBodyMessageType(void) {

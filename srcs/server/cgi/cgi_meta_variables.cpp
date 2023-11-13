@@ -4,10 +4,7 @@ namespace server {
 
 CgiMetaVariables::CgiMetaVariables(const HttpRequest& request)
 	: request_(request)
-	, meta_variables_() {
-	std::cout << "CgiMetaVariables::CgiMetaVariables(const HttpRequest& request)" << std::endl;
-	// metaFuncArray.push_back(&CgiMetaVariables::authType);
-}
+	, meta_variables_() {}
 
 CgiMetaVariables::~CgiMetaVariables() {}
 
@@ -23,13 +20,7 @@ CgiMetaVariables& CgiMetaVariables::operator=(const CgiMetaVariables& other) {
 }
 
 int CgiMetaVariables::setup() {
-	std::cout << "CgiMetaVariables::setup()" << std::endl;
-	std::string meta_variable;
-	for (std::vector<MetaFuncPtr>::iterator it = metaFuncArray.begin(); it != metaFuncArray.end();
-		 ++it) {
-		if ((this->**it)() < 0)
-			return -1;
-	}
+	authType();
 	return 0;
 }
 
@@ -39,6 +30,15 @@ void CgiMetaVariables::setMetaVariables(std::string key, std::string value) {
 
 const std::map<std::string, std::string>& CgiMetaVariables::getMetaVariables() const {
 	return meta_variables_;
+}
+
+int CgiMetaVariables::authType() {
+	std::string auth_type = request_.getHeaderValue("Authorization");
+	if (auth_type.compare("") != 0) {
+		auth_type = auth_type.substr(0, auth_type.find(' '));
+	}
+	setMetaVariables("AUTH_TYPE", auth_type);
+	return 0;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
