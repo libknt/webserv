@@ -22,6 +22,8 @@ private:
 	int contentType();
 	int gatewayInterface();
 	int remoteAddr();
+	int remoteHost();
+	int remoteIdet();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
