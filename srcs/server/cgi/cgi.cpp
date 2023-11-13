@@ -46,10 +46,16 @@ int Cgi::setup() {
 		std::cerr << "Cgi::setup(): meta_variables_.setup() failed" << std::endl;
 		return -1;
 	}
+	if (meta_variables_.createCgiEnviron() < 0) {
+		std::cerr << "Cgi::createCgiEnviron(): meta_variables_.createCgiEnviron() failed"
+				  << std::endl;
+		return -1;
+	}
 	if (setupInterProcessCommunication() < 0) {
 		std::cerr << "Cgi::setupInterProcessCommunication() failed" << std::endl;
 		return -1;
 	}
+	std::cout << meta_variables_ << std::endl;
 	return 0;
 }
 

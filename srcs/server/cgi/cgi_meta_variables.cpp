@@ -2,21 +2,66 @@
 
 namespace server {
 
+char** DeepCopyCharPointerArray(char** source);
+
 CgiMetaVariables::CgiMetaVariables(const HttpRequest& request)
 	: request_(request)
-	, meta_variables_() {}
+	, meta_variables_()
+	, cgi_environ_(NULL) {}
 
-CgiMetaVariables::~CgiMetaVariables() {}
+CgiMetaVariables::~CgiMetaVariables() {
+	if (cgi_environ_) {
+		for (size_t i = 0; cgi_environ_[i]; ++i) {
+			delete[] cgi_environ_[i];
+		}
+		delete[] cgi_environ_;
+	}
+}
 
 CgiMetaVariables::CgiMetaVariables(const CgiMetaVariables& other)
 	: request_(other.request_)
-	, meta_variables_(other.meta_variables_) {}
+	, meta_variables_(other.meta_variables_) {
+	cgi_environ_ = DeepCopyCharPointerArray(other.cgi_environ_);
+}
 
 CgiMetaVariables& CgiMetaVariables::operator=(const CgiMetaVariables& other) {
 	if (this != &other) {
 		meta_variables_ = other.meta_variables_;
+		cgi_environ_ = DeepCopyCharPointerArray(other.cgi_environ_);
 	}
 	return *this;
+}
+
+char** DeepCopyCharPointerArray(char** source) {
+	if (!source) {
+		return NULL;
+	}
+
+	size_t count = 0;
+	while (source[count]) {
+		++count;
+	}
+
+	char** destination = new (std::nothrow) char*[count + 1];
+	if (!destination) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < count; ++i) {
+		size_t length = std::strlen(source[i]) + 1;
+		destination[i] = new (std::nothrow) char[length];
+		if (!destination[i]) {
+			for (size_t j = 0; j < i; ++j) {
+				delete[] destination[j];
+			}
+			delete[] destination;
+			return NULL;
+		}
+		std::strcpy(destination[i], source[i]);
+	}
+
+	destination[count] = NULL;
+	return destination;
 }
 
 int CgiMetaVariables::setup() {
@@ -46,6 +91,35 @@ int CgiMetaVariables::setup() {
 		(this->*functions[i])();
 	}
 
+	return 0;
+}
+
+int CgiMetaVariables::createCgiEnviron() {
+	size_t size = meta_variables_.size();
+
+	cgi_environ_ = new (std::nothrow) char*[size + 1];
+	if (!cgi_environ_) {
+		return -1;
+	}
+
+	size_t i = 0;
+	for (std::map<std::string, std::string>::const_iterator it = meta_variables_.begin();
+		 it != meta_variables_.end();
+		 ++it) {
+		std::string env = it->first + "=" + it->second;
+		cgi_environ_[i] = new (std::nothrow) char[env.size() + 1];
+		if (!cgi_environ_[i]) {
+			for (size_t j = 0; j < i; ++j) {
+				delete[] cgi_environ_[j];
+			}
+			delete[] cgi_environ_;
+			cgi_environ_ = NULL;
+			return -1;
+		}
+		std::strcpy(cgi_environ_[i], env.c_str());
+		++i;
+	}
+	cgi_environ_[i] = NULL;
 	return 0;
 }
 
@@ -319,15 +393,16 @@ std::string CgiMetaVariables::extractPathTranslated(std::string& path) {
 	return path_translated;
 }
 
-std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
-	const std::map<std::string, std::string>& meta_variables =
-		cgi_meta_variables.getMetaVariables();
+char** CgiMetaVariables::getCgiEnviron() const {
+	return cgi_environ_;
+}
 
+std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
+	char** iterator = cgi_meta_variables.getCgiEnviron();
 	out << "CgiMetaVariables: " << std::endl;
-	for (std::map<std::string, std::string>::const_iterator it = meta_variables.begin();
-		 it != meta_variables.end();
-		 ++it) {
-		out << it->first << ": " << it->second << std::endl;
+
+	for (size_t i = 0; iterator[i]; ++i) {
+		out << iterator[i] << std::endl;
 	}
 	return out;
 }

@@ -2,8 +2,10 @@
 #define CGI_META_VARIABLES_HPP
 
 #include "http_request.hpp"
+#include <cstring>
 #include <iostream>
 #include <map>
+#include <new>
 #include <string>
 #include <vector>
 
@@ -23,6 +25,7 @@ private:
 
 	const HttpRequest& request_;
 	std::map<std::string, std::string> meta_variables_;
+	char** cgi_environ_;
 
 	typedef int (CgiMetaVariables::*MetaVariableFunc)();
 	int authType();
@@ -60,7 +63,9 @@ public:
 	~CgiMetaVariables();
 
 	int setup();
+	int createCgiEnviron();
 	const std::map<std::string, std::string>& getMetaVariables() const;
+	char** getCgiEnviron() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables);
