@@ -147,13 +147,13 @@ int CgiMetaVariables::remoteUser() {
 		remote_user = base64Decode(remote_user);
 		remote_user = remote_user.substr(0, remote_user.find(':'));
 	}
-	meta_variables_.insert(std::make_pair("REMOTE_USER", remote_user));
+	setMetaVariables("REMOTE_USER", remote_user);
 	return 0;
 }
 
 int CgiMetaVariables::requestMethod() {
 	std::string method = request_.getMethod();
-	meta_variables_.insert(std::make_pair("REQUEST_METHOD", method));
+	setMetaVariables("REQUEST_METHOD", method);
 	return 0;
 }
 
@@ -166,7 +166,7 @@ int CgiMetaVariables::serverName() {
 	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
 			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
 
-	meta_variables_.insert(std::make_pair("SERVER_NAME", ip_stream.str()));
+	setMetaVariables("SERVER_NAME", ip_stream.str());
 	return 0;
 }
 
@@ -176,18 +176,18 @@ int CgiMetaVariables::serverPort() {
 	std::stringstream ss;
 	ss << port;
 	std::string port_str = ss.str();
-	meta_variables_.insert(std::make_pair("SERVER_PORT", port_str));
+	setMetaVariables("SERVER_PORT", port_str);
 	return 0;
 }
 
 int CgiMetaVariables::serverProtocol() {
 	std::string protocol = request_.getVersion();
-	meta_variables_.insert(std::make_pair("SERVER_PROTOCOL", protocol));
+	setMetaVariables("SERVER_PROTOCOL", protocol);
 	return 0;
 }
 
 int CgiMetaVariables::serverSoftware() {
-	meta_variables_.insert(std::make_pair("SERVER_SOFTWARE", "webserv/1.0"));
+	setMetaVariables("SERVER_SOFTWARE", "webserv/1.0");
 	return 0;
 }
 
