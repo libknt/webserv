@@ -266,27 +266,57 @@ int CgiMetaVariables::requestPathParse(std::string request_path,
 }
 
 std::string CgiMetaVariables::extractQuery(std::string& path) {
-	std::string query;
-	query = path;
+	std::size_t query_postion = path.find('?');
+	if (query_postion == std::string::npos) {
+		return std::string();
+	}
+	std::string query = path.substr(query_postion + 1);
 	return query;
 }
 
 std::string CgiMetaVariables::extractScriptName(std::string& path) {
-	std::string query;
-	query = path;
-	return query;
+	size_t extension_dot_position = path.find('.');
+	if (extension_dot_position == std::string::npos) {
+		return std::string();
+	}
+	size_t i = extension_dot_position;
+	while (i < path.size() && path[i] != '/' && path[i] != '?') {
+		++i;
+	}
+
+	std::string script_file_name = path.substr(0, i);
+	return script_file_name;
 }
 
 std::string CgiMetaVariables::extractPathInfo(std::string& path) {
-	std::string query;
-	query = path;
-	return query;
+	size_t extension_dot_position = path.find('.');
+	if (extension_dot_position == std::string::npos) {
+		return std::string();
+	}
+	size_t i = extension_dot_position;
+	while (i < path.size() && path[i] != '/' && path[i] != '?') {
+		++i;
+	}
+	if (path[i] != '/') {
+		return std::string();
+	}
+	size_t query_postion = path.find('?', i);
+	std::string path_info;
+	if (query_postion == std::string::npos) {
+		path_info = path.substr(i);
+	} else {
+		path_info = path.substr(i, query_postion - i);
+	}
+	return path_info;
 }
 
 std::string CgiMetaVariables::extractPathTranslated(std::string& path) {
-	std::string query;
-	query = path;
-	return query;
+	std::string path_info = extractPathInfo(path);
+	// TODO server locationのrootを追加
+	//  root/path/info
+	std::string root = "root";
+	std::string path_translated = root + path_info;
+	return path_translated;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
