@@ -20,19 +20,31 @@ CgiMetaVariables& CgiMetaVariables::operator=(const CgiMetaVariables& other) {
 }
 
 int CgiMetaVariables::setup() {
-	authType();
-	contentLength();
-	contentType();
-	gatewayInterface();
-	remoteAddr();
-	remoteHost();
-	remoteIdet();
-	remoteUser();
-	requestMethod();
-	serverName();
-	serverPort();
-	serverProtocol();
-	serverSoftware();
+	MetaVariableFunc functions[] = {
+		&CgiMetaVariables::authType,
+		&CgiMetaVariables::contentLength,
+		&CgiMetaVariables::contentType,
+		&CgiMetaVariables::gatewayInterface,
+		&CgiMetaVariables::pathInfo,
+		&CgiMetaVariables::pathTranslated,
+		&CgiMetaVariables::queryString,
+		&CgiMetaVariables::remoteAddr,
+		&CgiMetaVariables::remoteHost,
+		&CgiMetaVariables::remoteIdet,
+		&CgiMetaVariables::remoteUser,
+		&CgiMetaVariables::requestMethod,
+		&CgiMetaVariables::scriptName,
+		&CgiMetaVariables::serverName,
+		&CgiMetaVariables::serverPort,
+		&CgiMetaVariables::serverProtocol,
+		&CgiMetaVariables::serverSoftware,
+	};
+
+	int funcSize = sizeof(functions) / sizeof(MetaVariableFunc);
+
+	for (int i = 0; i < funcSize; ++i) {
+		(this->*functions[i])();
+	}
 
 	return 0;
 }
@@ -66,6 +78,36 @@ int CgiMetaVariables::contentType() {
 
 int CgiMetaVariables::gatewayInterface() {
 	setMetaVariables("GATEWAY_INTERFACE", "CGI/1.1");
+	return 0;
+}
+
+int CgiMetaVariables::pathInfo() {
+	std::string path_info;
+	if (requestPathParse(request_.getRequestPath(), path_info, PATH_INFO_META_VARIABLE) < 0) {
+		return -1;
+	}
+	meta_variables_.insert(std::make_pair("PATH_INFO", path_info));
+	return 0;
+}
+
+int CgiMetaVariables::pathTranslated() {
+	std::string path_translated;
+	if (requestPathParse(
+			request_.getRequestPath(), path_translated, PATH_TRANSLATED_META_VARIABLE) < 0) {
+		return -1;
+	}
+	// TODO serverのドキュメントルートに合わせる.
+	// /var/www/html/additional/path/info
+	meta_variables_.insert(std::make_pair("PATH_TRANSLATED", path_translated));
+	return 0;
+}
+
+int CgiMetaVariables::queryString() {
+	std::string query;
+	if (requestPathParse(request_.getRequestPath(), query, QUERY_STRING_META_VARIABLE) < 0) {
+		return -1;
+	}
+	meta_variables_.insert(std::make_pair("QUERY_STRING", query));
 	return 0;
 }
 
@@ -157,6 +199,15 @@ int CgiMetaVariables::requestMethod() {
 	return 0;
 }
 
+int CgiMetaVariables::scriptName() {
+	std::string script_name;
+	if (requestPathParse(request_.getRequestPath(), script_name, SCRIPT_NAME_META_VARIABLE) < 0) {
+		return -1;
+	}
+	setMetaVariables("SCRIPT_NAME", script_name);
+	return 0;
+}
+
 int CgiMetaVariables::serverName() {
 	sockaddr_in server_addr = request_.getServerAddress();
 
@@ -189,6 +240,53 @@ int CgiMetaVariables::serverProtocol() {
 int CgiMetaVariables::serverSoftware() {
 	setMetaVariables("SERVER_SOFTWARE", "webserv/1.0");
 	return 0;
+}
+
+int CgiMetaVariables::requestPathParse(std::string request_path,
+	std::string& parsed_line,
+	META_VARIABLES what_meta_variable) {
+	switch (what_meta_variable) {
+		break;
+		case PATH_INFO_META_VARIABLE:
+			parsed_line = extractPathInfo(request_path);
+			break;
+		case PATH_TRANSLATED_META_VARIABLE:
+			parsed_line = extractPathTranslated(request_path);
+			break;
+		case QUERY_STRING_META_VARIABLE:
+			parsed_line = extractQuery(request_path);
+			break;
+		case SCRIPT_NAME_META_VARIABLE:
+			parsed_line = extractScriptName(request_path);
+			break;
+		default:
+			return -1;
+	}
+	return 0;
+}
+
+std::string CgiMetaVariables::extractQuery(std::string& path) {
+	std::string query;
+	query = path;
+	return query;
+}
+
+std::string CgiMetaVariables::extractScriptName(std::string& path) {
+	std::string query;
+	query = path;
+	return query;
+}
+
+std::string CgiMetaVariables::extractPathInfo(std::string& path) {
+	std::string query;
+	query = path;
+	return query;
+}
+
+std::string CgiMetaVariables::extractPathTranslated(std::string& path) {
+	std::string query;
+	query = path;
+	return query;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {

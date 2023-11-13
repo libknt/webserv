@@ -9,6 +9,13 @@
 
 namespace server {
 
+enum META_VARIABLES {
+	PATH_INFO_META_VARIABLE,
+	PATH_TRANSLATED_META_VARIABLE,
+	QUERY_STRING_META_VARIABLE,
+	SCRIPT_NAME_META_VARIABLE,
+};
+
 class CgiMetaVariables {
 private:
 	CgiMetaVariables();
@@ -17,10 +24,14 @@ private:
 	const HttpRequest& request_;
 	std::map<std::string, std::string> meta_variables_;
 
+	typedef int (CgiMetaVariables::*MetaVariableFunc)();
 	int authType();
 	int contentLength();
 	int contentType();
 	int gatewayInterface();
+	int pathInfo();
+	int pathTranslated();
+	int queryString();
 	int remoteAddr();
 	int remoteHost();
 	int remoteIdet();
@@ -28,10 +39,19 @@ private:
 	std::string base64Decode(std::string const& encoded_string);
 	int remoteUser();
 	int requestMethod();
+	int scriptName();
 	int serverName();
 	int serverPort();
 	int serverProtocol();
 	int serverSoftware();
+
+	int requestPathParse(std::string request_path,
+		std::string& parsed_line,
+		META_VARIABLES what_meta_variable);
+	std::string extractQuery(std::string& path);
+	std::string extractScriptName(std::string& path);
+	std::string extractPathInfo(std::string& path);
+	std::string extractPathTranslated(std::string& path);
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
