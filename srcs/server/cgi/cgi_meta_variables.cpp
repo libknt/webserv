@@ -68,19 +68,19 @@ int CgiMetaVariables::remoteAddr() {
 	std::ostringstream ip_stream;
 	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
 			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
-	meta_variables_.insert(std::make_pair("REMOTE_ADDR", ip_stream.str()));
+	setMetaVariables("REMOTE_ADDR", ip_stream.str());
 	return 0;
 }
 
 int CgiMetaVariables::remoteHost() {
 	// TODO 取得する関数が、使用可能関数にないと思う
-	meta_variables_.insert(std::make_pair("REMOTE_HOST", ""));
+	setMetaVariables("REMOTE_HOST", "");
 	return 0;
 }
 
 int CgiMetaVariables::remoteIdet() {
 	// TODO 推奨されてないので空
-	meta_variables_.insert(std::make_pair("REMOTE_IDENT", ""));
+	setMetaVariables("REMOTE_IDENT", "");
 	return 0;
 }
 
