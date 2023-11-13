@@ -148,7 +148,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					std::cout << "  Request received" << std::endl;
 					determineIfCgiRequest(sd);
 					if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
-						std::cout << "  execute cgi" << std::endl;
 						Cgi& cgi = getCgi(sd);
 						cgi.setup();
 						// TODO cgi実行
