@@ -28,6 +28,7 @@ int CgiMetaVariables::setup() {
 	remoteHost();
 	remoteIdet();
 	remoteUser();
+	requestMethod();
 	return 0;
 }
 
@@ -142,6 +143,12 @@ int CgiMetaVariables::remoteUser() {
 		remote_user = remote_user.substr(0, remote_user.find(':'));
 	}
 	meta_variables_.insert(std::make_pair("REMOTE_USER", remote_user));
+	return 0;
+}
+
+int CgiMetaVariables::requestMethod() {
+	std::string method = request_.getMethod();
+	meta_variables_.insert(std::make_pair("REQUEST_METHOD", method));
 	return 0;
 }
 

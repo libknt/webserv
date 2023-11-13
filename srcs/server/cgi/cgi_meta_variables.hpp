@@ -27,6 +27,7 @@ private:
 	inline bool isBase64(unsigned char c);
 	std::string base64Decode(std::string const& encoded_string);
 	int remoteUser();
+	int requestMethod();
 
 public:
 	CgiMetaVariables(const HttpRequest& request);
