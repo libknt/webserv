@@ -4,6 +4,7 @@
 #include "types.hpp"
 #include <cstring>
 #include <iostream>
+#include <map>
 
 namespace server {
 
@@ -17,8 +18,9 @@ enum STATUS_CODE {
 
 class HttpResponse {
 private:
-	std::string response_;
 	STATUS_CODE status_code_;
+	std::map<std::string, std::string> header_;
+	std::string body_;
 
 public:
 	HttpResponse();
