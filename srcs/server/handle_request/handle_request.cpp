@@ -19,45 +19,45 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			LocationDirective location_directive = it->second;
 
 			if (method == "GET") {
-				response = executeGet(request, servers[i]);
+				response = executeGet(request, location_directive);
 			} else if (method == "POST") {
-				response = executePost(request, servers[i]);
+				response = executePost(request, location_directive);
 			} else if (method == "DELETE") {
-				response = executeDelete(request, servers[i]);
+				response = executeDelete(request, location_directive);
 			} else {
 				if (request.getStatus() == http_request_status::ERROR) {
 					response.setStatusCode(BAD_REQUEST);
 				}
-				response = createErrorResponse(response, servers[i]);
+				response = createErrorResponse(response, location_directive);
 			}
 		}
 	}
 	return response;
 }
 
-HttpResponse executeGet(const HttpRequest& request, const ServerDirective& server_directive) {
+HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive) {
 	HttpResponse response;
 	(void)request;
-	(void)server_directive;
+	(void)location_directive;
 	return (response);
 }
 
-HttpResponse executePost(const HttpRequest& request, const ServerDirective& server_directive) {
+HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive) {
 	HttpResponse response;
 	(void)request;
-	(void)server_directive;
+	(void)location_directive;
 	return (response);
 }
 
-HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& server_directive) {
+HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive) {
 	HttpResponse response;
 	(void)request;
-	(void)server_directive;
+	(void)location_directive;
 	return (response);
 }
 
-HttpResponse createErrorResponse(HttpResponse& response, const ServerDirective& server_directive) {
-	(void)server_directive;
+HttpResponse createErrorResponse(HttpResponse& response, const LocationDirective& location_directive) {
+	(void)location_directive;
 	return (response);
 }
 };
