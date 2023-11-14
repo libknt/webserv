@@ -22,8 +22,10 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 
 const std::string HttpResponse::createResponse() {
 	std::string response;
+	std::stringstream stringstream;
+	stringstream << status_code_;
 
-	response += statusCodeToStatusText(status_code_) + "\r\n";
+	response += "HTTP/1.1 " + stringstream.str() + " " + statusCodeToStatusText(status_code_) + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = header_.begin(); it != header_.end(); ++it) {
 		response += it->first + it->second + "\r\n";
 	}
