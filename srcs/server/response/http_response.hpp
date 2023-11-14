@@ -28,7 +28,8 @@ public:
 	HttpResponse(const HttpResponse& other);
 	HttpResponse& operator=(const HttpResponse& other);
 	void setStatusCode(const STATUS_CODE& status_code);
-	const std::string& getResponse() const;
+	const std::string createResponse();
+	std::string statusCodeToString(const STATUS_CODE code);
 };
 
 } // namespace server
