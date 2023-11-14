@@ -24,6 +24,30 @@ void HttpResponse::setStatusCode(const STATUS_CODE& status_code) {
 	status_code_ = status_code;
 }
 
+void HttpResponse::setHeaderValue(const std::string &key, const std::string &value) {
+	header_.insert(std::make_pair(key, value));
+}
+
+void HttpResponse::setBody(const std::string &body) {
+	body_ = body;
+}
+
+STATUS_CODE HttpResponse::getStatusCode() const {
+	return (status_code_);
+}
+
+const std::string HttpResponse::getHeaderValue(const std::string &key) {
+	return (header_[key]);
+}
+
+const std::map<std::string, std::string> &HttpResponse::getHeader() const{
+	return (header_);
+}
+
+const std::string &HttpResponse::getBody() const{
+	return (body_);
+}
+
 const std::string HttpResponse::createResponse() {
 	std::string response;
 
