@@ -1,6 +1,7 @@
 #include "location_directive.hpp"
 
 LocationDirective::LocationDirective() {
+	default_error_page_ = "error_page.html";
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
@@ -15,7 +16,8 @@ LocationDirective::LocationDirective() {
 LocationDirective::~LocationDirective() {}
 
 LocationDirective::LocationDirective(const LocationDirective& other)
-	: error_pages_(other.error_pages_)
+	: default_error_page_(other.default_error_page_)
+	, error_pages_(other.error_pages_)
 	, allow_methods_(other.allow_methods_)
 	, client_max_body_size_(other.client_max_body_size_)
 	, root_(other.root_)
@@ -27,6 +29,7 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 
 LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
+		default_error_page_ = other.default_error_page_;
 		error_pages_ = other.error_pages_;
 		allow_methods_ = other.allow_methods_;
 		client_max_body_size_ = other.client_max_body_size_;
@@ -43,7 +46,12 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) {
 	std::vector<std::string> args;
 	while (!tokens.empty()) {
-		if (tokens.front() == "error_page") {
+		if (tokens.front() == "default_error_page") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			if (parseDefaultErrorPageDirective(args) == -1) {
+				return -1;
+			}
+		} else if (tokens.front() == "error_page") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseErrorPageDirective(args) == -1) {
 				return -1;
@@ -96,6 +104,15 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 		}
 		args.clear();
 	}
+	return 0;
+}
+
+int LocationDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseDefaultErrorPageDirective" << std::endl;
+		return -1;
+	}
+	default_error_page_ = tokens.front();
 	return 0;
 }
 
@@ -200,10 +217,6 @@ int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::st
 	return 0;
 }
 
-std::map<std::string, std::string> LocationDirective::getErrorPages() const {
-	return error_pages_;
-}
-
 int LocationDirective::parseCgiDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
@@ -231,6 +244,14 @@ int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tok
 		cgi_extensions_.push_back(tokens[i]);
 	}
 	return 0;
+}
+
+std::string LocationDirective::getDefaultErrorPage() const {
+	return default_error_page_;
+}
+
+std::map<std::string, std::string> LocationDirective::getErrorPages() const {
+	return error_pages_;
 }
 
 std::vector<std::string> LocationDirective::getAllowMethods() const {
@@ -275,6 +296,8 @@ bool LocationDirective::isValidCgiExtensions(const std::string& extension) const
 }
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
+	out << "DefaultErrorPage: " << location_directive.getDefaultErrorPage() << std::endl;
+
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 	out << "ErrorPages: " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = error_pages.begin();

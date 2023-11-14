@@ -9,6 +9,7 @@
 
 class LocationDirective {
 private:
+	std::string default_error_page_;
 	std::map<std::string, std::string> error_pages_;
 	std::vector<std::string> allow_methods_;
 	std::string client_max_body_size_;
@@ -19,6 +20,7 @@ private:
 	std::string cgi_;
 	std::vector<std::string> cgi_extensions_;
 
+	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 	int parseErrorPageDirective(std::vector<std::string>& tokens);
 	int parseClientMaxBodySizeDirective(std::vector<std::string>& tokens);
 	int parseRootDirective(std::vector<std::string>& tokens);
@@ -36,6 +38,7 @@ public:
 	LocationDirective& operator=(const LocationDirective& other);
 
 	int parseLocationDirective(std::vector<std::string>& tokens);
+	std::string getDefaultErrorPage() const;
 	std::map<std::string, std::string> getErrorPages() const;
 	std::vector<std::string> getAllowMethods() const;
 	std::string getClientMaxBodySize() const;
