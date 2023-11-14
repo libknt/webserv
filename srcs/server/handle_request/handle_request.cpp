@@ -9,8 +9,15 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 	HttpResponse response;
 
 	for (size_t i = 0; i < servers.size(); i++) {
-		if (servers[i].getPort() == request.getServerPort())
-		{
+		ServerDirective server_directive = servers[i];
+		if (server_directive.getPort() == request.getServerPort()) {
+			std::map<std::string, LocationDirective> locations = server_directive.getLocations();
+			std::map<std::string, LocationDirective>::iterator it = locations.find(request.getRequestPath());
+			if (it != locations.end()) {
+				std::cerr << "Location not found" << std::endl;
+			}
+			LocationDirective location_directive = it->second;
+
 			if (method == "GET") {
 				response = executeGet(request, servers[i]);
 			} else if (method == "POST") {
