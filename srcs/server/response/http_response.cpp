@@ -23,7 +23,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 const std::string HttpResponse::createResponse() {
 	std::string response;
 
-	response += statusCodeToString(status_code_) + "\r\n";
+	response += statusCodeToStatusText(status_code_) + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = header_.begin(); it != header_.end(); ++it) {
 		response += it->first + it->second + "\r\n";
 	}
@@ -32,7 +32,7 @@ const std::string HttpResponse::createResponse() {
 	return response;
 }
 
-std::string HttpResponse::statusCodeToString(const STATUS_CODE code) {
+std::string HttpResponse::statusCodeToStatusText(const STATUS_CODE code) {
     switch (code) {
         case OK:
             return "OK";

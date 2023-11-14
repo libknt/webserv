@@ -28,7 +28,7 @@ public:
 	HttpResponse(const HttpResponse& other);
 	HttpResponse& operator=(const HttpResponse& other);
 	const std::string createResponse();
-	std::string statusCodeToString(const STATUS_CODE code);
+	std::string statusCodeToStatusText(const STATUS_CODE code);
 	void setStatusCode(const STATUS_CODE& status_code);
 	void setHeaderValue(const std::string &key, const std::string &value);
 	void setBody(const std::string &body);
