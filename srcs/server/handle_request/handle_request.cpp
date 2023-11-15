@@ -15,6 +15,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			std::map<std::string, LocationDirective>::iterator it = locations.find(request.getRequestPath());
 			if (it != locations.end()) {
 				std::cerr << "Location not found" << std::endl;
+				//TO DO 404 ERROR;
 			}
 			LocationDirective location_directive = it->second;
 
@@ -37,8 +38,10 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 
 HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive) {
 	HttpResponse response;
-	(void)request;
-	(void)location_directive;
+
+	std::string file_path = location_directive.getRoot() + "/" + location_directive.getIndex();
+	std::cout << "Debug: " << file_path << std::endl;
+	(void) request;
 	return (response);
 }
 
