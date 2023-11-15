@@ -27,9 +27,9 @@ const std::string HttpResponse::createResponse() {
 
 	response += "HTTP/1.1 " + stringstream.str() + " " + statusCodeToStatusText(status_code_) + "\r\n";
 	for (std::map<std::string, std::string>::iterator it = header_.begin(); it != header_.end(); ++it) {
-		response += it->first + it->second + "\r\n";
+		response += it->first + ": " + it->second + "\r\n";
 	}
-	response += "/r/n";
+	response += "\r\n";
 	response += body_;
 	return response;
 }
