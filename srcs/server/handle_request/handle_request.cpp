@@ -13,8 +13,10 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 		if (server_directive.getPort() == request.getServerPort()) {
 			std::map<std::string, LocationDirective> locations = server_directive.getLocations();
 			std::map<std::string, LocationDirective>::iterator it = locations.find(request.getRequestPath());
-			if (it != locations.end()) {
+			if (it == locations.end()) {
 				std::cerr << "Location not found" << std::endl;
+				//TODO 404 not found Error
+				return (response);
 			}
 			LocationDirective location_directive = it->second;
 
