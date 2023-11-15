@@ -230,7 +230,9 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer), 0);
+	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+	std::cout << "------------debug-------------" << std::endl;
+	std::cout << recv_buffer << std::endl;
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
@@ -326,8 +328,6 @@ int ServerManager::sendResponse(int sd) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
 	std::string buffer = response_[sd].createResponse();
-	std::cout << "----------------debug-----------" << std::endl;
-	std::cout << buffer << std::endl;
 	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
 	int send_result = ::send(sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {
