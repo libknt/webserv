@@ -231,8 +231,6 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
 	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
-	std::cout << "------------debug-------------" << std::endl;
-	std::cout << recv_buffer << std::endl;
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);

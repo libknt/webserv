@@ -24,6 +24,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			if (method == "GET") {
 				response = executeGet(request, location_directive);
 			} else if (method == "POST") {
+				std::cout << "POST" << std::endl;
 				response = executePost(request, location_directive);
 			} else if (method == "DELETE") {
 				response = executeDelete(request, location_directive);
