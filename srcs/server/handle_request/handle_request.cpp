@@ -1,4 +1,5 @@
 #include "handle_request.hpp"
+#include <sys/stat.h>
 
 namespace server {
 
@@ -39,9 +40,25 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 
 HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive) {
 	HttpResponse response;
+	struct stat stat_info;
 
 	std::string file_path = location_directive.getRoot() + "/" + location_directive.getIndex();
-	std::cout << "Debug: " << file_path << std::endl;
+	if (stat(file_path.c_str(), &stat_info) != 0) {
+		if (location_directive.getAutoindex() == "on") {
+			//TODO make auto index
+		}
+		else {
+			//TODO Error
+		}
+	}
+	else {
+		std::ifstream file_stream(file_path);
+		std::string body;
+		response.setStatusCode(OK);
+		response.setHeaderValue("Content-Length", std::to_string(stat_info.st_size));
+		std::getline(file_stream, body, static_cast<char>(EOF));
+		response.setBody(body);
+	}
 	(void) request;
 	return (response);
 }

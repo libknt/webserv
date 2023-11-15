@@ -325,20 +325,9 @@ int ServerManager::setWriteFd(int sd) {
 int ServerManager::sendResponse(int sd) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	std::string buffer = "HTTP/1.1 200 OK\r\n"
-						 "Date: Wed, 09 Nov 2023 12:00:00 GMT\r\n"
-						 "Server: MyServer\r\n"
-						 "Content-Type: text/html; charset=UTF-8\r\n"
-						 "Content-Length: 97\r\n"
-						 "\r\n"
-						 "<html>\r\n"
-						 "<head>\r\n"
-						 "<title>Simple Page</title>\r\n"
-						 "</head>\r\n"
-						 "<body>\r\n"
-						 "<h1>Hello, World!</h1>\r\n"
-						 "</body>\r\n"
-						 "</html>\r\n";
+	std::string buffer = response_[sd].createResponse();
+	std::cout << "----------------debug-----------" << std::endl;
+	std::cout << buffer << std::endl;
 	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
 	int send_result = ::send(sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {
