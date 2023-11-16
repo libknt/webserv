@@ -1,8 +1,6 @@
 #include "server_manager.hpp"
 #include "parse_http_request.hpp"
 
-//mergeテスト
-
 namespace server {
 
 ServerManager::ServerManager(const Configuration& configuration)
