@@ -52,7 +52,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			}
 		} else if (tokens.front() == "location") {
 			tokens.erase(tokens.begin());
-			std::string location_path = parseLocationPath(tokens);
+			location_path = parseLocationPath(tokens);
 			if (location_path.empty()) {
 				return -1;
 			}
@@ -60,7 +60,9 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			if (location_directive.parseLocationDirective(location_tokens) == -1) {
 				return -1;
 			}
-			locations_[location_path] = location_directive;
+			if (locations_.find(location_path) == locations_.end()) {
+				locations_[location_path] = location_directive;
+			}
 		} else {
 			std::cerr << "Parse Error: serverDirective" << std::endl;
 			return -1;
