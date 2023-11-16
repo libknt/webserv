@@ -89,7 +89,7 @@ public:
 	int setRequestPath(std::string const& request_path);
 	int setVersion(std::string const& version);
 	int setHeaderValue(std::string const& key, std::string const& value);
-	int setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const &body_message_type)
+	int setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const &body_message_type);
 	int setContentLength(size_t content_length);
 	int setChunkedStatus(chunked_status::CHUNKED_STATUS const &chunked_status );
 	int setChunkedSize(size_t chunked_size_);
@@ -98,10 +98,11 @@ public:
 	int setServerAddress(sockaddr_in const &server_address);
 
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
+	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;
 	std::string const getMethod() const;
 	std::string const getVersion() const;
-	std::string const& getRequestPath() const;
-	std::string const getHeaderValue(std::string const& key);
+	std::string const &getRequestPath() const;
+	std::string const getHeaderValue(std::string const& key) const;
 	std::map<std::string, std::string> const& getHeader() const;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType();
 	size_t const &getContentLength() const;
