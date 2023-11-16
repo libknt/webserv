@@ -170,12 +170,12 @@ const std::map<std::string, LocationDirective>& ServerDirective::getLocations() 
 }
 
 bool ServerDirective::isCgiLocation(const std::string& location,
-	const std::string& script_file_name) const {
+	const std::string& script_name) const {
 	for (std::map<std::string, LocationDirective>::const_iterator it = locations_.begin();
 		 it != locations_.end();
 		 ++it) {
 		if (it->first == location && it->second.getCgi() == "on") {
-			if (it->second.isValidCgiExtensions(script_file_name))
+			if (it->second.isValidCgiExtensions(script_name))
 				return true;
 		}
 	}

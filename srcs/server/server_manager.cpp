@@ -258,13 +258,13 @@ int ServerManager::determineIfCgiRequest(int sd) {
 	if (path.empty()) {
 		return 0;
 	}
-	std::string script_file_name;
+	std::string script_name;
 	std::string location;
-	decomposeCgiUrl(path, location, script_file_name);
-	if (script_file_name.empty()) {
+	decomposeCgiUrl(path, location, script_name);
+	if (script_name.empty()) {
 		return 0;
 	}
-	if (server_configuration.isCgiLocation(location, script_file_name)) {
+	if (server_configuration.isCgiLocation(location, script_name)) {
 		request.setIsCgi(true);
 	}
 	return 0;
@@ -272,9 +272,9 @@ int ServerManager::determineIfCgiRequest(int sd) {
 
 void ServerManager::decomposeCgiUrl(const std::string& path,
 	std::string& location,
-	std::string& script_file_name) {
-	script_file_name = extractScriptFileName(path);
-	if (!script_file_name.empty()) {
+	std::string& script_name) {
+	script_name = extractScriptFileName(path);
+	if (!script_name.empty()) {
 		location = extractParentDirectoryPath(path);
 	}
 }
@@ -297,9 +297,9 @@ std::string ServerManager::extractScriptFileName(const std::string& path) {
 		return std::string();
 	}
 
-	std::string script_file_name = path.substr(extension_dot_position);
-	sanitizePath(script_file_name);
-	return script_file_name;
+	std::string script_name = path.substr(extension_dot_position);
+	sanitizePath(script_name);
+	return script_name;
 }
 
 std::string ServerManager::extractParentDirectoryPath(const std::string& path) {
