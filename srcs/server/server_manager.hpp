@@ -44,10 +44,12 @@ private:
 	void sanitizePath(std::string& path);
 	std::string extractParentDirectoryPath(std::string const& path);
 	int setWriteFd(int sd);
+	int setReadFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
 	int disconnect(int sd);
 	int createCgi(int sd);
+	int receiveCgi(Cgi& cgi);
 
 public:
 	ServerManager(const Configuration& configuration);

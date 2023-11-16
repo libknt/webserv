@@ -130,6 +130,19 @@ int ServerManager::monitorSocketEvents() {
 	return 0;
 }
 
+int ServerManager::receiveCgi(Cgi& cgi) {
+	std::cout << "  cgi receive" << std::endl;
+	int status = cgi.createCgiResponse();
+	if (status < 0) {
+		std::cerr << "createCgiResponse() failed" << std::endl;
+		return -1;
+	}
+	if(status == 1) {
+		FD_CLR(cgi.getSocketVector(0), &master_read_fds_);
+	}
+	return 0;
+}
+
 int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 	for (int sd = 0; sd <= highest_sd_ && ready_sds > 0; ++sd) {
@@ -140,20 +153,33 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					return -1;
 				}
 			} else {
-				if (receiveAndParseHttpRequest(sd) < 0) {
-					is_running = false;
-					return -1;
-				}
-				if (server_status_[sd] == server::PREPARING_RESPONSE) {
-					std::cout << "  Request received" << std::endl;
-					determineIfCgiRequest(sd);
-					if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
-						Cgi& cgi = getCgi(sd);
-						cgi.setup();
-						// TODO cgi実行
-					} else {
-						std::cout << "  create response" << std::endl;
-						setWriteFd(sd);
+				if (server_status_[sd] == RECEIVING_CGI) {
+					std::cout << "  cgi receive" << std::endl;
+					receiveCgi(getCgi(sd));
+				} else {
+					if (receiveAndParseHttpRequest(sd) < 0) {
+						is_running = false;
+						return -1;
+					}
+					if (server_status_[sd] == server::PREPARING_RESPONSE) {
+						std::cout << "  Request received" << std::endl;
+						determineIfCgiRequest(sd);
+						if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
+							Cgi& cgi = getCgi(sd);
+							std::cout << "  create cgi" << std::endl;
+							cgi.setup();
+							std::cout << "  execute cgi" << std::endl;
+							if (cgi.executeCgi() == 0 && !cgi.hasBody()) {
+								std::cout << "  cgi has no body" << std::endl;
+								setReadFd(cgi.getSocketVector(0));
+								std::cout << "  set read fd" << std::endl;
+								server_status_[sd] = RECEIVING_CGI;
+							}
+							// TODO cgi実行
+						} else {
+							std::cout << "  create response" << std::endl;
+							setWriteFd(sd);
+						}
 					}
 				}
 			}
@@ -322,6 +348,11 @@ int ServerManager::setWriteFd(int sd) {
 	return 0;
 }
 
+int ServerManager::setReadFd(int sd) {
+	FD_SET(sd, &master_read_fds_);
+	return 0;
+}
+
 int ServerManager::sendResponse(int sd) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
@@ -393,4 +424,5 @@ Cgi& ServerManager::getCgi(int sd) {
 	std::map<int, server::Cgi>::iterator it = cgi_.find(sd);
 	return it->second;
 }
+
 } // namespace server
