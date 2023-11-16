@@ -226,7 +226,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer), 0);
+	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);

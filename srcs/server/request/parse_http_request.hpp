@@ -24,7 +24,7 @@ public:
 	virtual ~ParseHttpRequest();
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	SERVER_STATUS handleBuffer(int socketfd, char* buf);
-	HttpRequest& getHttpRequest(int sd);
+	HttpRequest& getRequest(int sd);
 	int addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
 	int httpRequestCleanup(int sd);
 	int httpRequestErase(int sd);

@@ -29,15 +29,22 @@ SERVER_STATUS ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 				  << std::endl;
 		return PROCESSING_ERROR;
 	}
-	if (it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
+
+	if (it->second.getStatus() == http_request_status::BODY &&
+		it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH) {
 		it->second.parseHttpRequest(http_line_stream_[socketfd]);
-	else {
+		http_line_stream_[socketfd].clear();
+	} else {
 		while ((index = http_line_stream_[socketfd].find("\r\n")) != std::string::npos) {
 			std::string line = http_line_stream_[socketfd].substr(0, index);
 			http_line_stream_[socketfd] = http_line_stream_[socketfd].substr(index + 2);
-
 			it->second.parseHttpRequest(line);
 			// TODO if error occured, you parseHttpRequest(line) must return -1. So handle it.
+		}
+		if (it->second.getStatus() == http_request_status::BODY &&
+			it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH) {
+			it->second.parseHttpRequest(http_line_stream_[socketfd]);
+			http_line_stream_[socketfd].clear();
 		}
 	}
 
@@ -47,8 +54,8 @@ SERVER_STATUS ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	return RECEIVING_REQUEST;
 }
 
-HttpRequest& ParseHttpRequest::getHttpRequest(int sd) {
-	std::map<int, server::HttpRequest>::iterator it = http_request_map_.find(sd);
+HttpRequest const& ParseHttpRequest::getRequest(int sd) const {
+	std::map<int, server::HttpRequest>::const_iterator it = http_request_map_.find(sd);
 	return it->second;
 }
 
