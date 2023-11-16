@@ -48,10 +48,6 @@ int ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 	}
 
 	if (http_request_status::FINISHED == it->second.getStatus()) {
-		std::cout << "++++++++++++++++++++++++++" << std::endl;
-		std::cout << it->second.getUriPath() << std::endl;
-		std::cout << it->second.getUriQuery() << std::endl;
-		std::cout << "++++++++++++++++++++++++++" << std::endl;
 		return 1;
 	}
 	return (0);
