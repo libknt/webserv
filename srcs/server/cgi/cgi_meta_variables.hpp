@@ -66,10 +66,12 @@ public:
 	int createCgiEnviron();
 	const std::map<std::string, std::string>& getMetaVariables() const;
 	char** getCgiEnviron() const;
+	const std::string& getMetaVariables(std::string key) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables);
 
+char** DeepCopyCharPointerArray(char** source);
 } // namespace server
 
 #endif

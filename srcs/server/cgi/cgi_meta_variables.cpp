@@ -2,8 +2,6 @@
 
 namespace server {
 
-char** DeepCopyCharPointerArray(char** source);
-
 CgiMetaVariables::CgiMetaVariables(const HttpRequest& request)
 	: request_(request)
 	, meta_variables_()
@@ -395,6 +393,10 @@ std::string CgiMetaVariables::extractPathTranslated(std::string& path) {
 
 char** CgiMetaVariables::getCgiEnviron() const {
 	return cgi_environ_;
+}
+
+const std::string& CgiMetaVariables::getMetaVariables(std::string key) const {
+	return meta_variables_.find(key)->second;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
