@@ -3,7 +3,7 @@ Host: example.com
 Transfer-Encoding: chunked
 Content-Type: application/xml
 
-1a
+22
 <sample><data>Test</data></sample>
 0
 
