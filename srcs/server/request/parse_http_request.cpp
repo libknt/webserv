@@ -66,11 +66,4 @@ void ParseHttpRequest::addAcceptClientInfo(int socketfd,
 		http_request_map_.insert(std::pair<int, HttpRequest>(socketfd, request));
 	}
 }
-
-void ParseHttpRequest::printAcceptedFds() {
-	typedef std::map<int, HttpRequest>::iterator REQUEST_MAP_IT;
-	for (REQUEST_MAP_IT it = http_request_map_.begin(); it != http_request_map_.end(); ++it) {
-		std::cout << "fd : " << it->first << std::endl;
-	}
-}
 }
