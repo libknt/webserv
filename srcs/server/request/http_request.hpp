@@ -109,6 +109,8 @@ public:
 	chunked_status::CHUNKED_STATUS const &getChunkedStatus();
 	size_t const &getChunkedSize();
 	std::string const& getBody() const;
+	std::string getUriPath() const;
+	std::string getUriQuery() const;
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
 };
