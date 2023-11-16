@@ -135,20 +135,20 @@ std::string const& HttpRequest::getBody() const {
 	return body_;
 }
 
-std::string HttpRequest::getUriQuery() const {
-	std::string::size_type query_index = request_path_.find("?");
-	if (query_index != std::string::npos && query_index + 1 <= request_path_.size()) {
-		return (request_path_.substr(query_index + 1));
-	}
-	return (std::string(""));
-}
-
 std::string HttpRequest::getUriPath() const {
 	std::string::size_type query_index = request_path_.find("?");
 	if (query_index != std::string::npos) {
 		return (request_path_.substr(0, query_index));
 	}
 	return (request_path_);
+}
+
+std::string HttpRequest::getUriQuery() const {
+	std::string::size_type query_index = request_path_.find("?");
+	if (query_index != std::string::npos && query_index + 1 <= request_path_.size()) {
+		return (request_path_.substr(query_index + 1));
+	}
+	return (std::string(""));
 }
 
 sockaddr_in const& HttpRequest::getClientAddress() const {
