@@ -153,11 +153,24 @@ int ServerDirective::parseLocationPath(std::vector<std::string>& tokens) {
 	}
 
 	std::string token = tokens.front();
-	if (token[token.size() - 1] != '/') {
+	if (token[0] != '/') {
 		std::cerr << "Parse Error: parseLocationPath" << std::endl;
 		return -1;
 	}
-	location_path_ = token;
+
+	bool is_last_char_slash = false;
+	for (size_t i = 0; i < token.size(); ++i) {
+		if (token[i] == '/') {
+			if (!is_last_char_slash) {
+				location_path_ += token[i];
+				is_last_char_slash = true;
+			}
+		} else {
+			location_path_ += token[i];
+			is_last_char_slash = false;
+		}
+	}
+
 	tokens.erase(tokens.begin());
 	return 0;
 }
