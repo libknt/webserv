@@ -6,6 +6,10 @@ CXX			=	c++
 
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 -fsanitize=address
 
+ADDRESS_FLAGS = -g -fsanitize=address
+
+LEAK_FLAGS= -g -fsanitize=leak
+
 SRCS_DIR	=	srcs
 
 OBJS_DIR	=	objs
@@ -39,6 +43,14 @@ format:
 
 test:
 	make -C test
+
+address: fclean
+address: CXXFLAGS += $(ADDRESS_FLAGS)
+address: all
+
+leak: fclean
+leak: CXXFLAGS += $(LEAK_FLAGS)
+leak: all
 
 .PHONY: test tidy format cppcheck
 

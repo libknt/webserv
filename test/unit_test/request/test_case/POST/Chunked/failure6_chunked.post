@@ -3,9 +3,9 @@ Host: example.com
 Content-Type: text/html
 Transfer-Encoding: chunked
 
-E
+c
 <html><body>
-7
+4
 <h1>
 18
 Chunked message

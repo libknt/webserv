@@ -1,6 +1,7 @@
 #ifndef PARSE_HTTP_REQUEST_HPP
 #define PARSE_HTTP_REQUEST_HPP
 
+#include "define.hpp"
 #include "http_request.hpp"
 #include "types.hpp"
 #include <cstdlib>
@@ -11,10 +12,6 @@
 #include <vector>
 
 namespace server {
-
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1024
-#endif
 
 class ParseHttpRequest {
 private:
@@ -27,7 +24,7 @@ public:
 	virtual ~ParseHttpRequest();
 	ParseHttpRequest& operator=(ParseHttpRequest& other);
 	SERVER_STATUS handleBuffer(int socketfd, char* buf);
-	HttpRequest& getHttpRequest(int sd);
+	HttpRequest& getRequest(int sd);
 	int addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
 	int httpRequestCleanup(int sd);
 	int httpRequestErase(int sd);
