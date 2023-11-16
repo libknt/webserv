@@ -75,18 +75,6 @@ private:
 	std::string body_;
 	sockaddr_in client_address_;
 	sockaddr_in server_address_;
-	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
-	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
-	int parseMethod(std::string const& line);
-	int parseHeader(std::string const& line);
-	int checkHeaderValue();
-	int parseBody(std::string const& line);
-	int parseContentLengthBody(std::string const& line);
-	int parseChunkedBody(std::string const& line);
-	int setMethod(std::string const& method);
-	int setRequestPath(std::string const& request_path);
-	int setVersion(std::string const& version);
-	int setHeaderValue(std::string const& key, std::string const& value);
 
 	HttpRequest();
 
@@ -95,14 +83,30 @@ public:
 	explicit HttpRequest(HttpRequest const& other);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
-	int parseHttpRequest(std::string const& line);
-	http_request_status::HTTP_REQUEST_STATUS const& getStatus(void) const;
+	int setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
+	int setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
+	int setMethod(std::string const& method);
+	int setRequestPath(std::string const& request_path);
+	int setVersion(std::string const& version);
+	int setHeaderValue(std::string const& key, std::string const& value);
+	int setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const &body_message_type)
+	int setContentLength(size_t content_length);
+	int setChunkedStatus(chunked_status::CHUNKED_STATUS const &chunked_status );
+	int setChunkedSize(size_t chunked_size_);
+	int setBody(std::string const &body);
+	int setClientAddress(sockaddr_in const &client_address);
+	int setServerAddress(sockaddr_in const &server_address);
+
+	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
 	std::string const getMethod() const;
 	std::string const getVersion() const;
 	std::string const& getRequestPath() const;
 	std::string const getHeaderValue(std::string const& key);
-	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType(void);
 	std::map<std::string, std::string> const& getHeader() const;
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType();
+	size_t const &getContentLength() const;
+	chunked_status::CHUNKED_STATUS const &getChunkedStatus();
+	size_t const &getChunkedSize();
 	std::string const& getBody() const;
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;

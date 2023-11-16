@@ -19,6 +19,13 @@ class ParseHttpRequest {
 private:
 	std::map<int, HttpRequest> http_request_map_;
 	std::map<int, std::string> http_line_stream_;
+	int parseHttpRequest();
+	int parseMethod();
+	int parseHeader();
+	int checkHeaderValue();
+	int parseBody(std::string const& line);
+	int parseContentLengthBody(std::string const& line);
+	int parseChunkedBody(std::string const& line);
 
 public:
 	explicit ParseHttpRequest();
