@@ -145,7 +145,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				if (server_status_[sd] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
 					determineIfCgiRequest(sd);
-					if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
+					if (http_request_parse_.getRequest(sd).getIsCgi()) {
 						std::cout << "  execute cgi" << std::endl;
 						// TODO cgi実行
 					} else {
@@ -248,7 +248,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 }
 
 int ServerManager::determineIfCgiRequest(int sd) {
-	HttpRequest& request = http_request_parse_.getHttpRequest(sd);
+	HttpRequest& request = http_request_parse_.getRequest(sd);
 	std::string ip_address = request.getServerIpAddress();
 	std::string port = request.getServerPort();
 	const ServerDirective& server_configuration =
