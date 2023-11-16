@@ -104,6 +104,8 @@ public:
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType(void);
 	std::map<std::string, std::string> const& getHeader() const;
 	std::string const& getBody() const;
+	std::string getUriQuery() const;
+	std::string getUriPath() const;
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
 };

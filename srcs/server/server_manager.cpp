@@ -94,6 +94,7 @@ int ServerManager::monitorSocketEvents() {
 
 		std::cout << "Waiting on select()!" << std::endl;
 		int select_result = select(highest_sd_ + 1, &read_fds__, NULL, NULL, &timeout_);
+		std::cout << "SELECT DONE" << std::endl;
 
 		if (select_result < 0) {
 			std::cerr << "select() failed: " << strerror(errno) << std::endl;
@@ -158,6 +159,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			}
 			break;
 		}
+		std::cout << "accept あり: " << client_sd << std::endl;
 		sockaddr_in connected_server_address;
 		socklen_t server_socket_address_len = sizeof(connected_server_address);
 
@@ -185,6 +187,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
 	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+	std::cout << recv_buffer << std::endl;
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		disconnect(sd);
