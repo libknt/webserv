@@ -6,6 +6,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include "rules.hpp"
 
 namespace server {
 
