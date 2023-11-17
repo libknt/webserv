@@ -64,7 +64,7 @@ void HttpRequestParser::addAcceptClientInfo(int sd,
 	}
 }
 
-int HttpRequestParser::parseRequest(int sd, std::string &line) {
+int HttpRequestParser::parseRequest(int sd, std::string const &line) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
 		//TODO somethig happened when accpect;
@@ -75,7 +75,7 @@ int HttpRequestParser::parseRequest(int sd, std::string &line) {
 			parseStartLine(it->second, line);
 			break;
 		case http_request_status::HEADER:
-			//parseHeader(it->second, line);
+			parseHeader(it->second, line);
 			break;
 		case http_request_status::BODY:
 			std::cout << "parseBODY" << std::endl;
@@ -93,7 +93,7 @@ int HttpRequestParser::parseRequest(int sd, std::string &line) {
 	return (0);
 }
 
-int HttpRequestParser::parseStartLine(HttpRequest &request, std::string &line) {
+int HttpRequestParser::parseStartLine(HttpRequest &request, std::string const &line) {
 
 	size_t index = 0;
 	parse_start_line::PARSE_START_LINE status = parse_start_line::METHOD;
@@ -129,11 +129,30 @@ int HttpRequestParser::parseStartLine(HttpRequest &request, std::string &line) {
 	return (0);
 }
 
-//int HttpRequestParser::parseHeader(HttpRequest &request, std::string &line) {
-//	
-//	for (size_t i = 0; i < line.size(); i++) {
-//		if (IS_TCHAR(line[i]))
-//	}
-//}
+int HttpRequestParser::parseHeader(HttpRequest &request, std::string const &line) {
+	
+	std::string	key;
+	std::string value;
+	std::string::size_type index = line.find(":");
+	if (line.size() == 0) {
+		if (request.getMethod() == "POST")
+			request.setStatus(http_request_status::BODY);
+		else
+			request.setStatus(http_request_status::FINISHED);
+	}
+	if (index == std::string::npos) {
+		request.setStatus(http_request_status::ERROR);
+		return (-1);
+	}
+	key = line.substr(0, index);
+	if (index + 1 < line.size()) {
+		index++;
+		while (line[index] == ' ')
+			index++;
+		value = line.substr(index);
+	}
+	request.setHeaderValue(key, value);
+	return (0);
+}
 
 }

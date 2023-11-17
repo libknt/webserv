@@ -24,13 +24,20 @@ namespace parse_start_line {
 	};
 }
 
+namespace parse_header{
+	enum PARSE_HEADER {
+		KEY,
+		VALUE,
+	};
+}
+
 class HttpRequestParser {
 private:
 	std::map<int, HttpRequest> http_request_map_;
 	std::map<int, std::string> http_line_stream_;
-	int parseRequest(int sd, std::string &line);
-	int parseStartLine(HttpRequest &request, std::string &line);
-	int parseHeader(HttpRequest &request, std::string &line);
+	int parseRequest(int sd, std::string const &line);
+	int parseStartLine(HttpRequest &request, std::string const &line);
+	int parseHeader(HttpRequest &request, std::string const &line);
 	int checkHeaderValue(int sd);
 	int parseBody(int sd, std::string const &line);
 	int parseContentLengthBody(int sd, std::string const& line);
