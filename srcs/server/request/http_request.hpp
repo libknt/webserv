@@ -93,7 +93,7 @@ public:
 	int setContentLength(size_t content_length);
 	int setChunkedStatus(chunked_status::CHUNKED_STATUS const &chunked_status );
 	int setChunkedSize(size_t chunked_size_);
-	int setBody(std::string const &body);
+	int addBody(std::string const &body);
 	int setClientAddress(sockaddr_in const &client_address);
 	int setServerAddress(sockaddr_in const &server_address);
 
@@ -106,9 +106,10 @@ public:
 	std::map<std::string, std::string> const& getHeader() const;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType();
 	size_t const &getContentLength() const;
-	chunked_status::CHUNKED_STATUS const &getChunkedStatus();
-	size_t const &getChunkedSize();
+	chunked_status::CHUNKED_STATUS const &getChunkedStatus()const;
+	size_t getChunkedSize() const;
 	std::string const& getBody() const;
+	size_t getBodySize() const;
 	std::string getUriPath() const;
 	std::string getUriQuery() const;
 	sockaddr_in const& getClientAddress() const;

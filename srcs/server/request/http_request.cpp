@@ -104,16 +104,33 @@ std::string const HttpRequest::getHeaderValue(std::string const& key) const{
 	return it->second;
 }
 
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType() {
-	return (body_message_type_);
-}
-
 std::map<std::string, std::string> const& HttpRequest::getHeader() const {
 	return header_;
 }
 
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType() {
+	return (body_message_type_);
+}
+
+size_t const &HttpRequest::getContentLength() const {
+	return (content_length_);
+}
+
+chunked_status::CHUNKED_STATUS const &HttpRequest::getChunkedStatus() const{
+	return (chunked_status_);
+}
+
+size_t HttpRequest::getChunkedSize() const {
+	return (chunked_size_);
+}
+
+
 std::string const& HttpRequest::getBody() const {
 	return body_;
+}
+
+size_t HttpRequest::getBodySize() const {
+	return (body_.size());
 }
 
 std::string HttpRequest::getUriPath() const {
@@ -215,8 +232,8 @@ int	HttpRequest::setChunkedSize(size_t chunked_size) {
 	return (0);
 }
 
-int HttpRequest::setBody(std::string const &body) {
-	body_ = body;
+int HttpRequest::addBody(std::string const &body) {
+	body_ += body;
 	return (0);
 }
 

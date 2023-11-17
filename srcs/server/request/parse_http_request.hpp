@@ -38,10 +38,10 @@ private:
 	int parseRequest(int sd, std::string const &line);
 	int parseStartLine(HttpRequest &request, std::string const &line);
 	int parseHeader(HttpRequest &request, std::string const &line);
-	int checkHeaderValue(int sd);
-	int parseBody(int sd, std::string const &line);
-	int parseContentLengthBody(int sd, std::string const& line);
-	int parseChunkedBody(int sd, std::string const& line);
+	int parseBody(HttpRequest &request, std::string const &line);
+	int parseContentLengthBody(HttpRequest &request, std::string const& line);
+	int parseChunkedBody(HttpRequest &request, std::string const& line);
+	int checkHeaderValue(HttpRequest &request);
 
 public:
 	explicit HttpRequestParser();
