@@ -17,7 +17,7 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 	return (*this);
 }
 
-int HttpRequestParser::handleBuffer(int sd, char const* buf) {
+int HttpRequestParser::handleBuffer(int sd, char *buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
@@ -64,19 +64,18 @@ void HttpRequestParser::addAcceptClientInfo(int sd,
 	}
 }
 
-int HttpRequestParser::parseRequest(int sd, std::string const &line) {
+int HttpRequestParser::parseRequest(int sd, std::string &line) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
 		//TODO somethig happened when accpect;
 		return (-1);
 	}
-	std::cout << line << std::endl;
 	switch (it->second.getStatus()) {
 		case http_request_status::METHOD:
-			std::cout << "parseMethod" << std::endl;
+			parseStartLine(it->second, line);
 			break;
 		case http_request_status::HEADER:
-			std::cout << "parseHeader" << std::endl;
+			//parseHeader(it->second, line);
 			break;
 		case http_request_status::BODY:
 			std::cout << "parseBODY" << std::endl;
@@ -93,4 +92,48 @@ int HttpRequestParser::parseRequest(int sd, std::string const &line) {
 	}
 	return (0);
 }
+
+int HttpRequestParser::parseStartLine(HttpRequest &request, std::string &line) {
+
+	size_t index = 0;
+	parse_start_line::PARSE_START_LINE status = parse_start_line::METHOD;
+		
+	for (size_t i = 0; i < line.size(); i++) {
+		if (line[i] == ' ') {
+			switch (status) {
+				case parse_start_line::METHOD:
+					if (request.setMethod(line.substr(index, i - index)) < 0) {
+						return (-1);
+					}
+					index = i + 1;
+					status = parse_start_line::REQUEST_PATH;
+					break;
+				case parse_start_line::REQUEST_PATH:
+					if (request.setRequestPath(line.substr(index, i - index)) < 0) {
+						return (-1);
+					}
+					index = i + 1;
+					status = parse_start_line::VERSION;
+					break;
+				default:
+					request.setStatus(http_request_status::ERROR);
+					break;
+			}
+		}
+	}
+	if (status != parse_start_line::VERSION || request.setVersion(line.substr(index, line.size() - index))) {
+		request.setStatus(http_request_status::ERROR);
+		return (-1);
+	}
+	request.setStatus(http_request_status::HEADER);
+	return (0);
+}
+
+//int HttpRequestParser::parseHeader(HttpRequest &request, std::string &line) {
+//	
+//	for (size_t i = 0; i < line.size(); i++) {
+//		if (IS_TCHAR(line[i]))
+//	}
+//}
+
 }

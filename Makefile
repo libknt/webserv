@@ -4,7 +4,7 @@ NAME		=	server
 
 CXX			=	c++
 
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 -fsanitize=address
 
 ADDRESS_FLAGS = -g -fsanitize=address
 
