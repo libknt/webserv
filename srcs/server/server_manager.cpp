@@ -168,7 +168,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			return -1;
 		}
 
-		http_request_parse_.addAcceptClientInfo(
+		http_request_parser_.addAcceptClientInfo(
 			client_sd, client_socket_address, connected_server_address);
 
 		std::cout << "  New incoming connection -  " << client_sd << std::endl;
@@ -195,7 +195,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 		disconnect(sd);
 		return 0;
 	}
-	http_request_parse_.handleBuffer(sd, recv_buffer);
+	http_request_parser_.handleBuffer(sd, recv_buffer);
 
 	return 0;
 }

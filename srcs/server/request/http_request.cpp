@@ -87,9 +87,6 @@ std::string const HttpRequest::getVersion() const {
 		case http_version::HTTP_1_1:
 			protocol = "HTTP_1_1";
 			break;
-		case http_version::HTTP_2_0:
-			protocol = "HTTP_2_0";
-			break;
 		default:
 			protocol = std::string("");
 	}

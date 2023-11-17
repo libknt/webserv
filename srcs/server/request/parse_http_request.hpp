@@ -16,26 +16,26 @@ namespace server {
 #define BUFFER_SIZE 1024
 #endif
 
-class ParseHttpRequest {
+class HttpRequestParser {
 private:
 	std::map<int, HttpRequest> http_request_map_;
 	std::map<int, std::string> http_line_stream_;
-	int parseHttpRequest();
-	int parseMethod();
-	int parseHeader();
-	int checkHeaderValue();
-	int parseBody(std::string const& line);
-	int parseContentLengthBody(std::string const& line);
-	int parseChunkedBody(std::string const& line);
+	int parseRequest(int sd, std::string const &line);
+	int parseMethod(int sd, std::string const &line);
+	int parseHeader(int sd, std::string const &line);
+	int checkHeaderValue(int sd);
+	int parseBody(int sd, std::string const& line);
+	int parseContentLengthBody(int sd, std::string const& line);
+	int parseChunkedBody(int sd, std::string const& line);
 
 public:
-	explicit ParseHttpRequest();
-	explicit ParseHttpRequest(ParseHttpRequest& other);
-	virtual ~ParseHttpRequest();
-	ParseHttpRequest& operator=(ParseHttpRequest& other);
-	int handleBuffer(int socketfd, char* buf);
+	explicit HttpRequestParser();
+	explicit HttpRequestParser(HttpRequestParser& other);
+	virtual ~HttpRequestParser();
+	HttpRequestParser& operator=(HttpRequestParser& other);
+	int handleBuffer(int sd, char const* buf);
 	HttpRequest const& getRequest(int sd) const;
-	void addAcceptClientInfo(int socketfd, sockaddr_in client_address, sockaddr_in server_address);
+	void addAcceptClientInfo(int sd, sockaddr_in client_address, sockaddr_in server_address);
 };
 
 }

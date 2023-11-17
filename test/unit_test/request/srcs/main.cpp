@@ -12,7 +12,7 @@
 #endif
 
 int main(int argc, char* argv[]) {
-	server::ParseHttpRequest parse_http_request;
+	server::HttpRequestParser parse_http_request;
 	std::vector<int> fd(argc);
 	bool is_all_read = false;
 	char buffer[BUFFER_SIZE];

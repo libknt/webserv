@@ -20,7 +20,7 @@ private:
 	int highest_sd_;
 	bool is_running;
 	struct timeval timeout_;
-	ParseHttpRequest http_request_parse_;
+	HttpRequestParser http_request_parser_;
 
 	ServerManager();
 	int setupServerSockets();
