@@ -55,7 +55,7 @@ HttpRequest const& HttpRequestParser::getRequest(int sd) const {
 	return it->second;
 }
 
-void HttpRequestParser::AcceptClientInfo(int sd,
+void HttpRequestParser::addAcceptClientInfo(int sd,
 	sockaddr_in client_address,
 	sockaddr_in server_address) {
 	if (http_request_map_.find(sd) == http_request_map_.end()) {
@@ -66,15 +66,31 @@ void HttpRequestParser::AcceptClientInfo(int sd,
 
 int HttpRequestParser::parseRequest(int sd, std::string const &line) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
-	if (it == http_request_map_[sd].end()) {
-		HttpRequest request
-		request.setStatus(http_request_status::ERROR);
-		http_request_map_.insert(std::make_pair(sd, request));
+	if (it == http_request_map_.end()) {
+		//TODO somethig happened when accpect;
 		return (-1);
 	}
-	switch (it->second.getStatus())
+	std::cout << line << std::endl;
+	switch (it->second.getStatus()) {
+		case http_request_status::METHOD:
+			std::cout << "parseMethod" << std::endl;
+			break;
+		case http_request_status::HEADER:
+			std::cout << "parseHeader" << std::endl;
+			break;
+		case http_request_status::BODY:
+			std::cout << "parseBODY" << std::endl;
+			break;
+		case http_request_status::FINISHED:
+			std::cout << "FINISHED" << std::endl;
+			break;
+		case http_request_status::ERROR:
+			std::cout << "Error" << std::endl;
+			break;
+		case http_request_status::UNDEFINED:
+			std::cout << "UNDEFINED" << std::endl;
+			break;
+	}
+	return (0);
 }
-
-int HttpRequestParser::parseMethod(int sd);
-int HttpRequestParser::parseHeader(int sd);
 }
