@@ -96,7 +96,7 @@ std::string const& HttpRequest::getRequestPath() const {
 	return request_path_;
 }
 
-std::string const HttpRequest::getHeaderValue(std::string const& key) const{
+std::string const HttpRequest::getHeaderValue(std::string const& key) const {
 	std::map<std::string, std::string>::const_iterator it = header_.find(key);
 	if (it == header_.end())
 		return (std::string(""));
@@ -111,18 +111,17 @@ http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessag
 	return (body_message_type_);
 }
 
-size_t const &HttpRequest::getContentLength() const {
+size_t const& HttpRequest::getContentLength() const {
 	return (content_length_);
 }
 
-chunked_status::CHUNKED_STATUS const &HttpRequest::getChunkedStatus() const{
+chunked_status::CHUNKED_STATUS const& HttpRequest::getChunkedStatus() const {
 	return (chunked_status_);
 }
 
 size_t HttpRequest::getChunkedSize() const {
 	return (chunked_size_);
 }
-
 
 std::string const& HttpRequest::getBody() const {
 	return body_;
@@ -161,7 +160,7 @@ int HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& statu
 	return (0);
 }
 
-int	HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
+int HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
 	error_status_ = error_status;
 	return (0);
 }
@@ -205,43 +204,43 @@ int HttpRequest::setHeaderValue(std::string const& key, std::string const& value
 	std::map<std::string, std::string>::iterator it = header_.find(key);
 	if (it != header_.end()) {
 		it->second = it->second + ", " + value;
-	}
-	else
+	} else
 		header_.insert(std::make_pair(key, value));
 	return (0);
 }
 
-int	HttpRequest::setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const &body_message_type) {
+int HttpRequest::setBodyMassageType(
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& body_message_type) {
 	body_message_type_ = body_message_type;
 	return (0);
 }
 
-int	HttpRequest::setContentLength(size_t content_length) {
+int HttpRequest::setContentLength(size_t content_length) {
 	content_length_ = content_length;
 	return (0);
 }
 
-int	HttpRequest::setChunkedStatus(chunked_status::CHUNKED_STATUS const &chunked_status ) {
+int HttpRequest::setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status) {
 	chunked_status_ = chunked_status;
 	return (0);
 }
 
-int	HttpRequest::setChunkedSize(size_t chunked_size) {
+int HttpRequest::setChunkedSize(size_t chunked_size) {
 	chunked_size_ = chunked_size;
 	return (0);
 }
 
-int HttpRequest::addBody(std::string const &body) {
+int HttpRequest::addBody(std::string const& body) {
 	body_ += body;
 	return (0);
 }
 
-int HttpRequest::setClientAddress(sockaddr_in const &client_address) {
+int HttpRequest::setClientAddress(sockaddr_in const& client_address) {
 	client_address_ = client_address;
 	return (0);
 }
 
-int HttpRequest::setServerAddress(sockaddr_in const &server_address) {
+int HttpRequest::setServerAddress(sockaddr_in const& server_address) {
 	server_address_ = server_address;
 	return (0);
 }

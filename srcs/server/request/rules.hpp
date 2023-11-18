@@ -14,12 +14,14 @@
 #endif
 
 #ifndef IS_TDELIMITAR
-#define IS_TDELIMITAR(chr) (chr == '(' || chr == ')' || chr == ',' || chr == '/' || chr == ':' || chr == ';' || chr == '<' || chr == '>' || chr == '=' || chr == '?' || chr == '@' || chr == '[' || chr == '\\' || chr == ']' || chr == '{' || chr == '}')
-#endif 
+#define IS_TDELIMITAR(chr)                                                                         \
+	(chr == '(' || chr == ')' || chr == ',' || chr == '/' || chr == ':' || chr == ';' ||           \
+		chr == '<' || chr == '>' || chr == '=' || chr == '?' || chr == '@' || chr == '[' ||        \
+		chr == '\\' || chr == ']' || chr == '{' || chr == '}')
+#endif
 
 #ifndef IS_TCHAR
 #define IS_TCHAR(chr) (IS_DIGIT(chr) || IS_ALPHA(chr) || (!IS_TDELIMITAR(chr) && chr != '"'))
 #endif
-
 
 #endif

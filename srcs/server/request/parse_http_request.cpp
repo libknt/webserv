@@ -17,7 +17,7 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 	return (*this);
 }
 
-int HttpRequestParser::handleBuffer(int sd, char *buf) {
+int HttpRequestParser::handleBuffer(int sd, char* buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
@@ -64,10 +64,10 @@ void HttpRequestParser::addAcceptClientInfo(int sd,
 	}
 }
 
-int HttpRequestParser::parseRequest(int sd, std::string const &line) {
+int HttpRequestParser::parseRequest(int sd, std::string const& line) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
-		//TODO somethig happened when accpect;
+		// TODO somethig happened when accpect;
 		return (-1);
 	}
 	switch (it->second.getStatus()) {
@@ -90,11 +90,11 @@ int HttpRequestParser::parseRequest(int sd, std::string const &line) {
 	return (0);
 }
 
-int HttpRequestParser::parseStartLine(HttpRequest &request, std::string const &line) {
+int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& line) {
 
 	size_t index = 0;
 	parse_start_line::PARSE_START_LINE status = parse_start_line::METHOD;
-		
+
 	for (size_t i = 0; i < line.size(); i++) {
 		if (line[i] == ' ') {
 			switch (status) {
@@ -118,7 +118,8 @@ int HttpRequestParser::parseStartLine(HttpRequest &request, std::string const &l
 			}
 		}
 	}
-	if (status != parse_start_line::VERSION || request.setVersion(line.substr(index, line.size() - index))) {
+	if (status != parse_start_line::VERSION ||
+		request.setVersion(line.substr(index, line.size() - index))) {
 		request.setStatus(http_request_status::ERROR);
 		return (-1);
 	}
@@ -126,9 +127,9 @@ int HttpRequestParser::parseStartLine(HttpRequest &request, std::string const &l
 	return (0);
 }
 
-int HttpRequestParser::parseHeader(HttpRequest &request, std::string const &line) {
-	
-	std::string	key;
+int HttpRequestParser::parseHeader(HttpRequest& request, std::string const& line) {
+
+	std::string key;
 	std::string value;
 	std::string::size_type index = line.find(":");
 	if (line.size() == 0) {
@@ -149,7 +150,7 @@ int HttpRequestParser::parseHeader(HttpRequest &request, std::string const &line
 	return (0);
 }
 
-int HttpRequestParser::parseBody(HttpRequest &request, std::string const &line) {
+int HttpRequestParser::parseBody(HttpRequest& request, std::string const& line) {
 	switch (request.getBodyMessageType()) {
 		case http_body_message_type::CHUNK_ENCODING:
 			return (parseChunkedBody(request, line));
@@ -162,7 +163,7 @@ int HttpRequestParser::parseBody(HttpRequest &request, std::string const &line) 
 	}
 }
 
-int HttpRequestParser::parseContentLengthBody(HttpRequest &request, std::string const& line) {
+int HttpRequestParser::parseContentLengthBody(HttpRequest& request, std::string const& line) {
 	request.addBody(line);
 	if (request.getBodySize() == request.getContentLength())
 		request.setStatus(http_request_status::FINISHED);
@@ -174,7 +175,7 @@ int HttpRequestParser::parseContentLengthBody(HttpRequest &request, std::string 
 	return (0);
 }
 
-int HttpRequestParser::parseChunkedBody(HttpRequest &request, std::string const& line) {
+int HttpRequestParser::parseChunkedBody(HttpRequest& request, std::string const& line) {
 	if (request.getChunkedStatus() == chunked_status::CHUNKED_SIZE) {
 		// TODO no error handling
 		// TODO Caution ! strtol is C++ 11 function.
@@ -193,28 +194,26 @@ int HttpRequestParser::parseChunkedBody(HttpRequest &request, std::string const&
 	}
 	return (0);
 }
-int HttpRequestParser::checkHeaderValue(HttpRequest &request) {
+int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 	std::string method = request.getMethod();
 	if (method == "GET" || method == "DELETE") {
 		request.setBodyMassageType(http_body_message_type::NONE);
 		request.setStatus(http_request_status::FINISHED);
-	}
-	else if (method == "POST") {
+	} else if (method == "POST") {
 		if (request.getHeaderValue("Transfer-Encoding") == "chunked")
 			request.setBodyMassageType(http_body_message_type::CHUNK_ENCODING);
 		else if (request.getHeaderValue("Content-Length") != "") {
 			request.setBodyMassageType(http_body_message_type::CONTENT_LENGTH);
 			// TODO you should check the value is affordable.
-			request.setContentLength(static_cast<size_t>(std::atoi(request.getHeaderValue("Content-Length").c_str())));
+			request.setContentLength(
+				static_cast<size_t>(std::atoi(request.getHeaderValue("Content-Length").c_str())));
 		}
 		request.setStatus(http_request_status::BODY);
-	}
-	else  {
-			request.setStatus(http_request_status::ERROR);
-			request.setErrorStatus(http_error_status::BAD_REQUEST);
-			return (-1);
+	} else {
+		request.setStatus(http_request_status::ERROR);
+		request.setErrorStatus(http_error_status::BAD_REQUEST);
+		return (-1);
 	}
 	return (0);
 }
 }
-

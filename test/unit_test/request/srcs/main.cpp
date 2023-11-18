@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 				std::cerr << "TEST" << argv[i] << ": OK" << std::endl;
 			else {
 				std::cerr << "TEST" << argv[i] << ": NG" << request.getStatus() << std::endl;
-                std::cout << request << std::endl;
+				std::cout << request << std::endl;
 				exit(1);
 			}
 			close(fd[i]);
