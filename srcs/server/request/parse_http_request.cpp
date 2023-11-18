@@ -178,7 +178,6 @@ int HttpRequestParser::parseContentLengthBody(HttpRequest& request, std::string 
 int HttpRequestParser::parseChunkedBody(HttpRequest& request, std::string const& line) {
 	if (request.getChunkedStatus() == chunked_status::CHUNKED_SIZE) {
 		// TODO no error handling
-		// TODO Caution ! strtol is C++ 11 function.
 		request.setChunkedSize(std::strtol(line.c_str(), NULL, 16));
 		request.setChunkedStatus(chunked_status::CHUNKED_MESSAGE);
 	} else if (line.size() == 0 && request.getChunkedSize() == 0) {

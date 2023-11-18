@@ -267,6 +267,8 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 		 ++it) {
 		std::cout << "key: " << it->first << " value: " << it->second << std::endl;
 	}
+	std::cout << "-----body----" << std::endl;
+	std::cout << request.getBody() << std::endl;
 	return out;
 }
 
