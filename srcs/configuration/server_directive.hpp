@@ -18,7 +18,6 @@ private:
 
 	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
-	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 	std::string parseLocationPath(std::vector<std::string>& tokens);
 	bool isValidIPSegment(int num) const;
 	bool isValidIPv4(const std::string& ip) const;
