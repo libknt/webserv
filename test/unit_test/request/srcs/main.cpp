@@ -43,9 +43,8 @@ int main(int argc, char* argv[]) {
 				(std::string(argv[i]).find("failure") != std::string::npos &&
 					request.getStatus() == server::http_request_status::ERROR)) {
 				std::cerr << "TEST" << argv[i] << ": OK" << std::endl;
-                std::cout << request << std::endl;
-            }
-			else {
+				std::cout << request << std::endl;
+			} else {
 				std::cerr << "TEST" << argv[i] << ": NG" << request.getStatus() << std::endl;
 				std::cout << request << std::endl;
 				exit(1);
