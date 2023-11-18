@@ -130,15 +130,6 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 	return 0;
 }
 
-int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 1) {
-		std::cerr << "Parse Error: parseDefaultErrorPageDirective" << std::endl;
-		return -1;
-	}
-	default_error_page_ = tokens.front();
-	return 0;
-}
-
 std::string ServerDirective::parseLocationPath(std::vector<std::string>& tokens) {
 	if (tokens.empty()) {
 		std::cerr << "Parse Error: parseLocationPath" << std::endl;
