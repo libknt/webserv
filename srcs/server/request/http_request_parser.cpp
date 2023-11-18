@@ -199,13 +199,15 @@ int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 		request.setBodyMassageType(http_body_message_type::NONE);
 		request.setStatus(http_request_status::FINISHED);
 	} else if (method == "POST") {
-		if (request.getHeaderValue("transfer-encoding") == "chunked")
+		if (request.getHeaderValue("transfer-encoding") == "chunked") {
 			request.setBodyMassageType(http_body_message_type::CHUNK_ENCODING);
-		else if (request.getHeaderValue("content-length") != "") {
+		} else if (request.getHeaderValue("content-length") != "") {
 			request.setBodyMassageType(http_body_message_type::CONTENT_LENGTH);
 			// TODO you should check the value is affordable.
 			request.setContentLength(
 				static_cast<size_t>(std::atoi(request.getHeaderValue("content-length").c_str())));
+		} else {
+			request.setStatus(http_request_status::ERROR);
 		}
 		request.setStatus(http_request_status::BODY);
 	} else {
