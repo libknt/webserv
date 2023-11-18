@@ -8,7 +8,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 	std::vector<ServerDirective> servers = configuration.getServers();
 	HttpResponse response;
 
-// エラー: リソースが存在しない(), 許されていないmethod
+	// エラー: リソースが存在しない(), 許されていないmethod
 	for (size_t i = 0; i < servers.size(); i++) {
 		ServerDirective server_directive = servers[i];
 		if (server_directive.getPort() == request.getServerPort()) {
@@ -45,14 +45,16 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 	return (response);
 }
 
-HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive) {
+HttpResponse executeDelete(const HttpRequest& request,
+	const LocationDirective& location_directive) {
 	HttpResponse response;
 	(void)request;
 	(void)location_directive;
 	return (response);
 }
 
-HttpResponse createErrorResponse(const STATUS_CODE status_code, const LocationDirective& location_directive) {
+HttpResponse createErrorResponse(const STATUS_CODE status_code,
+	const LocationDirective& location_directive) {
 	HttpResponse response;
 
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
@@ -61,16 +63,17 @@ HttpResponse createErrorResponse(const STATUS_CODE status_code, const LocationDi
 	stringstream << status_code;
 	std::string error_page_path = error_pages[stringstream.str()];
 
-    std::ifstream file_stream(error_page_path.c_str());
-    std::string line, body_content;
-    if (file_stream.is_open()) {
-        while (getline(file_stream, line)) {
-            body_content += line + "\n";
-        }
-        file_stream.close();
-    } else {
-        body_content = "<html><body><h1> testestestest create Error Response: " + stringstream.str() + "</h1></body></html>";
-    }
+	std::ifstream file_stream(error_page_path.c_str());
+	std::string line, body_content;
+	if (file_stream.is_open()) {
+		while (getline(file_stream, line)) {
+			body_content += line + "\n";
+		}
+		file_stream.close();
+	} else {
+		body_content =
+			"<html><body><h1> createErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
 	response.setBody(body_content);
