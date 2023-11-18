@@ -16,11 +16,11 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			std::map<std::string, LocationDirective> locations = server_directive.getLocations();
 			LocationDirective location_directive = locations[request.getRequestPath()];
 
-			if (method == "GET") {
+			if (method == "GET" && location_directive.isAllowMethod(method)) {
 				response = executeGet(request, location_directive);
-			} else if (method == "POST") {
+			} else if (method == "POST" && location_directive.isAllowMethod(method)) {
 				response = executePost(request, location_directive);
-			} else if (method == "DELETE") {
+			} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
 				response = executeDelete(request, location_directive);
 			} else {
 				response = createErrorResponse(METHOD_NOT_ALLOWED, location_directive);
@@ -69,7 +69,7 @@ HttpResponse createErrorResponse(const STATUS_CODE status_code, const LocationDi
         }
         file_stream.close();
     } else {
-        body_content = "<html><body><h1>Error " + stringstream.str() + "</h1></body></html>";
+        body_content = "<html><body><h1> testestestest create Error Response: " + stringstream.str() + "</h1></body></html>";
     }
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
