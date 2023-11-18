@@ -1,5 +1,6 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
+#include "rules.hpp"
 #include <arpa/inet.h>
 #include <iostream>
 #include <map>

@@ -201,11 +201,20 @@ int HttpRequest::setVersion(std::string const& version) {
 }
 
 int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
-	std::map<std::string, std::string>::iterator it = header_.find(key);
+	std::string internal_key;
+	for (size_t i = 0; i < key.size(); i++) {
+		if (!IS_TCHAR(key[i])) {
+			setStatus(http_request_status::ERROR);
+			return (-1);
+		}
+		const char chr = std::tolower(key[i]);
+		internal_key.push_back(chr);
+	}
+	std::map<std::string, std::string>::iterator it = header_.find(internal_key);
 	if (it != header_.end()) {
 		it->second = it->second + ", " + value;
 	} else
-		header_.insert(std::make_pair(key, value));
+		header_.insert(std::make_pair(internal_key, value));
 	return (0);
 }
 
