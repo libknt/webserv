@@ -1,5 +1,5 @@
 #include "http_request.hpp"
-#include "parse_http_request.hpp"
+#include "http_request_parser.hpp"
 #include <fcntl.h>
 #include <iostream>
 #include <netinet/in.h>
@@ -12,7 +12,7 @@
 #endif
 
 int main(int argc, char* argv[]) {
-	server::HttpRequestParser parse_http_request;
+	server::HttpRequestParser http_request_parser;
 	std::vector<int> fd(argc);
 	bool is_all_read = false;
 	char buffer[BUFFER_SIZE];
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "BUFFER_SIZE: " << BUFFER_SIZE << std::endl;
 	for (int i = 1; i < argc; i++) {
 		fd[i] = open(argv[i], O_RDWR);
-		parse_http_request.addAcceptClientInfo(fd[i], client_address, server_address);
+		http_request_parser.addAcceptClientInfo(fd[i], client_address, server_address);
 	}
 	while (!is_all_read) {
 		is_all_read = true;
@@ -31,13 +31,13 @@ int main(int argc, char* argv[]) {
 			int size = read(fd[i], buffer, BUFFER_SIZE - 1);
 			if (0 < size) {
 				is_all_read = false;
-				parse_http_request.handleBuffer(fd[i], buffer);
+				http_request_parser.handleBuffer(fd[i], buffer);
 			}
 		}
 	}
 	for (int i = 1; i < argc; i++) {
 		if (0 < fd[i]) {
-			server::HttpRequest const request(parse_http_request.getRequest(fd[i]));
+			server::HttpRequest const request(http_request_parser.getRequest(fd[i]));
 			if ((std::string(argv[i]).find("success") != std::string::npos &&
 					request.getStatus() == server::http_request_status::FINISHED) ||
 				(std::string(argv[i]).find("failure") != std::string::npos &&

@@ -2,7 +2,7 @@
 #define SERVER_MANAGER_HPP
 
 #include "configuration.hpp"
-#include "parse_http_request.hpp"
+#include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
 #include "types.hpp"
 #include <map>
