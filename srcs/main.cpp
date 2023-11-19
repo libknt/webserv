@@ -22,6 +22,8 @@ int main(int argc, char** argv) {
 			return 1;
 	}
 
+	std::cout << configuration << std::endl;
+
 	server::ServerManager server(configuration);
 	if (server.runServer() != -1) {
 		std::cerr << "runServer() failed" << std::endl;
