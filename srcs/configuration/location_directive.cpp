@@ -269,6 +269,10 @@ std::string LocationDirective::getAutoindex() const {
 	return autoindex_;
 }
 
+std::map<std::string, std::string> LocationDirective::getReturn() const {
+	return return_;
+}
+
 std::string LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
