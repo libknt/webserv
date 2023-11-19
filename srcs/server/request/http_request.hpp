@@ -90,7 +90,8 @@ public:
 	int setRequestPath(std::string const& request_path);
 	int setVersion(std::string const& version);
 	int setHeaderValue(std::string const& key, std::string const& value);
-	void setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& body_message_type);
+	void setBodyMassageType(
+		http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& body_message_type);
 	void setContentLength(size_t content_length);
 	void setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status);
 	void setChunkedSize(size_t chunked_size_);
