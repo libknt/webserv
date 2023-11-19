@@ -293,19 +293,26 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 		 ++it) {
 		out << it->first << ":" << it->second << ", ";
 	}
-	std::cout << std::endl;
+	out << std::endl;
 
 	std::vector<std::string> allow_methods = location_directive.getAllowMethods();
 	out << "HTTPMethods: " << std::endl;
 	for (size_t i = 0; i < allow_methods.size(); ++i) {
 		out << allow_methods[i] << ", ";
 	}
-	std::cout << std::endl;
+	out << std::endl;
 
 	out << "GetClientMaxBodySize: " << location_directive.getClientMaxBodySize() << std::endl;
 	out << "Root: " << location_directive.getRoot() << std::endl;
 	out << "Index: " << location_directive.getIndex() << std::endl;
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
+
+	std::map<std::string, std::string> return_directive = location_directive.getReturn();
+	if (return_directive.size()) {
+		std::map<std::string, std::string>::iterator it = return_directive.begin();
+		out << "Return: " << it->first << ":" << it->second << std::endl;
+	}
+
 	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding()
 		<< std::endl;
 	out << "CGI: " << location_directive.getCgi() << std::endl;
