@@ -93,24 +93,24 @@ int HttpRequestParser::parseRequest(int sd, std::string const& line) {
 int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& line) {
 
 	size_t index = 0;
-	parse_start_line::PARSE_START_LINE status = parse_start_line::METHOD;
+	parse_request_line::PARSE_REQUEST_LINE status = parse_request_line::METHOD;
 
 	for (size_t i = 0; i < line.size(); i++) {
 		if (line[i] == ' ') {
 			switch (status) {
-				case parse_start_line::METHOD:
+				case parse_request_line::METHOD:
 					if (request.setMethod(line.substr(index, i - index)) < 0) {
 						return (-1);
 					}
 					index = i + 1;
-					status = parse_start_line::REQUEST_PATH;
+					status = parse_request_line::REQUEST_PATH;
 					break;
-				case parse_start_line::REQUEST_PATH:
+				case parse_request_line::REQUEST_PATH:
 					if (request.setRequestPath(line.substr(index, i - index)) < 0) {
 						return (-1);
 					}
 					index = i + 1;
-					status = parse_start_line::VERSION;
+					status = parse_request_line::VERSION;
 					break;
 				default:
 					request.setStatus(http_request_status::ERROR);
@@ -118,7 +118,7 @@ int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& l
 			}
 		}
 	}
-	if (status != parse_start_line::VERSION ||
+	if (status != parse_request_line::VERSION ||
 		request.setVersion(line.substr(index, line.size() - index))) {
 		request.setStatus(http_request_status::ERROR);
 		return (-1);

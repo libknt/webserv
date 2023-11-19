@@ -13,8 +13,8 @@
 namespace server {
 static const int BUFFER_SIZE = 1024;
 
-namespace parse_start_line {
-enum PARSE_START_LINE {
+namespace parse_request_line{
+enum PARSE_REQUEST_LINE {
 	METHOD,
 	REQUEST_PATH,
 	VERSION,
