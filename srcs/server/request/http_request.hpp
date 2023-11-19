@@ -84,19 +84,19 @@ public:
 	explicit HttpRequest(HttpRequest const& other);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
-	int setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
-	int setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
+	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
+	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	int setMethod(std::string const& method);
 	int setRequestPath(std::string const& request_path);
 	int setVersion(std::string const& version);
 	int setHeaderValue(std::string const& key, std::string const& value);
-	int setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& body_message_type);
-	int setContentLength(size_t content_length);
-	int setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status);
-	int setChunkedSize(size_t chunked_size_);
-	int appendBody(std::string const& body);
-	int setClientAddress(sockaddr_in const& client_address);
-	int setServerAddress(sockaddr_in const& server_address);
+	void setBodyMassageType(http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& body_message_type);
+	void setContentLength(size_t content_length);
+	void setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status);
+	void setChunkedSize(size_t chunked_size_);
+	void appendBody(std::string const& body);
+	void setClientAddress(sockaddr_in const& client_address);
+	void setServerAddress(sockaddr_in const& server_address);
 
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
 	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;

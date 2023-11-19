@@ -155,14 +155,12 @@ sockaddr_in const& HttpRequest::getServerAddress() const {
 	return server_address_;
 }
 
-int HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
+void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
 	status_ = status;
-	return (0);
 }
 
-int HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
+void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
 	error_status_ = error_status;
-	return (0);
 }
 
 int HttpRequest::setMethod(std::string const& method) {
@@ -218,40 +216,33 @@ int HttpRequest::setHeaderValue(std::string const& key, std::string const& value
 	return (0);
 }
 
-int HttpRequest::setBodyMassageType(
+void HttpRequest::setBodyMassageType(
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& body_message_type) {
 	body_message_type_ = body_message_type;
-	return (0);
 }
 
-int HttpRequest::setContentLength(size_t content_length) {
+void HttpRequest::setContentLength(size_t content_length) {
 	content_length_ = content_length;
-	return (0);
 }
 
-int HttpRequest::setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status) {
+void HttpRequest::setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status) {
 	chunked_status_ = chunked_status;
-	return (0);
 }
 
-int HttpRequest::setChunkedSize(size_t chunked_size) {
+void HttpRequest::setChunkedSize(size_t chunked_size) {
 	chunked_size_ = chunked_size;
-	return (0);
 }
 
-int HttpRequest::appendBody(std::string const& body) {
+void HttpRequest::appendBody(std::string const& body) {
 	body_ += body;
-	return (0);
 }
 
-int HttpRequest::setClientAddress(sockaddr_in const& client_address) {
+void HttpRequest::setClientAddress(sockaddr_in const& client_address) {
 	client_address_ = client_address;
-	return (0);
 }
 
-int HttpRequest::setServerAddress(sockaddr_in const& server_address) {
+void HttpRequest::setServerAddress(sockaddr_in const& server_address) {
 	server_address_ = server_address;
-	return (0);
 }
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
