@@ -15,6 +15,7 @@ private:
 	std::string root_;
 	std::string index_;
 	std::string autoindex_;
+	std::map<std::string, std::string> return_;
 	std::string chunked_transfer_encoding_;
 	std::string cgi_;
 	std::vector<std::string> cgi_extensions_;
@@ -25,6 +26,7 @@ private:
 	int parseIndexDirective(std::vector<std::string>& tokens);
 	int parseAutoindexDirective(std::vector<std::string>& tokens);
 	int parseAllowMethodsDirective(std::vector<std::string>& tokens);
+	int parseReturnDirective(std::vector<std::string>& tokens);
 	int parseChunkedTransferEncodingDirective(std::vector<std::string>& tokens);
 	int parseCgiDirective(std::vector<std::string>& tokens);
 	int parseCgiExtensionsDirective(std::vector<std::string>& tokens);

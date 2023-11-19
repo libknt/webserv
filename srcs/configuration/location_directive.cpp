@@ -21,6 +21,7 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 	, root_(other.root_)
 	, index_(other.index_)
 	, autoindex_(other.autoindex_)
+	, return_(other.return_)
 	, chunked_transfer_encoding_(other.chunked_transfer_encoding_)
 	, cgi_(other.cgi_)
 	, cgi_extensions_(other.cgi_extensions_) {}
@@ -33,6 +34,7 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 		root_ = other.root_;
 		index_ = other.index_;
 		autoindex_ = other.autoindex_;
+		return_ = other.return_;
 		chunked_transfer_encoding_ = other.chunked_transfer_encoding_;
 		cgi_ = other.cgi_;
 		cgi_extensions_ = other.cgi_extensions_;
@@ -72,6 +74,11 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 			allow_methods_.clear();
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseAllowMethodsDirective(args) == -1) {
+				return -1;
+			}
+		} else if (tokens.front() == "return") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			if (parseReturnDirective(args) == -1) {
 				return -1;
 			}
 		} else if (tokens.front() == "chunked_transfer_encoding") {
@@ -184,6 +191,15 @@ int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& toke
 		}
 		allow_methods_.push_back(tokens[i]);
 	}
+	return 0;
+}
+
+int LocationDirective::parseReturnDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() != 2) {
+		std::cerr << "Parse Error: parseReturnDirective" << std::endl;
+		return -1;
+	}
+	return_[tokens[0]] = tokens[1];
 	return 0;
 }
 
