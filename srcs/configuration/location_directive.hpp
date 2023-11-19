@@ -49,6 +49,7 @@ public:
 	std::string getCgi() const;
 	const std::vector<std::string>& getCgiExtensions() const;
 	bool isValidCgiExtensions(const std::string& extension) const;
+	bool isAllowMethod(const std::string& method);
 };
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive);

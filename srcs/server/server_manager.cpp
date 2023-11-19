@@ -1,7 +1,5 @@
 #include "server_manager.hpp"
 
-// mergeテスト
-
 namespace server {
 
 ServerManager::ServerManager(const Configuration& configuration)
@@ -146,14 +144,14 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				if (server_status_[sd] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
 					determineIfCgiRequest(sd);
-					if (http_request_parse_.getHttpRequest(sd).getIsCgi()) {
+					if (http_request_parse_.getRequest(sd).getIsCgi()) {
 						std::cout << "  execute cgi" << std::endl;
 						// TODO cgi実行
 					} else {
 						std::cout << "  create response" << std::endl;
 						// TODO: Requestの実行, Responseの作成して送る
 						response_[sd] = handle_request::handleRequest(
-							http_request_parse_.getHttpRequest(sd), configuration_);
+							http_request_parse_.getRequest(sd), configuration_);
 						setWriteFd(sd);
 					}
 				}
@@ -252,7 +250,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 }
 
 int ServerManager::determineIfCgiRequest(int sd) {
-	HttpRequest& request = http_request_parse_.getHttpRequest(sd);
+	HttpRequest& request = http_request_parse_.getRequest(sd);
 	std::string ip_address = request.getServerIpAddress();
 	std::string port = request.getServerPort();
 	const ServerDirective& server_configuration =
