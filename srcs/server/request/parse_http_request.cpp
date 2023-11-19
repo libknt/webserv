@@ -47,8 +47,8 @@ SERVER_STATUS ParseHttpRequest::handleBuffer(int socketfd, char* buf) {
 			http_line_stream_[socketfd].clear();
 		}
 	}
-
-	if (http_request_status::FINISHED == it->second.getStatus()) {
+	http_request_status::HTTP_REQUEST_STATUS status = it->second.getStatus();
+	if (status == http_request_status::FINISHED || status == http_request_status::ERROR) {
 		return PREPARING_RESPONSE;
 	}
 	return RECEIVING_REQUEST;
