@@ -1,6 +1,5 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
-#include "rules.hpp"
 #include <arpa/inet.h>
 #include <iostream>
 #include <map>
@@ -76,6 +75,8 @@ private:
 	std::string body_;
 	sockaddr_in client_address_;
 	sockaddr_in server_address_;
+	bool isTokenDelimiter(char chr);
+	bool isTokenCharacter(char chr);
 
 	HttpRequest();
 

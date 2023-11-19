@@ -201,7 +201,7 @@ int HttpRequest::setVersion(std::string const& version) {
 int HttpRequest::setHeaderValue(std::string const& key, std::string const& value) {
 	std::string internal_key;
 	for (size_t i = 0; i < key.size(); i++) {
-		if (!IS_TCHAR(key[i])) {
+		if (!isTokenCharacter(key[i])) {
 			setStatus(http_request_status::ERROR);
 			return (-1);
 		}
@@ -243,6 +243,18 @@ void HttpRequest::setClientAddress(sockaddr_in const& client_address) {
 
 void HttpRequest::setServerAddress(sockaddr_in const& server_address) {
 	server_address_ = server_address;
+}
+
+bool HttpRequest::isTokenDelimiter(char chr)
+{
+    return (chr == '(' || chr == ')' || chr == ',' || chr == '/' || chr == ':' || chr == ';' ||        \
+		chr == '<' || chr == '>' || chr == '=' || chr == '?' || chr == '@' || chr == '[' ||        \
+		chr == '\\' || chr == ']' || chr == '{' || chr == '}');
+}
+
+bool HttpRequest::isTokenCharacter(char chr)
+{
+    return  (std::isdigit(chr) || std::isalpha(chr) || (std::isprint(chr) && !isTokenDelimiter(chr) && chr != '"'));
 }
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
