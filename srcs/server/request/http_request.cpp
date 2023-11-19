@@ -245,16 +245,15 @@ void HttpRequest::setServerAddress(sockaddr_in const& server_address) {
 	server_address_ = server_address;
 }
 
-bool HttpRequest::isTokenDelimiter(char chr)
-{
-    return (chr == '(' || chr == ')' || chr == ',' || chr == '/' || chr == ':' || chr == ';' ||        \
-		chr == '<' || chr == '>' || chr == '=' || chr == '?' || chr == '@' || chr == '[' ||        \
-		chr == '\\' || chr == ']' || chr == '{' || chr == '}');
+bool HttpRequest::isTokenDelimiter(char chr) {
+	return (chr == '(' || chr == ')' || chr == ',' || chr == '/' || chr == ':' || chr == ';' ||
+			chr == '<' || chr == '>' || chr == '=' || chr == '?' || chr == '@' || chr == '[' ||
+			chr == '\\' || chr == ']' || chr == '{' || chr == '}');
 }
 
-bool HttpRequest::isTokenCharacter(char chr)
-{
-    return  (std::isdigit(chr) || std::isalpha(chr) || (std::isprint(chr) && !isTokenDelimiter(chr) && chr != '"'));
+bool HttpRequest::isTokenCharacter(char chr) {
+	return (std::isdigit(chr) || std::isalpha(chr) ||
+			(std::isprint(chr) && !isTokenDelimiter(chr) && chr != '"'));
 }
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
