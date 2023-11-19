@@ -181,7 +181,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 }
 
 int ServerManager::receiveAndParseHttpRequest(int sd) {
-	char recv_buffer[BUFFER_SIZE];
+	char recv_buffer[server::BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
 	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);

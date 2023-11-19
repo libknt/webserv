@@ -11,10 +11,7 @@
 #include <vector>
 
 namespace server {
-
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1024
-#endif
+static const int BUFFER_SIZE = 1024;
 
 namespace parse_start_line {
 enum PARSE_START_LINE {

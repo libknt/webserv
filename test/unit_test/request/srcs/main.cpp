@@ -7,19 +7,15 @@
 #include <unistd.h>
 #include <vector>
 
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1024
-#endif
-
 int main(int argc, char* argv[]) {
 	server::HttpRequestParser http_request_parser;
 	std::vector<int> fd(argc);
 	bool is_all_read = false;
-	char buffer[BUFFER_SIZE];
+	char buffer[server::BUFFER_SIZE];
 	sockaddr_in server_address;
 	sockaddr_in client_address;
 
-	std::cout << "BUFFER_SIZE: " << BUFFER_SIZE << std::endl;
+	std::cout << "server::BUFFER_SIZE: " << server::BUFFER_SIZE << std::endl;
 	for (int i = 1; i < argc; i++) {
 		fd[i] = open(argv[i], O_RDWR);
 		http_request_parser.addAcceptClientInfo(fd[i], client_address, server_address);
@@ -27,8 +23,8 @@ int main(int argc, char* argv[]) {
 	while (!is_all_read) {
 		is_all_read = true;
 		for (int i = 1; i < argc; i++) {
-			memset(buffer, '\0', BUFFER_SIZE);
-			int size = read(fd[i], buffer, BUFFER_SIZE - 1);
+			memset(buffer, '\0', server::BUFFER_SIZE);
+			int size = read(fd[i], buffer, server::BUFFER_SIZE - 1);
 			if (0 < size) {
 				is_all_read = false;
 				http_request_parser.handleBuffer(fd[i], buffer);
