@@ -12,9 +12,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 	for (size_t i = 0; i < servers.size(); i++) {
 		ServerDirective server_directive = servers[i];
 		if (server_directive.getPort() == request.getServerPort()) {
-			// TODO: locationがない場合でもデフォルトの設定を適用し、エラーがでないようにする
-			std::map<std::string, LocationDirective> locations = server_directive.getLocations();
-			LocationDirective location_directive = locations[request.getRequestPath()];
+			LocationDirective location_directive = server_directive.findLocation(request.getRequestPath());
 
 			if (method == "GET" && location_directive.isAllowMethod(method)) {
 				response = executeGet(request, location_directive);

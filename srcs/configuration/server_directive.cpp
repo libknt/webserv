@@ -189,6 +189,14 @@ bool ServerDirective::isCgiLocation(const std::string& location,
 	return false;
 }
 
+LocationDirective& ServerDirective::findLocation(std::string path) const {
+	std::map<std::string, LocationDirective> locations = getLocations();
+	if (locations.count(path)) {
+		return locations[path];
+	}
+	return locations["/"];
+}
+
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;
