@@ -239,7 +239,7 @@ int HttpRequest::setChunkedSize(size_t chunked_size) {
 	return (0);
 }
 
-int HttpRequest::addBody(std::string const& body) {
+int HttpRequest::appendBody(std::string const& body) {
 	body_ += body;
 	return (0);
 }

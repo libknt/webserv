@@ -94,7 +94,7 @@ public:
 	int setContentLength(size_t content_length);
 	int setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status);
 	int setChunkedSize(size_t chunked_size_);
-	int addBody(std::string const& body);
+	int appendBody(std::string const& body);
 	int setClientAddress(sockaddr_in const& client_address);
 	int setServerAddress(sockaddr_in const& server_address);
 

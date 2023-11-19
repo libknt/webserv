@@ -164,7 +164,7 @@ int HttpRequestParser::parseBody(HttpRequest& request, std::string const& line) 
 }
 
 int HttpRequestParser::parseContentLengthBody(HttpRequest& request, std::string const& line) {
-	request.addBody(line);
+	request.appendBody(line);
 	if (request.getBodySize() == request.getContentLength())
 		request.setStatus(http_request_status::FINISHED);
 	else if (request.getContentLength() < request.getBodySize()) {
@@ -188,7 +188,7 @@ int HttpRequestParser::parseChunkedBody(HttpRequest& request, std::string const&
 			request.setErrorStatus(http_error_status::BAD_REQUEST);
 			return (-1);
 		}
-		request.addBody(line);
+		request.appendBody(line);
 		request.setChunkedStatus(chunked_status::CHUNKED_SIZE);
 	}
 	return (0);
