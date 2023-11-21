@@ -287,7 +287,7 @@ const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 }
 
 bool LocationDirective::isStatusCode(const std::string& status_code) {
-	if (status_code.size() != 3) {
+	if (status_code.size() > 3) {
 		return false;
 	}
 	for (size_t i = 0; i < status_code.size(); ++i) {
