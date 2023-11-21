@@ -200,6 +200,7 @@ int LocationDirective::parseReturnDirective(std::vector<std::string>& tokens) {
 		return -1;
 	}
 	return_.insert(std::make_pair(tokens[0], tokens[1]));
+	return_[tokens[0]] = tokens[1];
 	return 0;
 }
 
@@ -269,7 +270,7 @@ std::string LocationDirective::getAutoindex() const {
 	return autoindex_;
 }
 
-std::map<std::string, std::string> LocationDirective::getReturn() const {
+std::map<std::string, std::string> const& LocationDirective::getReturn() const {
 	return return_;
 }
 

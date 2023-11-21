@@ -44,7 +44,7 @@ public:
 	std::string getRoot() const;
 	std::string getIndex() const;
 	std::string getAutoindex() const;
-	std::map<std::string, std::string> getReturn() const;
+	std::map<std::string, std::string> const& getReturn() const;
 	std::string getChunkedTransferEncoding() const;
 	std::string getCgi() const;
 	const std::vector<std::string>& getCgiExtensions() const;
