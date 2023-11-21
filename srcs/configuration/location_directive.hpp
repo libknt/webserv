@@ -9,6 +9,7 @@
 
 class LocationDirective {
 private:
+	const std::string location_path_;
 	std::map<std::string, std::string> error_pages_;
 	std::vector<std::string> allow_methods_;
 	std::string client_max_body_size_;
@@ -31,11 +32,13 @@ private:
 
 public:
 	LocationDirective();
+	LocationDirective(const std::string& location_path);
 	~LocationDirective();
 	LocationDirective(const LocationDirective& other);
 	LocationDirective& operator=(const LocationDirective& other);
 
 	int parseLocationDirective(std::vector<std::string>& tokens);
+	std::string getLocationPath() const;
 	std::map<std::string, std::string> getErrorPages() const;
 	std::vector<std::string> getAllowMethods() const;
 	std::string getClientMaxBodySize() const;

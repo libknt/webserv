@@ -32,7 +32,6 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 
 	// TODO: too many elseif
 	while (!tokens.empty()) {
-		LocationDirective location_directive;
 		std::string location_path;
 
 		if (tokens.front() == "listen") {
@@ -56,6 +55,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			if (location_path.empty()) {
 				return -1;
 			}
+			LocationDirective location_directive(location_path);
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			if (location_directive.parseLocationDirective(location_tokens) == -1) {
 				return -1;
@@ -212,7 +212,7 @@ std::ostream& operator<<(std::ostream& out, const ServerDirective& server_direct
 		 it != locations.end();
 		 ++it) {
 		out << "===== location" << i << " =====" << std::endl;
-		out << "LocationPath: " << it->first << std::endl;
+		out << "Location: " << it->first << std::endl;
 		out << it->second << std::endl;
 		i++;
 	}
