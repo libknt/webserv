@@ -28,8 +28,8 @@ int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
 		return -1;
 	}
-	//TODO ここに宣言するのが微妙ではある。
-	HttpRequest &request = it->second;
+	// TODO ここに宣言するのが微妙ではある。
+	HttpRequest& request = it->second;
 	if (!(request.getStatus() == http_request_status::BODY) ||
 		!(request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)) {
 		while ((index = http_line_stream_[sd].find("\r\n")) != std::string::npos) {
@@ -61,7 +61,7 @@ void HttpRequestParser::addAcceptClientInfo(int sd,
 	sockaddr_in server_address) {
 
 	if (http_request_map_.find(sd) != http_request_map_.end()) {
-		//TODO Error リクエストのデータが残っているのにacceptされている。
+		// TODO Error リクエストのデータが残っているのにacceptされている。
 		std::cerr << "Error: リクエストのデータが残っているのにacceptされている。" << std::endl;
 		http_request_map_.erase(sd);
 	}
@@ -75,7 +75,7 @@ int HttpRequestParser::parseRequest(int sd, std::string const& line) {
 		// TODO somethig happened when accpect;
 		return (-1);
 	}
-	HttpRequest &request = it->second;
+	HttpRequest& request = it->second;
 	switch (request.getStatus()) {
 		case http_request_status::METHOD:
 			parseStartLine(it->second, line);
