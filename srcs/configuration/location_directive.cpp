@@ -1,6 +1,20 @@
 #include "location_directive.hpp"
 
 LocationDirective::LocationDirective() {
+	location_path_ = "/";
+	std::vector<std::string> allow_methods;
+	allow_methods.push_back("GET");
+	allow_methods_ = allow_methods;
+	client_max_body_size_ = "1M";
+	root_ = "html";
+	index_ = "index.html";
+	autoindex_ = "off";
+	chunked_transfer_encoding_ = "off";
+	cgi_ = "off";
+}
+
+LocationDirective::LocationDirective(std::string const&  location_path) {
+	location_path_ = location_path;
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
@@ -15,7 +29,8 @@ LocationDirective::LocationDirective() {
 LocationDirective::~LocationDirective() {}
 
 LocationDirective::LocationDirective(const LocationDirective& other)
-	: error_pages_(other.error_pages_)
+	: location_path_(other.location_path_)
+	, error_pages_(other.error_pages_)
 	, allow_methods_(other.allow_methods_)
 	, client_max_body_size_(other.client_max_body_size_)
 	, root_(other.root_)
@@ -27,6 +42,7 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 
 LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
+		location_path_ = other.location_path_;
 		error_pages_ = other.error_pages_;
 		allow_methods_ = other.allow_methods_;
 		client_max_body_size_ = other.client_max_body_size_;
