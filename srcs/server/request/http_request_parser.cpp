@@ -103,24 +103,23 @@ int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& l
 
 	for (size_t i = 0; i < line.size(); i++) {
 		if (line[i] == ' ') {
-			switch (status) {
-				case parse_request_line::METHOD:
+			if (status == parse_request_line::METHOD) {
 					if (request.setMethod(line.substr(index, i - index)) < 0) {
 						return (-1);
 					}
 					index = i + 1;
 					status = parse_request_line::REQUEST_PATH;
-					break;
-				case parse_request_line::REQUEST_PATH:
-					if (request.setRequestPath(line.substr(index, i - index)) < 0) {
-						return (-1);
-					}
-					index = i + 1;
-					status = parse_request_line::VERSION;
-					break;
-				default:
-					request.setStatus(http_request_status::ERROR);
+			}
+			else if (parse_request_line::REQUEST_PATH) {
+				if (request.setRequestPath(line.substr(index, i - index)) < 0) {
 					return (-1);
+				}
+				index = i + 1;
+				status = parse_request_line::VERSION;
+			}
+			else {
+				request.setStatus(http_request_status::ERROR);
+				return (-1);
 			}
 		}
 	}
