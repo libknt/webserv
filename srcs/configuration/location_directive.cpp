@@ -199,7 +199,7 @@ int LocationDirective::parseReturnDirective(std::vector<std::string>& tokens) {
 		std::cerr << "Parse Error: parseReturnDirective" << std::endl;
 		return -1;
 	}
-	return_[tokens[0]] = tokens[1];
+	return_.insert(std::make_pair(tokens[0], tokens[1]));
 	return 0;
 }
 
