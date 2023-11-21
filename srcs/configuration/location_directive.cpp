@@ -42,7 +42,6 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 
 LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
-		location_path_ = other.location_path_;
 		error_pages_ = other.error_pages_;
 		allow_methods_ = other.allow_methods_;
 		client_max_body_size_ = other.client_max_body_size_;

@@ -9,7 +9,7 @@
 
 class LocationDirective {
 private:
-	std::string location_path_;
+	const std::string location_path_;
 	std::map<std::string, std::string> error_pages_;
 	std::vector<std::string> allow_methods_;
 	std::string client_max_body_size_;
