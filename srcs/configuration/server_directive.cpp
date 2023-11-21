@@ -61,6 +61,9 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 		}
 		args.clear();
 	}
+	if (locations_.find("/") == locations_.end()) {
+		locations_["/"] = LocationDirective();
+	}
 	return 0;
 }
 
