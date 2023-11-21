@@ -51,7 +51,7 @@ SERVER_STATUS HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	return RECEIVING_REQUEST;
 }
 
-HttpRequest & HttpRequestParser::getRequest(int sd) {
+HttpRequest& HttpRequestParser::getRequest(int sd) {
 	std::map<int, server::HttpRequest>::iterator it = http_request_map_.find(sd);
 	return it->second;
 }
