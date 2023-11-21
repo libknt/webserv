@@ -26,11 +26,12 @@ int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		return (-1);
+		return -1;
 	}
-
-	if (!(it->second.getStatus() == http_request_status::BODY) ||
-		!(it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)) {
+	//TODO ここに宣言するのが微妙ではある。
+	HttpRequest &request = it->second;
+	if (!(request.getStatus() == http_request_status::BODY) ||
+		!(request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)) {
 		while ((index = http_line_stream_[sd].find("\r\n")) != std::string::npos) {
 			std::string line = http_line_stream_[sd].substr(0, index);
 			http_line_stream_[sd] = http_line_stream_[sd].substr(index + 2);
@@ -38,16 +39,16 @@ int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 		}
 	}
 
-	if (it->second.getStatus() == http_request_status::BODY &&
-		it->second.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH) {
+	if (request.getStatus() == http_request_status::BODY &&
+		request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH) {
 		parseRequest(sd, http_line_stream_[sd]);
 		http_line_stream_[sd].clear();
 	}
 
-	if (it->second.getStatus() == http_request_status::FINISHED) {
+	if (request.getStatus() == http_request_status::FINISHED) {
 		return 1;
 	}
-	return (0);
+	return 0;
 }
 
 HttpRequest const& HttpRequestParser::getRequest(int sd) const {
@@ -74,7 +75,8 @@ int HttpRequestParser::parseRequest(int sd, std::string const& line) {
 		// TODO somethig happened when accpect;
 		return (-1);
 	}
-	switch (it->second.getStatus()) {
+	HttpRequest &request = it->second;
+	switch (request.getStatus()) {
 		case http_request_status::METHOD:
 			parseStartLine(it->second, line);
 			break;
@@ -85,10 +87,10 @@ int HttpRequestParser::parseRequest(int sd, std::string const& line) {
 			parseBody(it->second, line);
 			break;
 		default:
-			it->second.setStatus(http_request_status::ERROR);
+			request.setStatus(http_request_status::ERROR);
 			break;
 	}
-	if (it->second.getStatus() == http_request_status::ERROR) {
+	if (request.getStatus() == http_request_status::ERROR) {
 		return (-1);
 	}
 	return (0);
@@ -118,7 +120,7 @@ int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& l
 					break;
 				default:
 					request.setStatus(http_request_status::ERROR);
-					break;
+					return (-1);
 			}
 		}
 	}
