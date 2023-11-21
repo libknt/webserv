@@ -58,10 +58,14 @@ HttpRequest const& HttpRequestParser::getRequest(int sd) const {
 void HttpRequestParser::addAcceptClientInfo(int sd,
 	sockaddr_in client_address,
 	sockaddr_in server_address) {
-	if (http_request_map_.find(sd) == http_request_map_.end()) {
-		HttpRequest request(client_address, server_address);
-		http_request_map_.insert(std::pair<int, HttpRequest>(sd, request));
+
+	if (http_request_map_.find(sd) != http_request_map_.end()) {
+		//TODO Error リクエストのデータが残っているのにacceptされている。
+		std::cerr << "Error: リクエストのデータが残っているのにacceptされている。" << std::endl;
+		http_request_map_.erase(sd);
 	}
+	HttpRequest request(client_address, server_address);
+	http_request_map_.insert(std::pair<int, HttpRequest>(sd, request));
 }
 
 int HttpRequestParser::parseRequest(int sd, std::string const& line) {
