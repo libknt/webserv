@@ -14,6 +14,8 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 		if (server_directive.getPort() == request.getServerPort()) {
 			LocationDirective location_directive =
 				server_directive.findLocation(request.getRequestPath());
+			std::vector<std::string> ret = location_directive.getReturn();
+			return setReturnResponse(ret[0], ret[1]);
 
 			if (method == "GET" && location_directive.isAllowMethod(method)) {
 				response = executeGet(request, location_directive);
@@ -52,7 +54,18 @@ HttpResponse executeDelete(const HttpRequest& request,
 	return (response);
 }
 
-HttpResponse createErrorResponse(const STATUS_CODE status_code,
+HttpResponse setReturnResponse(std::string& status_code, std::string& location_directive) {
+	HttpResponse response;
+
+	std::stringstream stringstream;
+	stringstream << status_code;
+
+	response.setStatusCode(status_code);
+	response.setHeaderValue("Content-Type", "text/html");
+	return response;
+}
+
+HttpResponse setErrorResponse(const STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
 	HttpResponse response;
 

@@ -229,7 +229,8 @@ int LocationDirective::parseReturnDirective(std::vector<std::string>& tokens) {
 		std::cerr << "Parse Error: parseReturnDirective" << std::endl;
 		return -1;
 	}
-	return_.insert(std::make_pair(tokens[0], tokens[1]));
+	return_.push_back(tokens[0]);
+	return_.push_back(tokens[1]);
 	return 0;
 }
 
@@ -303,7 +304,7 @@ std::string LocationDirective::getAutoindex() const {
 	return autoindex_;
 }
 
-std::map<std::string, std::string> const& LocationDirective::getReturn() const {
+std::vector<std::string> const& LocationDirective::getReturn() const {
 	return return_;
 }
 
@@ -372,10 +373,9 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	out << "Index: " << location_directive.getIndex() << std::endl;
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
 
-	std::map<std::string, std::string> return_directive = location_directive.getReturn();
+	std::vector<std::string> return_directive = location_directive.getReturn();
 	if (return_directive.size()) {
-		std::map<std::string, std::string>::iterator it = return_directive.begin();
-		out << "Return: " << it->first << ":" << it->second << std::endl;
+		out << "Return: " << return_directive[0] << ":" << return_directive[1] << std::endl;
 	}
 
 	out << "ChuckedTransferEncoding: " << location_directive.getChunkedTransferEncoding()
