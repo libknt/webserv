@@ -112,12 +112,9 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 		return -1;
 	}
 	for (size_t i = 0; i < tokens.size() - 1; ++i) {
-		for (size_t j = 0; j < tokens[i].size(); ++j) {
-			if (!std::isdigit(tokens[i][j])) {
-				std::cout << tokens[i][j] << std::endl;
-				std::cerr << "Parse Error: parseErrorPageDirective2" << std::endl;
-				return -1;
-			}
+		if (!isStatusCode(tokens[i])) {
+			std::cerr << "Parse Error: parseErrorPageDirective1" << std::endl;
+			return -1;
 		}
 		error_pages_[tokens[i]] = tokens[tokens.size() - 1];
 	}
@@ -199,8 +196,11 @@ int LocationDirective::parseReturnDirective(std::vector<std::string>& tokens) {
 		std::cerr << "Parse Error: parseReturnDirective" << std::endl;
 		return -1;
 	}
+	if (!isStatusCode(tokens[0])) {
+		std::cerr << "Parse Error: parseReturnDirective" << std::endl;
+		return -1;
+	}
 	return_.insert(std::make_pair(tokens[0], tokens[1]));
-	return_[tokens[0]] = tokens[1];
 	return 0;
 }
 
@@ -284,6 +284,18 @@ std::string LocationDirective::getCgi() const {
 
 const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
+}
+
+bool LocationDirective::isStatusCode(const std::string& status_code) {
+	if (status_code.size() != 3) {
+		return false;
+	}
+	for (size_t i = 0; i < status_code.size(); ++i) {
+		if (!std::isdigit(status_code[i])) {
+			return false;
+		}
+	}
+	return true;
 }
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {

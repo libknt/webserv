@@ -30,6 +30,7 @@ private:
 	int parseChunkedTransferEncodingDirective(std::vector<std::string>& tokens);
 	int parseCgiDirective(std::vector<std::string>& tokens);
 	int parseCgiExtensionsDirective(std::vector<std::string>& tokens);
+	bool isStatusCode(const std::string& status_code);
 
 public:
 	LocationDirective();
