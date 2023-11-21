@@ -60,7 +60,12 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) {
 	std::vector<std::string> args;
 	while (!tokens.empty()) {
-		if (tokens.front() == "error_page") {
+		if (tokens.front() == "default_error_page") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			if (parseDefaultErrorPageDirective(args) == -1) {
+				return -1;
+			}
+		} else if (tokens.front() == "error_page") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseErrorPageDirective(args) == -1) {
 				return -1;
@@ -118,6 +123,15 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 		}
 		args.clear();
 	}
+	return 0;
+}
+
+int LocationDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
+	if (tokens.size() != 1) {
+		std::cerr << "Parse Error: parseDefaultErrorPageDirective" << std::endl;
+		return -1;
+	}
+	default_error_page_ = tokens.front();
 	return 0;
 }
 

@@ -192,15 +192,14 @@ bool ServerDirective::isCgiLocation(const std::string& location,
 	return false;
 }
 
-LocationDirective& ServerDirective::findLocation(std::string request_path) const {
-	std::map<std::string, LocationDirective> locations = getLocations();
+LocationDirective& ServerDirective::findLocation(std::string request_path) {
 	for (size_t i = 0; i < request_path.size(); ++i) {
 		std::string path = request_path.substr(0, request_path.size() - i);
-		if (locations.count(path)) {
-			return locations[path];
+		if (locations_.count(path)) {
+			return locations_[path];
 		}
 	}
-	return locations["/"];
+	return locations_["/"];
 }
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
