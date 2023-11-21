@@ -212,7 +212,7 @@ std::ostream& operator<<(std::ostream& out, const ServerDirective& server_direct
 		 it != locations.end();
 		 ++it) {
 		out << "===== location" << i << " =====" << std::endl;
-		out << "LocationPath: " << it->first << std::endl;
+		out << "Location: " << it->first << std::endl;
 		out << it->second << std::endl;
 		i++;
 	}

@@ -249,6 +249,10 @@ int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tok
 	return 0;
 }
 
+std::string LocationDirective::getLocationPath() const {
+	return location_path_;
+}
+
 std::vector<std::string> LocationDirective::getAllowMethods() const {
 	return allow_methods_;
 }
@@ -282,6 +286,7 @@ const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 }
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
+	out << "LocationPath: " << location_directive.getLocationPath() << std::endl;
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 	out << "ErrorPages: " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = error_pages.begin();
