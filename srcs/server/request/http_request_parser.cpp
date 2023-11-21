@@ -26,7 +26,7 @@ int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		exit(-1);
+		return (-1);
 	}
 
 	if (!(it->second.getStatus() == http_request_status::BODY) ||
