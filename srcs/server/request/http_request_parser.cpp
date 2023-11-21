@@ -17,7 +17,7 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 	return (*this);
 }
 
-int HttpRequestParser::handleBuffer(int sd, char* buf) {
+int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;

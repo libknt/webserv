@@ -43,7 +43,7 @@ public:
 	explicit HttpRequestParser(HttpRequestParser& other);
 	virtual ~HttpRequestParser();
 	HttpRequestParser& operator=(HttpRequestParser& other);
-	int handleBuffer(int sd, char* buf);
+	int handleBuffer(int sd, const char* buf);
 	HttpRequest const& getRequest(int sd) const;
 	void addAcceptClientInfo(int sd, sockaddr_in client_address, sockaddr_in server_address);
 };
