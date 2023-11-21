@@ -2,7 +2,7 @@
 #define SERVER_MANAGER_HPP
 
 #include "configuration.hpp"
-#include "parse_http_request.hpp"
+#include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
 #include "types.hpp"
 #include <map>
@@ -20,7 +20,7 @@ private:
 	int highest_sd_;
 	bool is_running;
 	struct timeval timeout_;
-	ParseHttpRequest http_request_parse_;
+	HttpRequestParser http_request_parser_;
 
 	ServerManager();
 	int setupServerSockets();
