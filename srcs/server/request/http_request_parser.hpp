@@ -10,7 +10,6 @@
 #include <vector>
 
 namespace server {
-static const int BUFFER_SIZE = 1024;
 
 namespace parse_request_line {
 enum PARSE_REQUEST_LINE {
