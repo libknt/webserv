@@ -4,6 +4,7 @@
 #include "configuration.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+#include <dirent.h>
 #include <iostream>
 #include <string>
 
@@ -15,6 +16,7 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive);
 HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive);
 HttpResponse createErrorResponse(const STATUS_CODE status_code, const LocationDirective& location_directive);
+HttpResponse makeAutoIndex(const LocationDirective& location_directive);
 };
 
 }

@@ -39,10 +39,12 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	std::string file_path = location_directive.getRoot() + "/" + location_directive.getIndex();
 	if (stat(file_path.c_str(), &stat_info) != 0) {
 		if (location_directive.getAutoindex() == "on") {
+			response = makeAutoIndex(location_directive);
 			//TODO make auto index
+			
 		}
 		else {
-			//TODO Error
+			executeDelete(request, location_directive);
 		}
 	}
 	else {
@@ -94,6 +96,28 @@ HttpResponse createErrorResponse(const STATUS_CODE status_code, const LocationDi
 	response.setHeaderValue("Content-Type", "text/html");
 	response.setBody(body_content);
 	return response;
+}
+
+HttpResponse makeAutoIndex(const LocationDirective& location_directive) {
+	HttpResponse response;
+	std::string const root = location_directive.getRoot();
+	DIR *dir = opendir(root.c_str());
+	if (!dir) {
+		std::cerr << "Error" << std::endl;
+	} else {
+		std::string body = "<html>\n<head>\n<title>Index of</title>\n</head>\n";
+		body += "<body>\n<h1>Index of<h1>\n";
+		body += "<hr>\n<pre>\n";
+		struct dirent *ent;
+		while ((ent = readdir(dir))) {
+			body+= ("<a href=" + std::string(ent->d_name) + ">" + std::string(ent->d_name) + "</a>\n");
+		}
+		body+= ("</pre>\n</hr>\n</body>\n</html>\n");
+		response.setHeaderValue("Content-Length", std::to_string(body.size()));
+		response.setBody(body);
+	}
+	closedir(dir);
+	return (response);
 }
 };
 };
