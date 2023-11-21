@@ -13,7 +13,7 @@ LocationDirective::LocationDirective() {
 	cgi_ = "off";
 }
 
-LocationDirective::LocationDirective(std::string const&  location_path) {
+LocationDirective::LocationDirective(std::string const& location_path) {
 	location_path_ = location_path;
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
