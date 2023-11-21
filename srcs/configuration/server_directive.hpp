@@ -14,12 +14,10 @@ private:
 	std::string ip_address_;
 	std::string port_;
 	std::string server_name_;
-	std::string default_error_page_;
 	std::map<std::string, LocationDirective> locations_;
 
 	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
-	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 	std::string parseLocationPath(std::vector<std::string>& tokens);
 	bool isValidIPSegment(int num) const;
 	bool isValidIPv4(const std::string& ip) const;
@@ -35,8 +33,9 @@ public:
 	std::string getPort() const;
 	std::string getIpAddress() const;
 	std::string getServerName() const;
-	std::string getDefaultErrorPage() const;
 	const std::map<std::string, LocationDirective>& getLocations() const;
+	LocationDirective& findLocation(std::string path);
+	bool isCgiLocation(const std::string& location, const std::string& script_name) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);

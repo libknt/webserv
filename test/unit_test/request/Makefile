@@ -2,7 +2,7 @@ NAME       = Request_Unit_Test
 CXX        = c++
 CXXFLAGS   = -Wall -Werror -Wextra
 VERSION    = -std=c++14
-INCLUDES   = -I ./includes -I ${TESTPATH}
+INCLUDES   = -I ./../../../includes -I ${TESTPATH}
 TESTPATH   = ../../../srcs/server/request
 VPATH      = ${SRCSDIR}:${TESTPATH}
 SRCSDIR    = srcs
