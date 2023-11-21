@@ -1,8 +1,8 @@
 #include "server_manager.hpp"
 
 int main(int argc, char** argv) {
-	if (server::BUFFER_SIZE <= 1) {
-		std::cerr << "buffer size error: " << server::BUFFER_SIZE << std::endl;
+	if (BUFFER_SIZE <= 1) {
+		std::cerr << "buffer size error: " << BUFFER_SIZE << std::endl;
 		return (1);
 	}
 	Configuration configuration;

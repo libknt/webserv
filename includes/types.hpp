@@ -2,7 +2,6 @@
 #define TYPES_HPP
 
 namespace server {
-static const int BUFFER_SIZE = 1024;
 
 enum SERVER_STATUS {
 	REQUEST,

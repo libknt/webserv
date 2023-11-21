@@ -13,7 +13,7 @@ SRCS       = $(shell find ${SRCSDIR} -name "*.cpp" -type f)
 SRCS       += $(subst ${TESTPATH},${SRCSDIR},$(shell find ${TESTPATH} -name "*.cpp" -type f))
 OBJS       = $(subst ${SRCSDIR},${OBJSDIR},${SRCS:.cpp=.o})
 
-server::BUFFER_SIZE = 16
+BUFFER_SIZE = 16
 
 all: ${NAME}
 
@@ -22,12 +22,12 @@ ${NAME}: ${OBJS}
 
 ${OBJSDIR}/%.o:%.cpp
 	mkdir -p $(dir $@)
-	${CXX} ${CXXFLAGS} ${VERSION} ${INCLUDES} -D server::BUFFER_SIZE=$(server::BUFFER_SIZE) -c $< -o $@
+	${CXX} ${CXXFLAGS} ${VERSION} ${INCLUDES} -D BUFFER_SIZE=$(BUFFER_SIZE) -c $< -o $@
 
 test:
 	@for number in `seq 2 1025`; do \
 		$(MAKE) fclean; \
-		$(MAKE) server::BUFFER_SIZE=$$number ${NAME} || exit 1; \
+		$(MAKE) BUFFER_SIZE=$$number ${NAME} || exit 1; \
 		find ${TESTDIR} -type f | while read file; do \
 			./${NAME} "$$file" || exit 1; \
 		done || break; \
