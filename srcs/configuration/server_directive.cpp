@@ -32,7 +32,6 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 
 	// TODO: too many elseif
 	while (!tokens.empty()) {
-		LocationDirective location_directive;
 		std::string location_path;
 
 		if (tokens.front() == "listen") {
@@ -52,24 +51,26 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			}
 		} else if (tokens.front() == "location") {
 			tokens.erase(tokens.begin());
-			if (tokens.size()) {
-				location_path = tokens.front();
-				tokens.erase(tokens.begin());
-			} else {
-				std::cerr << "Parse Error: Invalid Location" << std::endl;
+			location_path = parseLocationPath(tokens);
+			if (location_path.empty()) {
 				return -1;
 			}
+			LocationDirective location_directive(location_path);
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			if (location_directive.parseLocationDirective(location_tokens) == -1) {
 				return -1;
 			}
-			locations_[location_path] = location_directive;
+			if (locations_.find(location_path) == locations_.end()) {
+				locations_[location_path] = location_directive;
+			}
 		} else {
 			std::cerr << "Parse Error: serverDirective" << std::endl;
-			std::cout << tokens.front() << std::endl;
 			return -1;
 		}
 		args.clear();
+	}
+	if (locations_.find("/") == locations_.end()) {
+		locations_["/"] = LocationDirective();
 	}
 	return 0;
 }
@@ -149,6 +150,36 @@ int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& to
 	return 0;
 }
 
+std::string ServerDirective::parseLocationPath(std::vector<std::string>& tokens) {
+	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseLocationPath" << std::endl;
+		return std::string();
+	}
+
+	std::string token = tokens.front();
+	if (token[0] != '/') {
+		std::cerr << "Parse Error: parseLocationPath" << std::endl;
+		return std::string();
+	}
+
+	bool is_last_char_slash = false;
+	std::string location_path;
+	for (size_t i = 0; i < token.size(); ++i) {
+		if (token[i] == '/') {
+			if (!is_last_char_slash) {
+				location_path += token[i];
+				is_last_char_slash = true;
+			}
+		} else {
+			location_path += token[i];
+			is_last_char_slash = false;
+		}
+	}
+
+	tokens.erase(tokens.begin());
+	return location_path;
+}
+
 std::string ServerDirective::getPort() const {
 	return port_;
 }
@@ -194,7 +225,7 @@ std::ostream& operator<<(std::ostream& out, const ServerDirective& server_direct
 		 it != locations.end();
 		 ++it) {
 		out << "===== location" << i << " =====" << std::endl;
-		out << "LocationPath: " << it->first << std::endl;
+		out << "Location: " << it->first << std::endl;
 		out << it->second << std::endl;
 		i++;
 	}

@@ -1,5 +1,4 @@
 #include "server_manager.hpp"
-#include "parse_http_request.hpp"
 
 namespace server {
 
@@ -145,7 +144,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				if (server_status_[sd] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
 					determineIfCgiRequest(sd);
-					if (http_request_parse_.getRequest(sd).getIsCgi()) {
+					if (http_request_parser_.getRequest(sd).getIsCgi()) {
 						std::cout << "  execute cgi" << std::endl;
 						// TODO cgi実行
 					} else {
@@ -199,12 +198,11 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			return -1;
 		}
 
-		if (http_request_parse_.addAcceptClientInfo(
+		if (http_request_parser_.addAcceptClientInfo(
 				client_sd, client_socket_address, connected_server_address) < 0) {
 			std::cerr << "addAcceptClientInfo() failed" << std::endl;
 			return -1;
 		}
-
 		std::cout << "  New incoming connection -  " << client_sd << std::endl;
 		FD_SET(client_sd, &master_read_fds_);
 		if (client_sd > highest_sd_)
@@ -237,7 +235,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 		disconnect(sd);
 		return 0;
 	}
-	server_status_[sd] = http_request_parse_.handleBuffer(sd, recv_buffer);
+	server_status_[sd] = http_request_parser_.handleBuffer(sd, recv_buffer);
 	if (server_status_[sd] == server::PROCESSING_ERROR) {
 		std::cerr << "handleBuffer() failed" << std::endl;
 		disconnect(sd);
@@ -248,7 +246,7 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 }
 
 int ServerManager::determineIfCgiRequest(int sd) {
-	HttpRequest& request = http_request_parse_.getRequest(sd);
+	HttpRequest& request = http_request_parser_.getRequest(sd);
 	std::string ip_address = request.getServerIpAddress();
 	std::string port = request.getServerPort();
 	const ServerDirective& server_configuration =
@@ -356,7 +354,7 @@ int ServerManager::sendResponse(int sd) {
 }
 
 int ServerManager::requestCleanup(int sd) {
-	http_request_parse_.httpRequestCleanup(sd);
+	http_request_parser_.httpRequestCleanup(sd);
 	FD_CLR(sd, &master_write_fds_);
 	server_status_[sd] = RECEIVING_REQUEST;
 	return 0;
@@ -370,7 +368,7 @@ int ServerManager::disconnect(int sd) {
 			--highest_sd_;
 	}
 	server_status_.erase(sd);
-	http_request_parse_.httpRequestErase(sd);
+	http_request_parser_.httpRequestErase(sd);
 	close(sd);
 	std::cout << "  Connection closed - " << sd << std::endl;
 	return 0;
