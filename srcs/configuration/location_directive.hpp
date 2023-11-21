@@ -32,7 +32,7 @@ private:
 
 public:
 	LocationDirective();
-	LocationDirective(std::string const& location_path);
+	LocationDirective(const std::string& location_path);
 	~LocationDirective();
 	LocationDirective(const LocationDirective& other);
 	LocationDirective& operator=(const LocationDirective& other);

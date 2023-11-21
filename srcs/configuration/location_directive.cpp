@@ -1,29 +1,29 @@
 #include "location_directive.hpp"
 
-LocationDirective::LocationDirective() {
-	location_path_ = "/";
+LocationDirective::LocationDirective()
+	: location_path_("/")
+	, client_max_body_size_("1M")
+	, root_("html")
+	, index_("index.html")
+	, autoindex_("off")
+	, chunked_transfer_encoding_("off")
+	, cgi_("off") {
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
-	client_max_body_size_ = "1M";
-	root_ = "html";
-	index_ = "index.html";
-	autoindex_ = "off";
-	chunked_transfer_encoding_ = "off";
-	cgi_ = "off";
 }
 
-LocationDirective::LocationDirective(std::string const& location_path) {
-	location_path_ = location_path;
+LocationDirective::LocationDirective(const std::string& location_path)
+	: location_path_(location_path)
+	, client_max_body_size_("1M")
+	, root_("html")
+	, index_("index.html")
+	, autoindex_("off")
+	, chunked_transfer_encoding_("off")
+	, cgi_("off") {
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
-	client_max_body_size_ = "1M";
-	root_ = "html";
-	index_ = "index.html";
-	autoindex_ = "off";
-	chunked_transfer_encoding_ = "off";
-	cgi_ = "off";
 }
 
 LocationDirective::~LocationDirective() {}
