@@ -34,7 +34,8 @@ public:
 	std::string getIpAddress() const;
 	std::string getServerName() const;
 	const std::map<std::string, LocationDirective>& getLocations() const;
-	bool isCgiLocation(const std::string& location, const std::string& script_file_name) const;
+	LocationDirective& findLocation(std::string path);
+	bool isCgiLocation(const std::string& location, const std::string& script_name) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);

@@ -100,14 +100,15 @@ const std::vector<ServerDirective>& Configuration::getServers() const {
 
 const ServerDirective& Configuration::getServerConfiguration(std::string const& ip_address,
 	std::string const& port) const {
-	for (size_t i = 0; i < servers_.size(); ++i) {
+
+	size_t i = 0;
+	while (i < servers_.size()) {
 		if (servers_[i].getIpAddress() == ip_address && servers_[i].getPort() == port) {
-			return servers_[i];
+			break;
 		}
+		++i;
 	}
-	// TODO そもそも存在しない場合はないと思うけどどうしよう
-	static ServerDirective invalid;
-	return invalid;
+	return servers_[i];
 }
 
 std::ostream& operator<<(std::ostream& out, const Configuration& configuration) {
