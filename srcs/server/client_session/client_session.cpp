@@ -21,8 +21,8 @@ ClientSession& ClientSession::operator=(const ClientSession& other) {
 	return *this;
 }
 
-int const ClientSession::getSd() const {
-    return sd_;
+int ClientSession::getSd() const {
+	return sd_;
 }
 
 }

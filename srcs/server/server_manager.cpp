@@ -139,7 +139,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			} else {
 				ClientSession& client_session = getClientSession(sd);
 				(void)client_session;
-				if (receiveAndParseHttpRequest(sd) < 0) {
+				if (receiveAndParseHttpRequest(client_session) < 0) {
 					is_running = false;
 					return -1;
 				}
@@ -239,25 +239,26 @@ int ServerManager::createServerStatus(int sd) {
 	return 0;
 }
 
-int ServerManager::receiveAndParseHttpRequest(int sd) {
+int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
+	int client_sd = client_session.getSd();
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+	int recv_result = recv(client_sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-		disconnect(sd);
+		disconnect(client_sd);
 		return -1;
 	}
 	if (recv_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		disconnect(sd);
+		disconnect(client_sd);
 		return 0;
 	}
-	server_status_[sd] = http_request_parser_.handleBuffer(sd, recv_buffer);
-	if (server_status_[sd] == server::PROCESSING_ERROR) {
+	server_status_[client_sd] = http_request_parser_.handleBuffer(client_sd, recv_buffer);
+	if (server_status_[client_sd] == server::PROCESSING_ERROR) {
 		std::cerr << "handleBuffer() failed" << std::endl;
-		disconnect(sd);
+		disconnect(client_sd);
 		return -1;
 	}
 

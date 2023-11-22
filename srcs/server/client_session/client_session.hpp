@@ -22,7 +22,7 @@ public:
 	~ClientSession();
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
-	int const getSd() const;
+	int getSd() const;
 };
 
 }
