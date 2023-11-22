@@ -204,11 +204,13 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			return -1;
 		}
 
-		if (http_request_parser_.addAcceptClientInfo(
-				client_sd, client_socket_address, connected_server_address) < 0) {
-			std::cerr << "addAcceptClientInfo() failed" << std::endl;
-			return -1;
-		}
+		registerClientSession(client_sd, client_socket_address, connected_server_address);
+
+		// if (http_request_parser_.addAcceptClientInfo(
+		// 		client_sd, client_socket_address, connected_server_address) < 0) {
+		// 	std::cerr << "addAcceptClientInfo() failed" << std::endl;
+		// 	return -1;
+		// }
 		std::cout << "  New incoming connection -  " << client_sd << std::endl;
 		FD_SET(client_sd, &master_read_fds_);
 		if (client_sd > highest_sd_)
@@ -216,6 +218,15 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 
 	} while (client_sd != -1);
 	return 0;
+}
+
+void ServerManager::registerClientSession(int sd,
+	sockaddr_in client_address,
+	sockaddr_in server_address) {
+	if (client_session_.find(sd) != client_session_.end()) {
+		return;
+	}
+	client_session_.insert(std::make_pair(sd, ClientSession(client_address, server_address)));
 }
 
 int ServerManager::createServerStatus(int sd) {

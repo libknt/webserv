@@ -1,6 +1,7 @@
 #ifndef SERVER_MANAGER_HPP
 #define SERVER_MANAGER_HPP
 
+#include "client_session.hpp"
 #include "configuration.hpp"
 #include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
@@ -15,6 +16,7 @@ class ServerManager {
 private:
 	const Configuration& configuration_;
 	std::vector<server::TcpSocket> sockets_;
+	std::map<int, ClientSession> client_session_;
 	fd_set master_read_fds_;
 	fd_set master_write_fds_;
 	fd_set read_fds_;
@@ -39,6 +41,8 @@ private:
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
 	int disconnect(int sd);
+
+	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
 
 public:
 	ServerManager(const Configuration& configuration);
