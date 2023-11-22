@@ -250,6 +250,11 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 		disconnect(client_session);
 		return 0;
 	}
+
+	HttpRequest& request = client_session.getRequest();
+
+	// ここでリクエストをパースする
+
 	// server_status_[client_sd] = http_request_parser_.handleBuffer(client_sd, recv_buffer);
 	// if (server_status_[client_sd] == server::PROCESSING_ERROR) {
 	// 	std::cerr << "handleBuffer() failed" << std::endl;
