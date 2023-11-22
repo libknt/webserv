@@ -43,7 +43,7 @@ private:
 	int disconnect(int sd);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
-	ClientSession& getClientSession(int sd);
+	ClientSession& getClientSession(int const sd);
 
 public:
 	ServerManager(const Configuration& configuration);

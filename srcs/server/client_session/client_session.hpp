@@ -9,13 +9,16 @@ namespace server {
 
 class ClientSession {
 private:
+	const int sd_;
 	HttpRequest request_;
 
 	/* data */
 	ClientSession();
 
 public:
-	explicit ClientSession(sockaddr_in client_address, sockaddr_in server_address);
+	explicit ClientSession(int const sd,
+		sockaddr_in const& client_address,
+		sockaddr_in const& server_address);
 	~ClientSession();
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);

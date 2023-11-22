@@ -137,6 +137,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					return -1;
 				}
 			} else {
+				ClientSession& client_session = getClientSession(sd);
+				(void)client_session;
 				if (receiveAndParseHttpRequest(sd) < 0) {
 					is_running = false;
 					return -1;
@@ -226,7 +228,7 @@ void ServerManager::registerClientSession(int sd,
 	if (client_session_.find(sd) != client_session_.end()) {
 		return;
 	}
-	client_session_.insert(std::make_pair(sd, ClientSession(client_address, server_address)));
+	client_session_.insert(std::make_pair(sd, ClientSession(sd, client_address, server_address)));
 }
 
 int ServerManager::createServerStatus(int sd) {
@@ -325,8 +327,8 @@ int ServerManager::disconnect(int sd) {
 	return 0;
 }
 
-ClientSession& ServerManager::getClientSession(int sd) {
-	return client_session_[sd];
+ClientSession& ServerManager::getClientSession(int const sd) {
+	return client_session_.find(sd)->second;
 }
 
 } // namespace server
