@@ -217,7 +217,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 	return 0;
 }
 
-int ServerManager::createsServerStatus(int sd) {
+int ServerManager::createServerStatus(int sd) {
 	if (server_status_.find(sd) != server_status_.end()) {
 		return -1;
 	}

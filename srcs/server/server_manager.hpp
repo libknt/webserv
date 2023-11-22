@@ -32,7 +32,7 @@ private:
 	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
-	int createsServerStatus(int sd);
+	int createServerStatus(int sd);
 	int receiveAndParseHttpRequest(int sd);
 	void determineRequestType(int sd);
 	int setWriteFd(int sd);
