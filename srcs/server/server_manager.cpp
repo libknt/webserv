@@ -142,6 +142,9 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					is_running = false;
 					return -1;
 				}
+				if (client_session.getStatus() == EVALUATING_RESPONSE_PATH) {
+					determineRequestType(client_session);
+				}
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
@@ -152,9 +155,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 	return 0;
 }
 
-void ServerManager::determineRequestType(int sd) {
+void ServerManager::determineRequestType(ClientSession& client_session) {
 	// この関数は,リファクタするので,今は仮実装
-	(void)sd;
+	// isCgiRequest(client_session);
+	// client_session.setStatus(CGI_PREPARING);
+	// else
+	client_session.setStatus(RESPONSE_PREPARING);
 	return;
 }
 

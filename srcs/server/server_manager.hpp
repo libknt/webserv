@@ -34,9 +34,8 @@ private:
 	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
-	// int createServerStatus(int sd);
 	int receiveAndParseHttpRequest(ClientSession& client_session);
-	void determineRequestType(int sd);
+	void determineRequestType(ClientSession& client_session);
 	int setWriteFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
