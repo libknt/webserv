@@ -200,19 +200,6 @@ const std::map<std::string, LocationDirective>& ServerDirective::getLocations() 
 	return locations_;
 }
 
-bool ServerDirective::isCgiLocation(const std::string& location,
-	const std::string& script_name) const {
-	for (std::map<std::string, LocationDirective>::const_iterator it = locations_.begin();
-		 it != locations_.end();
-		 ++it) {
-		if (it->first == location && it->second.getCgi() == "on") {
-			if (it->second.isValidCgiExtensions(script_name))
-				return true;
-		}
-	}
-	return false;
-}
-
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;
