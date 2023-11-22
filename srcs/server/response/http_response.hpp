@@ -17,6 +17,7 @@ enum STATUS_CODE {
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
 	METHOD_NOT_ALLOWED = 405,
+	Internal_Server_Error = 500,
 };
 
 class HttpResponse {
