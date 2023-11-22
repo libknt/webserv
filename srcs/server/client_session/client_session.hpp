@@ -2,6 +2,7 @@
 #define CLIENT_SESSION_HPP
 
 #include "http_request.hpp"
+#include "http_response.hpp"
 #include <arpa/inet.h>
 #include <iostream>
 
@@ -23,6 +24,7 @@ class ClientSession {
 private:
 	const int sd_;
 	HttpRequest request_;
+	HttpResponse response_;
 
 	CLIENT_SESSION_STATUS status_;
 
@@ -37,6 +39,7 @@ public:
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
 	HttpRequest& getRequest();
+	HttpResponse& getResponse();
 	void setStatus(CLIENT_SESSION_STATUS const& status);
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();

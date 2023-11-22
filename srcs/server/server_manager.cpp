@@ -147,6 +147,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				}
 				if (client_session.getStatus() == RESPONSE_PREPARING) {
 					// レスポンスの準備
+					client_session.getResponse().createResponse();
 					client_session.setStatus(SENDING_RESPONSE);
 				} else if (client_session.getStatus() == CGI_PREPARING) {
 					// cgiの準備
@@ -157,7 +158,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
-			sendResponse(getClientSession(sd));
+			ClientSession& client_session = getClientSession(sd);
+			sendResponse(client_session);
+			if (client_session.getStatus() == SESSION_COMPLETE) {
+				client_session.sessionCleanup();
+				std::cout << "  Connection Cleanup" << std::endl;
+			}
 			--ready_sds;
 		}
 	}
@@ -267,23 +273,9 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	std::string buffer = "HTTP/1.1 200 OK\r\n"
-						 "Date: Wed, 09 Nov 2023 12:00:00 GMT\r\n"
-						 "Server: MyServer\r\n"
-						 "Content-Type: text/html; charset=UTF-8\r\n"
-						 "Content-Length: 97\r\n"
-						 "\r\n"
-						 "<html>\r\n"
-						 "<head>\r\n"
-						 "<title>Simple Page</title>\r\n"
-						 "</head>\r\n"
-						 "<body>\r\n"
-						 "<h1>Hello, World!</h1>\r\n"
-						 "</body>\r\n"
-						 "</html>\r\n";
+	std::string buffer = client_session.getResponse().sendResponse();
 	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
 	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
-	(void)send_result;
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		unregisterClientSession(client_session);
@@ -294,11 +286,8 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		unregisterClientSession(client_session);
 		return -1;
 	}
-	client_session.setStatus(SESSION_COMPLETE);
-
-	if (client_session.getStatus() == SESSION_COMPLETE) {
-		client_session.sessionCleanup();
-		std::cout << "  Connection Cleanup" << std::endl;
+	if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
+		client_session.setStatus(SESSION_COMPLETE);
 	}
 	return 0;
 }
