@@ -138,7 +138,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				}
 			} else {
 				ClientSession& client_session = getClientSession(sd);
-				(void)client_session;
 				if (receiveAndParseHttpRequest(client_session) < 0) {
 					is_running = false;
 					return -1;
@@ -242,16 +241,17 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	int recv_result = recv(client_sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-		disconnect(client_session);
+		unregisterClientSession(client_session);
 		return -1;
 	}
 	if (recv_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		disconnect(client_session);
+		unregisterClientSession(client_session);
 		return 0;
 	}
 
 	HttpRequest& request = client_session.getRequest();
+	(void)request;
 
 	// ここでリクエストをパースする
 
@@ -315,7 +315,7 @@ int ServerManager::requestCleanup(int sd) {
 	return 0;
 }
 
-int ServerManager::disconnect(ClientSession& client_session) {
+int ServerManager::unregisterClientSession(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	FD_CLR(client_sd, &master_read_fds_);
 	FD_CLR(client_sd, &master_write_fds_);
