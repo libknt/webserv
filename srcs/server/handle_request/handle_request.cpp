@@ -38,8 +38,6 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	std::string file_path = location_directive.getRoot() + request.getRequestPath();
 	std::string	location_path = location_directive.getRoot() + location_directive.getLocationPath();
 
-	std::cout << file_path << std::endl;
-
 	if (stat(file_path.c_str(), &request_stat_info) != 0 || stat(location_path.c_str(), &location_stat_info) != 0) {
 		return (createErrorResponse(NOT_FOUND, location_directive));
 	}
@@ -128,18 +126,19 @@ HttpResponse makeAutoIndex(HttpRequest const &request, const LocationDirective& 
 	if (!dir) {
 		return (createErrorResponse(NOT_FOUND, location_directive));
 	} else {
-		std::string body = "<html>\n<head>\n<title>Index of</title>\n</head>\n";
-		body += "<body>\n<h1>Index of<h1>\n";
-		body += "<hr>\n<pre>\n";
+		std::string body;
 		struct dirent *ent;
 		while ((ent = readdir(dir))) {
 			if (std::string(ent->d_name) == ".")
 				continue;
-			else if (std::string(ent->d_name) == ".." ||  ent->d_type == DT_DIR)
+			else if (std::string(ent->d_name) == "..")
+				body = ("<a href=\"" + std::string(ent->d_name) + "/\">" + std::string(ent->d_name) + "</a>\n") + body;
+			else if (ent->d_type == DT_DIR)
 				body+= ("<a href=\"" + std::string(ent->d_name) + "/\">" + std::string(ent->d_name) + "</a>\n");
 			else
 				body+= ("<a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n");
 			}
+		body = "<html>\n<head>\n<title>Index of</title>\n</head>\n<body>\n<h1>Index of" + location_directive.getLocationPath() + "<h1>\n<hr>\n<pre>\n" + body;
 		body+= ("</pre>\n</hr>\n</body>\n</html>\n");
 		response.setStatusCode(OK);
 		response.setHeaderValue("Content-Length", std::to_string(body.size()));
