@@ -29,11 +29,11 @@ int ClientSession::getSd() const {
 }
 
 HttpRequest& ClientSession::getRequest() {
-    return request_;
+	return request_;
 }
 
 CLIENT_SESSION_STATUS ClientSession::getStatus() const {
-    return status_;
+	return status_;
 }
 
 }

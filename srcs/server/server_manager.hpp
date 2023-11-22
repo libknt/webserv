@@ -40,7 +40,7 @@ private:
 	int setWriteFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
-	int disconnect(int sd);
+	int disconnect(ClientSession& client_session);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
 	ClientSession& getClientSession(int const sd);
