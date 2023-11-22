@@ -162,8 +162,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 	return 0;
 }
 
-
 void ServerManager::determineRequestType(int sd){
+	(void)sd;
 	return;
 }
 
