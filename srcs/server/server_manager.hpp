@@ -16,7 +16,7 @@ class ServerManager {
 private:
 	const Configuration& configuration_;
 	std::vector<server::TcpSocket> sockets_;
-	std::map<int, ClientSession> client_session_;
+	std::map<int, ClientSession> active_client_sessions_;
 	fd_set master_read_fds_;
 	fd_set master_write_fds_;
 	fd_set read_fds_;
@@ -37,7 +37,6 @@ private:
 	void determineResponseType(ClientSession& client_session);
 	int setWriteFd(int sd);
 	int sendResponse(ClientSession& client_session);
-	int requestCleanup(int sd);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
 	int unregisterClientSession(ClientSession& client_session);

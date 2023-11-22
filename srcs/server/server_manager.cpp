@@ -223,10 +223,11 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 void ServerManager::registerClientSession(int sd,
 	sockaddr_in client_address,
 	sockaddr_in server_address) {
-	if (client_session_.find(sd) != client_session_.end()) {
+	if (active_client_sessions_.find(sd) != active_client_sessions_.end()) {
 		return;
 	}
-	client_session_.insert(std::make_pair(sd, ClientSession(sd, client_address, server_address)));
+	active_client_sessions_.insert(
+		std::make_pair(sd, ClientSession(sd, client_address, server_address)));
 }
 
 int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
@@ -311,13 +312,13 @@ int ServerManager::unregisterClientSession(ClientSession& client_session) {
 			--highest_sd_;
 	}
 	close(client_sd);
-	client_session_.erase(client_sd);
+	active_client_sessions_.erase(client_sd);
 	std::cout << "  Connection closed - " << client_sd << std::endl;
 	return 0;
 }
 
 ClientSession& ServerManager::getClientSession(int const sd) {
-	return client_session_.find(sd)->second;
+	return active_client_sessions_.find(sd)->second;
 }
 
 } // namespace server
