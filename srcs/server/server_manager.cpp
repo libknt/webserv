@@ -325,4 +325,8 @@ int ServerManager::disconnect(int sd) {
 	return 0;
 }
 
+ClientSession& ServerManager::getClientSession(int sd) {
+	return client_session_[sd];
 }
+
+} // namespace server
