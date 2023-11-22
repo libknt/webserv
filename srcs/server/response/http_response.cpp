@@ -32,7 +32,7 @@ const std::string HttpResponse::createResponse() {
 		response += it->first + ": " + it->second + "\r\n";
 	}
 	response += "\r\n";
-	response += body_ + "\r\n";
+	response += body_;
 	return response;
 }
 
