@@ -45,7 +45,7 @@ void ClientSession::setSessionStatusFromHttpRequest() {
 
 	switch (request_status) {
 		case http_request_status::FINISHED:
-			setStatus(EVALUATING_RESPONSE_PATH);
+			setStatus(EVALUATING_RESPONSE_TYPE);
 			break;
 		case http_request_status::ERROR:
 			setStatus(ERROR_OCCURRED);

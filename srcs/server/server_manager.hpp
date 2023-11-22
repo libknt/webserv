@@ -24,7 +24,6 @@ private:
 	int highest_sd_;
 	bool is_running;
 	struct timeval timeout_;
-	// std::map<int, SERVER_STATUS> server_status_;
 	HttpRequestParser http_request_parser_;
 
 	ServerManager();
@@ -35,7 +34,7 @@ private:
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
 	int receiveAndParseHttpRequest(ClientSession& client_session);
-	void determineRequestType(ClientSession& client_session);
+	void determineResponseType(ClientSession& client_session);
 	int setWriteFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
