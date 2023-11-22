@@ -52,7 +52,6 @@ public:
 	std::string getChunkedTransferEncoding() const;
 	std::string getCgi() const;
 	const std::vector<std::string>& getCgiExtensions() const;
-	bool isValidCgiExtensions(const std::string& extension) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive);
