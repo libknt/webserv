@@ -12,8 +12,7 @@ HttpRequest::HttpRequest(sockaddr_in client_address, sockaddr_in server_address)
 	, chunked_status_(chunked_status::CHUNKED_SIZE)
 	, chunked_size_(0)
 	, client_address_(client_address)
-	, server_address_(server_address)
-	, is_cgi_(false) {}
+	, server_address_(server_address) {}
 
 HttpRequest::~HttpRequest(){};
 
@@ -29,8 +28,7 @@ HttpRequest::HttpRequest(HttpRequest const& other)
 	, chunked_size_(other.chunked_size_)
 	, body_(other.body_)
 	, client_address_(other.client_address_)
-	, server_address_(other.server_address_)
-	, is_cgi_(other.is_cgi_) {}
+	, server_address_(other.server_address_) {}
 
 HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 	if (this != &other) {
@@ -46,7 +44,6 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 		body_ = other.body_;
 		client_address_ = other.client_address_;
 		server_address_ = other.server_address_;
-		is_cgi_ = other.is_cgi_;
 	}
 	return (*this);
 }
@@ -140,14 +137,6 @@ size_t HttpRequest::getChunkedSize() const {
 
 std::string const& HttpRequest::getBody() const {
 	return body_;
-}
-
-void HttpRequest::setIsCgi(bool is_cgi) {
-	is_cgi_ = is_cgi;
-}
-
-bool HttpRequest::getIsCgi() const {
-	return is_cgi_;
 }
 
 size_t HttpRequest::getBodySize() const {
