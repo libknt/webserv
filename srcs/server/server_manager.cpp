@@ -163,6 +163,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 }
 
 void ServerManager::determineRequestType(int sd) {
+	// この関数は,リファクタするので,今は仮実装
 	(void)sd;
 	return;
 }
