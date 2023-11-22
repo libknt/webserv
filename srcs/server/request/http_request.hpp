@@ -76,7 +76,6 @@ private:
 	std::string body_;
 	sockaddr_in client_address_;
 	sockaddr_in server_address_;
-	bool is_cgi_;
 	bool isTokenDelimiter(char chr);
 	bool isTokenCharacter(char chr);
 
@@ -121,8 +120,6 @@ public:
 	sockaddr_in const& getServerAddress() const;
 	std::string getServerIpAddress() const;
 	std::string getServerPort() const;
-	void setIsCgi(bool is_cgi);
-	bool getIsCgi() const;
 	void cleanup();
 };
 

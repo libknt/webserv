@@ -144,13 +144,13 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				if (server_status_[sd] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
 					determineRequestType(sd);
-					if (http_request_parser_.getRequest(sd).getIsCgi()) {
-						std::cout << "  execute cgi" << std::endl;
-						// TODO cgi実行
-					} else {
-						std::cout << "  create response" << std::endl;
-						setWriteFd(sd);
-					}
+					// if (http_request_parser_.getRequest(sd).getIsCgi()) {
+					// 	std::cout << "  execute cgi" << std::endl;
+					// 	// TODO cgi実行
+					// } else {
+					std::cout << "  create response" << std::endl;
+					setWriteFd(sd);
+					// }
 				}
 			}
 			--ready_sds;
@@ -162,7 +162,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 	return 0;
 }
 
-void ServerManager::determineRequestType(int sd){
+void ServerManager::determineRequestType(int sd) {
 	(void)sd;
 	return;
 }
