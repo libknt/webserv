@@ -299,15 +299,4 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 	return out;
 }
 
-void HttpRequest::cleanup() {
-	status_ = http_request_status::METHOD;
-	error_status_ = http_error_status::UNDEFINED;
-	method_ = http_method::UNDEFINED;
-	version_ = http_version::UNDEFINED;
-	body_message_type_ = http_body_message_type::UNDEFINED;
-	content_length_ = 0;
-	chunked_status_ = chunked_status::CHUNKED_SIZE;
-	chunked_size_ = 0;
-}
-
 }

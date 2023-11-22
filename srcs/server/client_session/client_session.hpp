@@ -13,6 +13,8 @@ enum CLIENT_SESSION_STATUS {
 	EVALUATING_RESPONSE_TYPE,
 	RESPONSE_PREPARING,
 	CGI_PREPARING,
+	SENDING_RESPONSE,
+	SENDING_CGI_RESPONSE,
 	SESSION_COMPLETE,
 	ERROR_OCCURRED,
 };
@@ -38,6 +40,7 @@ public:
 	void setStatus(CLIENT_SESSION_STATUS const& status);
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
+	void sessionCleanup();
 };
 
 }

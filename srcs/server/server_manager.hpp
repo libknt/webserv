@@ -36,11 +36,11 @@ private:
 	int receiveAndParseHttpRequest(ClientSession& client_session);
 	void determineResponseType(ClientSession& client_session);
 	int setWriteFd(int sd);
-	int sendResponse(int sd);
+	int sendResponse(ClientSession& client_session);
 	int requestCleanup(int sd);
-	int unregisterClientSession(ClientSession& client_session);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
+	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
 
 public:

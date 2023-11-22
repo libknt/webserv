@@ -120,7 +120,6 @@ public:
 	sockaddr_in const& getServerAddress() const;
 	std::string getServerIpAddress() const;
 	std::string getServerPort() const;
-	void cleanup();
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);

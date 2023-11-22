@@ -222,15 +222,6 @@ int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 	return (0);
 }
 
-int HttpRequestParser::httpRequestCleanup(int sd) {
-	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
-	if (it == http_request_map_.end()) {
-		return -1;
-	}
-	it->second.cleanup();
-	return 0;
-}
-
 int HttpRequestParser::httpRequestErase(int sd) {
 	http_request_map_.erase(sd);
 	return 0;

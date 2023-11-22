@@ -59,4 +59,12 @@ void ClientSession::setSessionStatusFromHttpRequest() {
 	}
 }
 
+void ClientSession::sessionCleanup() {
+	sockaddr_in client_address = request_.getClientAddress();
+	sockaddr_in server_address = request_.getServerAddress();
+	request_ = HttpRequest(client_address, server_address);
+
+	setStatus(AWAITING_REQUEST);
+}
+
 }
