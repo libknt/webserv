@@ -143,17 +143,17 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					is_running = false;
 					return -1;
 				}
-				if (server_status_[sd] == server::PREPARING_RESPONSE) {
-					std::cout << "  Request received" << std::endl;
-					determineRequestType(sd);
-					// if (http_request_parser_.getRequest(sd).getIsCgi()) {
-					// 	std::cout << "  execute cgi" << std::endl;
-					// 	// TODO cgi実行
-					// } else {
-					std::cout << "  create response" << std::endl;
-					setWriteFd(sd);
-					// }
-				}
+				// if (server_status_[sd] == server::PREPARING_RESPONSE) {
+				// 	std::cout << "  Request received" << std::endl;
+				// 	determineRequestType(sd);
+				// 	// if (http_request_parser_.getRequest(sd).getIsCgi()) {
+				// 	// 	std::cout << "  execute cgi" << std::endl;
+				// 	// 	// TODO cgi実行
+				// 	// } else {
+				// 	std::cout << "  create response" << std::endl;
+				// 	setWriteFd(sd);
+				// 	// }
+				// }
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
@@ -226,13 +226,13 @@ void ServerManager::registerClientSession(int sd,
 	client_session_.insert(std::make_pair(sd, ClientSession(sd, client_address, server_address)));
 }
 
-int ServerManager::createServerStatus(int sd) {
-	if (server_status_.find(sd) != server_status_.end()) {
-		return -1;
-	}
-	server_status_.insert(std::make_pair(sd, server::RECEIVING_REQUEST));
-	return 0;
-}
+// int ServerManager::createServerStatus(int sd) {
+// 	// if (server_status_.find(sd) != server_status_.end()) {
+// 	// 	return -1;
+// 	// }
+// 	// server_status_.insert(std::make_pair(sd, server::RECEIVING_REQUEST));
+// 	return 0;
+// }
 
 int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
@@ -250,12 +250,12 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 		disconnect(client_sd);
 		return 0;
 	}
-	server_status_[client_sd] = http_request_parser_.handleBuffer(client_sd, recv_buffer);
-	if (server_status_[client_sd] == server::PROCESSING_ERROR) {
-		std::cerr << "handleBuffer() failed" << std::endl;
-		disconnect(client_sd);
-		return -1;
-	}
+	// server_status_[client_sd] = http_request_parser_.handleBuffer(client_sd, recv_buffer);
+	// if (server_status_[client_sd] == server::PROCESSING_ERROR) {
+	// 	std::cerr << "handleBuffer() failed" << std::endl;
+	// 	disconnect(client_sd);
+	// 	return -1;
+	// }
 
 	return 0;
 }
@@ -294,18 +294,18 @@ int ServerManager::sendResponse(int sd) {
 		disconnect(sd);
 		return -1;
 	}
-	server_status_[sd] = COMPLETE;
-	if (server_status_[sd] == COMPLETE) {
-		requestCleanup(sd);
-		std::cout << "  Connection Cleanup" << std::endl;
-	}
+	// server_status_[sd] = COMPLETE;
+	// // if (server_status_[sd] == COMPLETE) {
+	// 	requestCleanup(sd);
+	// 	std::cout << "  Connection Cleanup" << std::endl;
+	// }
 	return 0;
 }
 
 int ServerManager::requestCleanup(int sd) {
 	http_request_parser_.httpRequestCleanup(sd);
 	FD_CLR(sd, &master_write_fds_);
-	server_status_[sd] = RECEIVING_REQUEST;
+	// server_status_[sd] = RECEIVING_REQUEST;
 	return 0;
 }
 
@@ -316,7 +316,7 @@ int ServerManager::disconnect(int sd) {
 		while (!FD_ISSET(highest_sd_, &master_read_fds_))
 			--highest_sd_;
 	}
-	server_status_.erase(sd);
+	// server_status_.erase(sd);
 	http_request_parser_.httpRequestErase(sd);
 	close(sd);
 	std::cout << "  Connection closed - " << sd << std::endl;

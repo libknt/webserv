@@ -7,10 +7,20 @@
 
 namespace server {
 
+enum CLIENT_SESSION_STATUS {
+	AWAITING_REQUEST,
+	REQUEST_RECEIVING,
+	RESPONSE_PREPARING,
+	SESSION_COMPLETE,
+	ERROR_OCCURRED,
+};
+
 class ClientSession {
 private:
 	const int sd_;
 	HttpRequest request_;
+
+	CLIENT_SESSION_STATUS status_;
 
 	/* data */
 	ClientSession();

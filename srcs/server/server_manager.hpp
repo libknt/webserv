@@ -3,9 +3,9 @@
 
 #include "client_session.hpp"
 #include "configuration.hpp"
+#include "define.hpp"
 #include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
-#include "types.hpp"
 #include <map>
 #include <vector>
 
@@ -24,7 +24,7 @@ private:
 	int highest_sd_;
 	bool is_running;
 	struct timeval timeout_;
-	std::map<int, SERVER_STATUS> server_status_;
+	// std::map<int, SERVER_STATUS> server_status_;
 	HttpRequestParser http_request_parser_;
 
 	ServerManager();
@@ -34,7 +34,7 @@ private:
 	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
-	int createServerStatus(int sd);
+	// int createServerStatus(int sd);
 	int receiveAndParseHttpRequest(ClientSession& client_session);
 	void determineRequestType(int sd);
 	int setWriteFd(int sd);
