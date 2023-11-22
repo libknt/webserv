@@ -162,6 +162,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			sendResponse(client_session);
 			if (client_session.getStatus() == SESSION_COMPLETE) {
 				client_session.sessionCleanup();
+				FD_CLR(client_session.getSd(), &master_write_fds_);
 				std::cout << "  Connection Cleanup" << std::endl;
 			}
 			--ready_sds;
