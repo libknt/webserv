@@ -64,18 +64,6 @@ void HttpResponse::createResponse() {
 		"</body>\r\n"
 
 		"</html>\r\n";
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
-	std::cout << buffer.size() << std::endl;
 	body_ = buffer;
 }
 

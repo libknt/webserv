@@ -74,15 +74,13 @@ private:
 	chunked_status::CHUNKED_STATUS chunked_status_;
 	size_t chunked_size_;
 	std::string body_;
-	sockaddr_in client_address_;
-	sockaddr_in server_address_;
+	// sockaddr_in client_address_;
+	// sockaddr_in server_address_;
 	bool isTokenDelimiter(char chr);
 	bool isTokenCharacter(char chr);
 
-	HttpRequest();
-
 public:
-	explicit HttpRequest(sockaddr_in client_address, sockaddr_in server_address);
+	HttpRequest();
 	explicit HttpRequest(HttpRequest const& other);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
@@ -98,8 +96,6 @@ public:
 	void setChunkedStatus(chunked_status::CHUNKED_STATUS const& chunked_status);
 	void setChunkedSize(size_t chunked_size_);
 	void appendBody(std::string const& body);
-	void setClientAddress(sockaddr_in const& client_address);
-	void setServerAddress(sockaddr_in const& server_address);
 
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
 	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;
@@ -116,10 +112,6 @@ public:
 	size_t getBodySize() const;
 	std::string getUriPath() const;
 	std::string getUriQuery() const;
-	sockaddr_in const& getClientAddress() const;
-	sockaddr_in const& getServerAddress() const;
-	std::string getServerIpAddress() const;
-	std::string getServerPort() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);

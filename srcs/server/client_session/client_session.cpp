@@ -6,14 +6,31 @@ ClientSession::ClientSession(int const sd,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
 	: sd_(sd)
-	, request_(HttpRequest(client_address, server_address))
+	, client_address_(client_address)
+	, server_address_(server_address)
+	, request_(HttpRequest())
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
 
-ClientSession::~ClientSession() {}
+ClientSession::ClientSession(int const sd,
+	sockaddr_in const& client_address,
+	sockaddr_in const& server_address,
+	CLIENT_SESSION_STATUS const& status)
+	: sd_(sd)
+	, client_address_(client_address)
+	, server_address_(server_address)
+	, request_(HttpRequest())
+	, response_(HttpResponse())
+	, status_(status) {}
+
+ClientSession::~ClientSession() {
+	std::cout << "ClientSession destructor called" << std::endl;
+}
 
 ClientSession::ClientSession(const ClientSession& other)
 	: sd_(other.sd_)
+	, client_address_(other.client_address_)
+	, server_address_(other.server_address_)
 	, request_(other.request_)
 	, response_(other.response_)
 	, status_(other.status_) {}
@@ -66,14 +83,62 @@ void ClientSession::setSessionStatusFromHttpRequest() {
 	}
 }
 
+sockaddr_in const& ClientSession::getClientAddress() const {
+	return client_address_;
+}
+
+sockaddr_in const& ClientSession::getServerAddress() const {
+	return server_address_;
+}
+
+std::string ClientSession::getClientIpAddress() const {
+	sockaddr_in client_address = client_address_;
+	char* client_ip = inet_ntoa(client_address.sin_addr);
+	return (std::string(client_ip));
+}
+
+std::string ClientSession::getServerIpAddress() const {
+	sockaddr_in server_address = server_address_;
+	char* server_ip = inet_ntoa(server_address.sin_addr);
+	return (std::string(server_ip));
+}
+
+std::string ClientSession::getClientPort() const {
+	sockaddr_in client_address = getClientAddress();
+	unsigned short client_port = ntohs(client_address.sin_port);
+
+	std::stringstream ss;
+	ss << client_port;
+	return ss.str();
+}
+
+std::string ClientSession::getServerPort() const {
+	sockaddr_in server_address = getServerAddress();
+	unsigned short server_port = ntohs(server_address.sin_port);
+
+	std::stringstream ss;
+	ss << server_port;
+	return ss.str();
+}
+
 void ClientSession::sessionCleanup() {
-	sockaddr_in const& client_address = request_.getClientAddress();
-	sockaddr_in const& server_address = request_.getServerAddress();
-	request_ = HttpRequest(client_address, server_address);
-
+	request_ = HttpRequest();
 	response_ = HttpResponse();
+}
 
-	setStatus(AWAITING_REQUEST);
+std::ostream& operator<<(std::ostream& out, const ClientSession& client_session) {
+	out << "ClientSession: " << std::endl;
+	out << "  sd: " << client_session.getSd() << std::endl;
+	out << "  client_address: " << client_session.getClientIpAddress() << ":"
+		<< client_session.getClientPort() << std::endl;
+	out << "  server_address: " << client_session.getServerIpAddress() << ":"
+		<< client_session.getServerPort() << std::endl;
+	out << "  status: " << client_session.getStatus() << std::endl;
+	// out << "  request: " << std::endl;
+	// out << client_session.getRequest() << std::endl;
+	// out << "  response: " << std::endl;
+	// out << client_session.getResponse();
+	return out;
 }
 
 }

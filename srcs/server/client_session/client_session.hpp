@@ -18,11 +18,14 @@ enum CLIENT_SESSION_STATUS {
 	SENDING_CGI_RESPONSE,
 	SESSION_COMPLETE,
 	ERROR_OCCURRED,
+	CLOSED,
 };
 
 class ClientSession {
 private:
 	const int sd_;
+	const sockaddr_in client_address_;
+	const sockaddr_in server_address_;
 	HttpRequest request_;
 	HttpResponse response_;
 
@@ -34,17 +37,29 @@ public:
 	explicit ClientSession(int const sd,
 		sockaddr_in const& client_address,
 		sockaddr_in const& server_address);
+	explicit ClientSession(int const sd,
+		sockaddr_in const& client_address,
+		sockaddr_in const& server_address,
+		CLIENT_SESSION_STATUS const& status);
 	~ClientSession();
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
 	HttpRequest& getRequest();
 	HttpResponse& getResponse();
+	sockaddr_in const& getClientAddress() const;
+	sockaddr_in const& getServerAddress() const;
+	std::string getClientIpAddress() const;
+	std::string getServerIpAddress() const;
+	std::string getClientPort() const;
+	std::string getServerPort() const;
 	void setStatus(CLIENT_SESSION_STATUS const& status);
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
 };
+
+std::ostream& operator<<(std::ostream& out, const ClientSession& client_session);
 
 }
 
