@@ -33,6 +33,8 @@ public:
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
+	HttpRequest& getRequest();
+	CLIENT_SESSION_STATUS getStatus() const;
 };
 
 }

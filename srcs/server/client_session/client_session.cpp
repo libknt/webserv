@@ -28,4 +28,12 @@ int ClientSession::getSd() const {
 	return sd_;
 }
 
+HttpRequest& ClientSession::getRequest() {
+    return request_;
+}
+
+CLIENT_SESSION_STATUS ClientSession::getStatus() const {
+    return status_;
+}
+
 }
