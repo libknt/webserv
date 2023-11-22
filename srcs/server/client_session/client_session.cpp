@@ -32,8 +32,31 @@ HttpRequest& ClientSession::getRequest() {
 	return request_;
 }
 
+void ClientSession::setStatus(CLIENT_SESSION_STATUS const& status) {
+	status_ = status;
+}
+
 CLIENT_SESSION_STATUS ClientSession::getStatus() const {
 	return status_;
+}
+
+void ClientSession::setSessionStatusFromHttpRequest() {
+	http_request_status::HTTP_REQUEST_STATUS request_status = request_.getStatus();
+
+	switch (request_status) {
+		case http_request_status::FINISHED:
+			setStatus(RESPONSE_PREPARING);
+			break;
+		case http_request_status::ERROR:
+			setStatus(ERROR_OCCURRED);
+			break;
+		case http_request_status::UNDEFINED:
+			setStatus(ERROR_OCCURRED);
+			break;
+		default:
+			setStatus(REQUEST_RECEIVING);
+			break;
+	}
 }
 
 }

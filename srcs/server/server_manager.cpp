@@ -142,17 +142,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					is_running = false;
 					return -1;
 				}
-				// if (server_status_[sd] == server::PREPARING_RESPONSE) {
-				// 	std::cout << "  Request received" << std::endl;
-				// 	determineRequestType(sd);
-				// 	// if (http_request_parser_.getRequest(sd).getIsCgi()) {
-				// 	// 	std::cout << "  execute cgi" << std::endl;
-				// 	// 	// TODO cgi実行
-				// 	// } else {
-				// 	std::cout << "  create response" << std::endl;
-				// 	setWriteFd(sd);
-				// 	// }
-				// }
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
@@ -225,14 +214,6 @@ void ServerManager::registerClientSession(int sd,
 	client_session_.insert(std::make_pair(sd, ClientSession(sd, client_address, server_address)));
 }
 
-// int ServerManager::createServerStatus(int sd) {
-// 	// if (server_status_.find(sd) != server_status_.end()) {
-// 	// 	return -1;
-// 	// }
-// 	// server_status_.insert(std::make_pair(sd, server::RECEIVING_REQUEST));
-// 	return 0;
-// }
-
 int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	char recv_buffer[BUFFER_SIZE];
@@ -255,12 +236,8 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 
 	// ここでリクエストをパースする
 
-	// server_status_[client_sd] = http_request_parser_.handleBuffer(client_sd, recv_buffer);
-	// if (server_status_[client_sd] == server::PROCESSING_ERROR) {
-	// 	std::cerr << "handleBuffer() failed" << std::endl;
-	// 	disconnect(client_sd);
-	// 	return -1;
-	// }
+	// リクエストのパース終了
+	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;
 }

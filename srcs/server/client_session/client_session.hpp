@@ -22,7 +22,6 @@ private:
 
 	CLIENT_SESSION_STATUS status_;
 
-	/* data */
 	ClientSession();
 
 public:
@@ -34,7 +33,9 @@ public:
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
 	HttpRequest& getRequest();
+	void setStatus(CLIENT_SESSION_STATUS const& status);
 	CLIENT_SESSION_STATUS getStatus() const;
+	void setSessionStatusFromHttpRequest();
 };
 
 }
