@@ -17,7 +17,7 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 	return (*this);
 }
 
-int HttpRequestParser::handleBuffer(int sd, const char* buf) {
+SERVER_STATUS HttpRequestParser::handleBuffer(int sd, const char* buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
@@ -26,7 +26,7 @@ int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		return -1;
+		return PROCESSING_ERROR;
 	}
 	// TODO ここに宣言するのが微妙ではある。
 	HttpRequest& request = it->second;
@@ -46,17 +46,17 @@ int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	}
 
 	if (request.getStatus() == http_request_status::FINISHED) {
-		return 1;
+		return PREPARING_RESPONSE;
 	}
-	return 0;
+	return RECEIVING_REQUEST;
 }
 
-HttpRequest const& HttpRequestParser::getRequest(int sd) const {
-	std::map<int, server::HttpRequest>::const_iterator it = http_request_map_.find(sd);
+HttpRequest& HttpRequestParser::getRequest(int sd) {
+	std::map<int, server::HttpRequest>::iterator it = http_request_map_.find(sd);
 	return it->second;
 }
 
-void HttpRequestParser::addAcceptClientInfo(int sd,
+int HttpRequestParser::addAcceptClientInfo(int sd,
 	sockaddr_in client_address,
 	sockaddr_in server_address) {
 
@@ -67,6 +67,7 @@ void HttpRequestParser::addAcceptClientInfo(int sd,
 	}
 	HttpRequest request(client_address, server_address);
 	http_request_map_.insert(std::pair<int, HttpRequest>(sd, request));
+	return (0);
 }
 
 int HttpRequestParser::parseRequest(int sd, std::string const& line) {
@@ -219,5 +220,19 @@ int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 		return (-1);
 	}
 	return (0);
+}
+
+int HttpRequestParser::httpRequestCleanup(int sd) {
+	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
+	if (it == http_request_map_.end()) {
+		return -1;
+	}
+	it->second.cleanup();
+	return 0;
+}
+
+int HttpRequestParser::httpRequestErase(int sd) {
+	http_request_map_.erase(sd);
+	return 0;
 }
 }

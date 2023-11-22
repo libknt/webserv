@@ -119,6 +119,21 @@ chunked_status::CHUNKED_STATUS const& HttpRequest::getChunkedStatus() const {
 	return (chunked_status_);
 }
 
+std::string HttpRequest::getServerIpAddress() const {
+	sockaddr_in server_address = getServerAddress();
+	char* server_ip = inet_ntoa(server_address.sin_addr);
+	return (std::string(server_ip));
+}
+
+std::string HttpRequest::getServerPort() const {
+	sockaddr_in server_address = getServerAddress();
+	unsigned short server_port = ntohs(server_address.sin_port);
+
+	std::stringstream ss;
+	ss << server_port;
+	return ss.str();
+}
+
 size_t HttpRequest::getChunkedSize() const {
 	return (chunked_size_);
 }
@@ -269,6 +284,7 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 	out << "server ip: " << server_ip << std::endl;
 	out << "server port: " << server_port << std::endl;
 	out << "method: " << request.getMethod() << std::endl;
+	out << "request path: " << request.getRequestPath() << std::endl;
 	out << "status: " << request.getStatus() << std::endl;
 	out << "version: " << request.getVersion() << std::endl;
 	out << "header" << std::endl;
@@ -281,6 +297,17 @@ std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 	std::cout << "-----body----" << std::endl;
 	std::cout << request.getBody() << std::endl;
 	return out;
+}
+
+void HttpRequest::cleanup() {
+	status_ = http_request_status::METHOD;
+	error_status_ = http_error_status::UNDEFINED;
+	method_ = http_method::UNDEFINED;
+	version_ = http_version::UNDEFINED;
+	body_message_type_ = http_body_message_type::UNDEFINED;
+	content_length_ = 0;
+	chunked_status_ = chunked_status::CHUNKED_SIZE;
+	chunked_size_ = 0;
 }
 
 }

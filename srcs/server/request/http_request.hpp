@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <netinet/in.h>
+#include <sstream>
 #include <string>
 
 namespace server {
@@ -117,6 +118,9 @@ public:
 	std::string getUriQuery() const;
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
+	std::string getServerIpAddress() const;
+	std::string getServerPort() const;
+	void cleanup();
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);

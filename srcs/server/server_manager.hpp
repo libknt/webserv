@@ -16,10 +16,13 @@ private:
 	const Configuration& configuration_;
 	std::vector<server::TcpSocket> sockets_;
 	fd_set master_read_fds_;
-	fd_set read_fds__;
+	fd_set master_write_fds_;
+	fd_set read_fds_;
+	fd_set write_fds_;
 	int highest_sd_;
 	bool is_running;
 	struct timeval timeout_;
+	std::map<int, SERVER_STATUS> server_status_;
 	HttpRequestParser http_request_parser_;
 
 	ServerManager();
@@ -29,7 +32,12 @@ private:
 	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
+	int createServerStatus(int sd);
 	int receiveAndParseHttpRequest(int sd);
+	void determineRequestType(int sd);
+	int setWriteFd(int sd);
+	int sendResponse(int sd);
+	int requestCleanup(int sd);
 	int disconnect(int sd);
 
 public:

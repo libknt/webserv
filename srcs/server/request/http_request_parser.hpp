@@ -2,6 +2,7 @@
 #define PARSE_HTTP_REQUEST_HPP
 
 #include "http_request.hpp"
+#include "types.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -43,9 +44,11 @@ public:
 	explicit HttpRequestParser(HttpRequestParser& other);
 	virtual ~HttpRequestParser();
 	HttpRequestParser& operator=(HttpRequestParser& other);
-	int handleBuffer(int sd, const char* buf);
-	HttpRequest const& getRequest(int sd) const;
-	void addAcceptClientInfo(int sd, sockaddr_in client_address, sockaddr_in server_address);
+	SERVER_STATUS handleBuffer(int sd, const char* buf);
+	HttpRequest& getRequest(int sd);
+	int addAcceptClientInfo(int sd, sockaddr_in client_address, sockaddr_in server_address);
+	int httpRequestCleanup(int sd);
+	int httpRequestErase(int sd);
 };
 
 }
