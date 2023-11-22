@@ -261,6 +261,8 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 
 	// リクエストのパース終了
 	client_session.setSessionStatusFromHttpRequest();
+	// 一旦
+	client_session.setStatus(RESPONSE_PREPARING);
 
 	return 0;
 }
