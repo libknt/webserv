@@ -137,10 +137,14 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					return -1;
 				}
 			} else {
-				ClientSession& client_session = getClientSession(sd);
-				if (receiveAndParseHttpRequest(client_session) < 0) {
+				if (receiveAndParseHttpRequest(getClientSession(sd)) < 0) {
 					is_running = false;
 					return -1;
+				}
+				ClientSession& client_session = getClientSession(sd);
+				if (client_session.getStatus() == CLOSED) {
+					--ready_sds;
+					continue;
 				}
 				if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
 					determineResponseType(client_session);
@@ -310,7 +314,13 @@ int ServerManager::unregisterClientSession(ClientSession& client_session) {
 }
 
 ClientSession& ServerManager::getClientSession(int const sd) {
-	return active_client_sessions_.find(sd)->second;
+	std::map<int, ClientSession>::iterator it = active_client_sessions_.find(sd);
+	if (it == active_client_sessions_.end()) {
+		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
+		static ClientSession dummy_client_session(-1, sockaddr_in(), sockaddr_in(), CLOSED);
+		return dummy_client_session;
+	}
+	return it->second;
 }
 
 } // namespace server
