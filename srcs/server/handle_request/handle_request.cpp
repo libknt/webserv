@@ -35,18 +35,14 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	HttpResponse response;
 	struct stat stat_info;
 
-	std::string file_path = location_directive.getRoot() + "/" + location_directive.getIndex();
+	std::string file_path = location_directive.getRoot() + request.getRequestPath();
+	std::cout << file_path << std::endl;
+
 	if (stat(file_path.c_str(), &stat_info) != 0) {
-		if (location_directive.getAutoindex() == "on") {
-			response = makeAutoIndex(location_directive);
-			//TODO make auto index
-			
-		}
-		else {
-			executeDelete(request, location_directive);
-		}
+		std::cout << "debug: WHY" << std::endl;
+		return (createErrorResponse(NOT_FOUND, location_directive));
 	}
-	else {
+	else if (S_ISREG(stat_info.st_mode)){
 		std::ifstream file_stream(file_path);
 		std::string body;
 		response.setStatusCode(OK);
@@ -54,7 +50,12 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 		std::getline(file_stream, body, static_cast<char>(EOF));
 		response.setBody(body);
 	}
-	(void) request;
+	else if (S_ISDIR(stat_info.st_mode)) {
+		std::cout << "directory" << std::endl;
+	}
+	else {
+		return (createErrorResponse(FORBIDDEN, location_directive));
+	}
 	return (response);
 }
 
@@ -96,6 +97,7 @@ HttpResponse createErrorResponse(const STATUS_CODE status_code,
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
+	response.setHeaderValue("Content-Length", std::to_string(body_content.size()));
 	response.setBody(body_content);
 	return response;
 }
