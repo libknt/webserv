@@ -260,7 +260,7 @@ int ServerManager::setWriteFd(int sd) {
 int ServerManager::sendResponse(int sd) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	std::string buffer = response_[sd].createResponse();
+	std::string buffer = response_[sd].concatenateComponents();
 	std::cout << buffer << std::endl;
 	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
 	int send_result = ::send(sd, send_buffer, sizeof(send_buffer), 0);
