@@ -38,6 +38,11 @@ fclean: clean
 re: fclean all
 
 
+docker:
+	@echo docker run -it --rm -v $$PWD:/root/webserv ubuntu:latest /bin/bash
+	@echo apt-get update
+	@echo apt install -y netbase g++ vim make
+
 format:
 	find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | xargs clang-format -i
 
