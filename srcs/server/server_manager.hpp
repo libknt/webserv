@@ -6,6 +6,7 @@
 #include "define.hpp"
 #include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
+#include <iostream>
 #include <map>
 #include <vector>
 
@@ -50,7 +51,21 @@ public:
 	explicit ServerManager(const ServerManager& other);
 	ServerManager& operator=(const ServerManager& other);
 	int runServer();
+
+	Configuration const& getConfiguration() const;
+	std::vector<server::TcpSocket> const& getSockets() const;
+	std::map<int, ClientSession> const& getActiveClientSessions() const;
+	fd_set const& getMasterReadFds() const;
+	fd_set const& getMasterWriteFds() const;
+	fd_set const& getReadFds() const;
+	fd_set const& getWriteFds() const;
+	int getHighestSd() const;
+	bool getIsRunning() const;
+	struct timeval const& getTimeout() const;
+	HttpRequestParser const& getHttpRequestParser() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const ServerManager& server_manager);
 
 } // namespace server
 

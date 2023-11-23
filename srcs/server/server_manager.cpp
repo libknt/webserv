@@ -357,4 +357,93 @@ ClientSession& ServerManager::getClientSession(int const sd) {
 	return it->second;
 }
 
+Configuration const& ServerManager::getConfiguration() const {
+	return configuration_;
+}
+
+std::vector<server::TcpSocket> const& ServerManager::getSockets() const {
+	return sockets_;
+}
+
+std::map<int, ClientSession> const& ServerManager::getActiveClientSessions() const {
+	return active_client_sessions_;
+}
+
+fd_set const& ServerManager::getMasterReadFds() const {
+	return master_read_fds_;
+}
+
+fd_set const& ServerManager::getMasterWriteFds() const {
+	return master_write_fds_;
+}
+
+fd_set const& ServerManager::getReadFds() const {
+	return read_fds_;
+}
+
+fd_set const& ServerManager::getWriteFds() const {
+	return write_fds_;
+}
+
+int ServerManager::getHighestSd() const {
+	return highest_sd_;
+}
+
+bool ServerManager::getIsRunning() const {
+	return is_running;
+}
+
+struct timeval const& ServerManager::getTimeout() const {
+	return timeout_;
+}
+
+HttpRequestParser const& ServerManager::getHttpRequestParser() const {
+	return http_request_parser_;
+}
+
+std::ostream& operator<<(std::ostream& out, const ServerManager& server_manager) {
+	out << "ServerManager: " << std::endl;
+	out << "  configuration_: " << server_manager.getConfiguration() << std::endl;
+	out << "  sockets_: " << std::endl;
+	for (size_t i = 0; i < server_manager.getSockets().size(); ++i) {
+		out << "    " << server_manager.getSockets()[i] << std::endl;
+	}
+	out << "  active_client_sessions_: " << std::endl;
+	for (std::map<int, ClientSession>::const_iterator it =
+			 server_manager.getActiveClientSessions().begin();
+		 it != server_manager.getActiveClientSessions().end();
+		 ++it) {
+		out << "    " << it->second << std::endl;
+	}
+	out << "  master_read_fds_: " << std::endl;
+	for (int i = 0; i <= server_manager.getHighestSd(); ++i) {
+		if (FD_ISSET(i, &server_manager.getMasterReadFds())) {
+			out << "    " << i << std::endl;
+		}
+	}
+	out << "  master_write_fds_: " << std::endl;
+	for (int i = 0; i <= server_manager.getHighestSd(); ++i) {
+		if (FD_ISSET(i, &server_manager.getMasterWriteFds())) {
+			out << "    " << i << std::endl;
+		}
+	}
+	out << "  read_fds_: " << std::endl;
+	for (int i = 0; i <= server_manager.getHighestSd(); ++i) {
+		if (FD_ISSET(i, &server_manager.getReadFds())) {
+			out << "    " << i << std::endl;
+		}
+	}
+	out << "  write_fds_: " << std::endl;
+	for (int i = 0; i <= server_manager.getHighestSd(); ++i) {
+		if (FD_ISSET(i, &server_manager.getWriteFds())) {
+			out << "    " << i << std::endl;
+		}
+	}
+	out << "  highest_sd_: " << server_manager.getHighestSd() << std::endl;
+	out << "  is_running: " << server_manager.getIsRunning() << std::endl;
+	out << "  timeout_: " << server_manager.getTimeout().tv_sec << std::endl;
+	// out << "  http_request_parser_: " << server_manager.getHttpRequestParser() << std::endl;
+	return out;
+}
+
 } // namespace server
