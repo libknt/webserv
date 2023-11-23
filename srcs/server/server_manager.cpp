@@ -151,7 +151,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					continue;
 				}
 				if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
-					determineResponseType(client_session);
+					setClientResponseStage(client_session);
 				}
 				if (client_session.getStatus() == RESPONSE_PREPARING) {
 					// レスポンスの準備
@@ -183,38 +183,19 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 	return 0;
 }
 
-static bool doesFileExist(std::string const& file_name) {
-	struct stat file_info;
-	int stat_status = stat(file_name.c_str(), &file_info);
-	if (stat_status == 0) {
-		return true;
-	}
-	return false;
-}
-
-static std::string extractExtension(std::string const& uri) {
-	std::string extension;
-	std::string::size_type index = uri.find(".");
-	if (index != std::string::npos) {
-		extension = uri.substr(index);
-	}
-	return extension;
-}
-
-void ServerManager::determineResponseType(ClientSession& client_session) {
-	ServerDirective const& server_directive = client_session.getServerDirective();
-	HttpRequest& request = client_session.getRequest();
-	LocationDirective const& location_directive =
+void ServerManager::setClientResponseStage(ClientSession& session) {
+	const ServerDirective& server_directive = session.getServerDirective();
+	const HttpRequest& request = session.getRequest();
+	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getUriPath());
-	std::string extension = extractExtension(request.getRequestPath());
-	std::string file_name =
-		location_directive.getRoot() + "/" + client_session.getRequest().getRequestPath();
+	std::string file_extension = Utils::getUriExtension(request.getUriPath());
+	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
 
-	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(extension) &&
-		doesFileExist(file_name)) {
-		client_session.setStatus(CGI_PREPARING);
+	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
+		Utils::isFilePresent(file_path)) {
+		session.setStatus(CGI_PREPARING);
 	} else {
-		client_session.setStatus(RESPONSE_PREPARING);
+		session.setStatus(RESPONSE_PREPARING);
 	}
 
 	return;
