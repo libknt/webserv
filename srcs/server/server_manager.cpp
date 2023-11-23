@@ -288,14 +288,10 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	}
 
 	HttpRequest& request = client_session.getRequest();
-	(void)request;
+	HttpRequestParser::parse(request, recv_buffer);
+	std::cout << request << std::endl;
 
-	// ここでリクエストをパースする
-
-	// リクエストのパース終了
 	client_session.setSessionStatusFromHttpRequest();
-	// 一旦
-	client_session.setStatus(EVALUATING_RESPONSE_TYPE);
 
 	return 0;
 }
@@ -397,10 +393,6 @@ struct timeval const& ServerManager::getTimeout() const {
 	return timeout_;
 }
 
-HttpRequestParser const& ServerManager::getHttpRequestParser() const {
-	return http_request_parser_;
-}
-
 std::ostream& operator<<(std::ostream& out, const ServerManager& server_manager) {
 	out << "ServerManager: " << std::endl;
 	out << "  configuration_: " << server_manager.getConfiguration() << std::endl;
@@ -442,7 +434,6 @@ std::ostream& operator<<(std::ostream& out, const ServerManager& server_manager)
 	out << "  highest_sd_: " << server_manager.getHighestSd() << std::endl;
 	out << "  is_running: " << server_manager.getIsRunning() << std::endl;
 	out << "  timeout_: " << server_manager.getTimeout().tv_sec << std::endl;
-	// out << "  http_request_parser_: " << server_manager.getHttpRequestParser() << std::endl;
 	return out;
 }
 

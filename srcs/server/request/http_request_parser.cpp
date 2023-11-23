@@ -10,68 +10,46 @@ HttpRequestParser::HttpRequestParser(HttpRequestParser& other) {
 }
 
 HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
-	if (this != &other) {
-		http_request_map_ = other.http_request_map_;
-		http_line_stream_ = other.http_line_stream_;
-	}
+	(void)other;
 	return (*this);
 }
 
-int HttpRequestParser::handleBuffer(int sd, const char* buf) {
+void HttpRequestParser::parse(HttpRequest& request, const char* buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
-	http_line_stream_[sd] += buffer;
 
-	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
-	if (it == http_request_map_.end()) {
-		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		return -1;
-	}
-	// TODO ここに宣言するのが微妙ではある。
-	HttpRequest& request = it->second;
+	request.appendStreamLine(buffer);
 	if (!(request.getStatus() == http_request_status::BODY) ||
 		!(request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)) {
-		while ((index = http_line_stream_[sd].find("\r\n")) != std::string::npos) {
-			std::string line = http_line_stream_[sd].substr(0, index);
-			http_line_stream_[sd] = http_line_stream_[sd].substr(index + 2);
-			parseRequest(sd, line);
+		while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
+			std::string line = request.getStreamLine().substr(0, index);
+			request.setStreamLine(request.getStreamLine().substr(index + 2));
+			if (parseRequest(request, line) == -1) {
+				return;
+			}
 		}
 	}
 
 	if (request.getStatus() == http_request_status::BODY &&
 		request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH) {
-		parseRequest(sd, http_line_stream_[sd]);
-		http_line_stream_[sd].clear();
+		if (parseRequest(request, request.getStreamLine()) == -1) {
+			return;
+		}
+		request.setStreamLine("");
 	}
-
-	if (request.getStatus() == http_request_status::FINISHED) {
-		return 1;
-	}
-	return 0;
 }
 
-HttpRequest& HttpRequestParser::getRequest(int sd) {
-	std::map<int, server::HttpRequest>::iterator it = http_request_map_.find(sd);
-	return it->second;
-}
-
-int HttpRequestParser::parseRequest(int sd, std::string const& line) {
-	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
-	if (it == http_request_map_.end()) {
-		// TODO somethig happened when accpect;
-		return (-1);
-	}
-	HttpRequest& request = it->second;
+int HttpRequestParser::parseRequest(HttpRequest& request, std::string const& line) {
 	switch (request.getStatus()) {
 		case http_request_status::METHOD:
-			parseStartLine(it->second, line);
+			parseStartLine(request, line);
 			break;
 		case http_request_status::HEADER:
-			parseHeader(it->second, line);
+			parseHeader(request, line);
 			break;
 		case http_request_status::BODY:
-			parseBody(it->second, line);
+			parseBody(request, line);
 			break;
 		default:
 			request.setStatus(http_request_status::ERROR);
@@ -206,10 +184,5 @@ int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 		return (-1);
 	}
 	return (0);
-}
-
-int HttpRequestParser::httpRequestErase(int sd) {
-	http_request_map_.erase(sd);
-	return 0;
 }
 }

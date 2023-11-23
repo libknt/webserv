@@ -25,7 +25,6 @@ private:
 	int highest_sd_;
 	bool is_running;
 	struct timeval timeout_;
-	HttpRequestParser http_request_parser_;
 
 	ServerManager();
 	int setupServerSockets();
@@ -62,7 +61,6 @@ public:
 	int getHighestSd() const;
 	bool getIsRunning() const;
 	struct timeval const& getTimeout() const;
-	HttpRequestParser const& getHttpRequestParser() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerManager& server_manager);

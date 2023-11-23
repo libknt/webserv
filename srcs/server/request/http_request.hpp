@@ -63,6 +63,7 @@ enum HTTP_BODY_MESSAGE_TYPE {
 
 class HttpRequest {
 private:
+	std::string stream_line_;
 	http_request_status::HTTP_REQUEST_STATUS status_;
 	http_error_status::HTTP_ERROR_STATUS error_status_;
 	http_method::HTTP_METHOD method_;
@@ -84,6 +85,8 @@ public:
 	explicit HttpRequest(HttpRequest const& other);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
+	void appendStreamLine(std::string const& stream_line);
+	void setStreamLine(std::string const& stream_line);
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	int setMethod(std::string const& method);
@@ -97,6 +100,7 @@ public:
 	void setChunkedSize(size_t chunked_size_);
 	void appendBody(std::string const& body);
 
+	std::string const& getStreamLine() const;
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
 	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;
 	std::string const getMethod() const;
