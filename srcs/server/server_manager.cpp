@@ -184,14 +184,18 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 void ServerManager::determineResponseType(ClientSession& client_session) {
 	ServerDirective const& server_directive = client_session.getServerDirective();
-	std::string path = client_session.getRequest().getUriPath();
-	std::string extension = ".py";
-	std::cout << client_session.getServerDirective() << std::endl;
-	if (server_directive.isCgiEnabled(path) && server_directive.isCgiExtension(path, extension)) {
-		std::cout << "  CGI Request" << std::endl;
+	std::string uri = client_session.getRequest().getUriPath();
+	LocationDirective const& location_directive = server_directive.findLocation(std::string(uri));
+	std::string extension;
+	std::string::size_type index = uri.find(".");
+	if (index != std::string::npos) {
+		extension = uri.substr(index);
+	}
+	// todo file existsw
+	
+	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(extension)) {
 		client_session.setStatus(CGI_PREPARING);
 	} else {
-		std::cout << "  Static Request" << std::endl;
 		client_session.setStatus(RESPONSE_PREPARING);
 	}
 

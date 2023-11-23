@@ -39,7 +39,7 @@ public:
 	bool isCgiEnabled(std::string const& location) const;
 	bool isCgiExtension(std::string const& location, std::string const& extension) const;
 	const std::map<std::string, LocationDirective>& getLocations() const;
-	LocationDirective& findLocation(std::string path);
+	LocationDirective const& findLocation(std::string path) const;
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);
