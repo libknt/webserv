@@ -4,6 +4,8 @@
 #include "types.hpp"
 #include <cstring>
 #include <iostream>
+#include <map>
+#include <sstream>
 
 namespace server {
 
@@ -12,21 +14,30 @@ enum STATUS_CODE {
 	CREATED = 201,
 	PERMANENT_REDIRECT = 308,
 	BAD_REQUEST = 400,
-	NOT_FOUND = 404
+	NOT_FOUND = 404,
+	METHOD_NOT_ALLOWED = 405,
 };
 
 class HttpResponse {
 private:
-	std::string response_;
 	STATUS_CODE status_code_;
+	std::map<std::string, std::string> header_;
+	std::string body_;
 
 public:
 	HttpResponse();
 	~HttpResponse();
 	HttpResponse(const HttpResponse& other);
 	HttpResponse& operator=(const HttpResponse& other);
+	const std::string createResponse();
+	std::string statusCodeToStatusText(const STATUS_CODE code);
 	void setStatusCode(const STATUS_CODE& status_code);
-	const std::string& getResponse() const;
+	void setHeaderValue(const std::string& key, const std::string& value);
+	void setBody(const std::string& body);
+	STATUS_CODE getStatusCode() const;
+	const std::string getHeaderValue(const std::string& key);
+	const std::map<std::string, std::string>& getHeader() const;
+	const std::string& getBody() const;
 };
 
 } // namespace server

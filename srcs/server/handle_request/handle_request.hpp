@@ -12,10 +12,11 @@ namespace server {
 
 namespace handle_request {
 HttpResponse handleRequest(const HttpRequest& request, const Configuration& configuration);
-HttpResponse executeGet(const HttpRequest& request, const ServerDirective& server_directive);
-HttpResponse executePost(const HttpRequest& request, const ServerDirective& server_directive);
-HttpResponse executeDelete(const HttpRequest& request, const ServerDirective& server_directive);
-HttpResponse createErrorResponse(HttpResponse& response, const ServerDirective& server_directive);
+HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive);
+HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive);
+HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive);
+HttpResponse setErrorResponse(const STATUS_CODE status_code,
+	const LocationDirective& location_directive);
 };
 
 }

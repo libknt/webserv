@@ -3,8 +3,7 @@
 ServerDirective::ServerDirective()
 	: ip_address_("127.0.0.1")
 	, port_("80")
-	, server_name_("localhost")
-	, default_error_page_("error_page.html") {}
+	, server_name_("localhost") {}
 
 ServerDirective::~ServerDirective() {}
 
@@ -12,7 +11,6 @@ ServerDirective::ServerDirective(const ServerDirective& other)
 	: ip_address_(other.ip_address_)
 	, port_(other.port_)
 	, server_name_(other.server_name_)
-	, default_error_page_(other.default_error_page_)
 	, locations_(other.locations_) {}
 
 ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
@@ -20,7 +18,6 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 		port_ = other.port_;
 		ip_address_ = other.ip_address_;
 		server_name_ = other.server_name_;
-		default_error_page_ = other.default_error_page_;
 		locations_ = other.locations_;
 	}
 	return *this;
@@ -32,7 +29,6 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 
 	// TODO: too many elseif
 	while (!tokens.empty()) {
-		LocationDirective location_directive;
 		std::string location_path;
 
 		if (tokens.front() == "listen") {
@@ -45,31 +41,28 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			if (parseServerNameDirective(args) == -1) {
 				return -1;
 			}
-		} else if (tokens.front() == "default_error_page") {
-			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			if (parseDefaultErrorPageDirective(args) == -1) {
-				return -1;
-			}
 		} else if (tokens.front() == "location") {
 			tokens.erase(tokens.begin());
-			if (tokens.size()) {
-				location_path = tokens.front();
-				tokens.erase(tokens.begin());
-			} else {
-				std::cerr << "Parse Error: Invalid Location" << std::endl;
+			location_path = parseLocationPath(tokens);
+			if (location_path.empty()) {
 				return -1;
 			}
+			LocationDirective location_directive(location_path);
 			location_tokens = ParserUtils::extractTokensFromBlock(tokens);
 			if (location_directive.parseLocationDirective(location_tokens) == -1) {
 				return -1;
 			}
-			locations_[location_path] = location_directive;
+			if (locations_.find(location_path) == locations_.end()) {
+				locations_.insert(std::make_pair(location_path, location_directive));
+			}
 		} else {
 			std::cerr << "Parse Error: serverDirective" << std::endl;
-			std::cout << tokens.front() << std::endl;
 			return -1;
 		}
 		args.clear();
+	}
+	if (locations_.find("/") == locations_.end()) {
+		locations_.insert(std::make_pair("/", LocationDirective()));
 	}
 	return 0;
 }
@@ -140,13 +133,34 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 	return 0;
 }
 
-int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 1) {
-		std::cerr << "Parse Error: parseDefaultErrorPageDirective" << std::endl;
-		return -1;
+std::string ServerDirective::parseLocationPath(std::vector<std::string>& tokens) {
+	if (tokens.empty()) {
+		std::cerr << "Parse Error: parseLocationPath" << std::endl;
+		return std::string();
 	}
-	default_error_page_ = tokens.front();
-	return 0;
+
+	std::string token = tokens.front();
+	if (token[0] != '/') {
+		std::cerr << "Parse Error: parseLocationPath" << std::endl;
+		return std::string();
+	}
+
+	bool is_last_char_slash = false;
+	std::string location_path;
+	for (size_t i = 0; i < token.size(); ++i) {
+		if (token[i] == '/') {
+			if (!is_last_char_slash) {
+				location_path += token[i];
+				is_last_char_slash = true;
+			}
+		} else {
+			location_path += token[i];
+			is_last_char_slash = false;
+		}
+	}
+
+	tokens.erase(tokens.begin());
+	return location_path;
 }
 
 std::string ServerDirective::getPort() const {
@@ -161,32 +175,37 @@ std::string ServerDirective::getServerName() const {
 	return server_name_;
 }
 
-std::string ServerDirective::getDefaultErrorPage() const {
-	return default_error_page_;
-}
-
 const std::map<std::string, LocationDirective>& ServerDirective::getLocations() const {
 	return locations_;
 }
 
 bool ServerDirective::isCgiLocation(const std::string& location,
-	const std::string& script_file_name) const {
+	const std::string& script_name) const {
 	for (std::map<std::string, LocationDirective>::const_iterator it = locations_.begin();
 		 it != locations_.end();
 		 ++it) {
 		if (it->first == location && it->second.getCgi() == "on") {
-			if (it->second.isValidCgiExtensions(script_file_name))
+			if (it->second.isValidCgiExtensions(script_name))
 				return true;
 		}
 	}
 	return false;
 }
 
+LocationDirective& ServerDirective::findLocation(std::string request_path) {
+	for (size_t i = 0; i < request_path.size(); ++i) {
+		std::string path = request_path.substr(0, request_path.size() - i);
+		if (locations_.count(path)) {
+			return locations_[path];
+		}
+	}
+	return locations_["/"];
+}
+
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;
 	out << "ServerName: " << server_directive.getServerName() << std::endl;
-	out << "DefaultErrorPage: " << server_directive.getDefaultErrorPage() << std::endl;
 
 	std::map<std::string, LocationDirective> locations = server_directive.getLocations();
 	size_t i = 0;
@@ -194,7 +213,7 @@ std::ostream& operator<<(std::ostream& out, const ServerDirective& server_direct
 		 it != locations.end();
 		 ++it) {
 		out << "===== location" << i << " =====" << std::endl;
-		out << "LocationPath: " << it->first << std::endl;
+		out << "Location: " << it->first << std::endl;
 		out << it->second << std::endl;
 		i++;
 	}
