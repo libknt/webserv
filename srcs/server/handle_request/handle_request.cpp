@@ -21,7 +21,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
 				response = executeDelete(request, location_directive);
 			} else {
-				response = setErrorResponse(METHOD_NOT_ALLOWED, location_directive);
+				response = createErrorResponse(METHOD_NOT_ALLOWED, location_directive);
 			}
 			break;
 		}
@@ -51,7 +51,7 @@ HttpResponse executeDelete(const HttpRequest& request,
 	return (response);
 }
 
-HttpResponse setErrorResponse(const STATUS_CODE status_code,
+HttpResponse createErrorResponse(const STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
 	HttpResponse response;
 
