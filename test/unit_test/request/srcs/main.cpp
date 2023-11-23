@@ -1,4 +1,4 @@
-#include "define.hpp"
+#include "webserv.hpp"
 #include "http_request.hpp"
 #include "http_request_parser.hpp"
 #include <fcntl.h>

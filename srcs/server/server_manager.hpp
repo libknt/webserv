@@ -3,7 +3,7 @@
 
 #include "client_session.hpp"
 #include "configuration.hpp"
-#include "define.hpp"
+#include "webserv.hpp"
 #include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
 #include <iostream>
