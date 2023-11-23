@@ -46,9 +46,26 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 HttpResponse executeDelete(const HttpRequest& request,
 	const LocationDirective& location_directive) {
 	HttpResponse response;
-	(void)request;
-	(void)location_directive;
-	return (response);
+	struct stat file_status;
+
+	if (stat(request.getRequestPath().c_str(), &file_status) == -1) {
+		std::cerr << "DELETE Error: stat() failed" << std::endl;
+		return createErrorResponse(NOT_FOUND, location_directive);
+	}
+
+	if (!(file_status.st_mode & S_IROTH) || !(file_status.st_mode & S_IWOTH)) {
+		std::cerr << "DELETE Error: Permission denied" << std::endl;
+		return createErrorResponse(BAD_REQUEST, location_directive);
+	}
+
+	if (remove(request.getRequestPath().c_str()) != 0) {
+		std::cerr << "DELETE Error: remove() falied" << std::endl;
+		return createErrorResponse(BAD_REQUEST, location_directive);
+	}
+
+	response.setStatusCode(NO_CONTENT);
+
+	return response;
 }
 
 HttpResponse createErrorResponse(const STATUS_CODE status_code,
@@ -70,7 +87,7 @@ HttpResponse createErrorResponse(const STATUS_CODE status_code,
 		file_stream.close();
 	} else {
 		body_content =
-			"<html><body><h1> createErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");

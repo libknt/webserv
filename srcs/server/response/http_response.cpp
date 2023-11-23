@@ -20,7 +20,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 	return *this;
 }
 
-const std::string HttpResponse::createResponse() {
+const std::string HttpResponse::concatenateComponents() {
 	std::string response;
 	std::stringstream stringstream;
 	stringstream << status_code_;
@@ -42,6 +42,8 @@ std::string HttpResponse::statusCodeToStatusText(const STATUS_CODE code) {
 			return "OK";
 		case CREATED:
 			return "CREATED";
+		case NO_CONTENT:
+			return "NO_CONTENT";
 		case PERMANENT_REDIRECT:
 			return "PERMANENT_REDIRECT";
 		case BAD_REQUEST:

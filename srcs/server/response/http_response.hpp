@@ -12,6 +12,7 @@ namespace server {
 enum STATUS_CODE {
 	OK = 200,
 	CREATED = 201,
+	NO_CONTENT = 204,
 	PERMANENT_REDIRECT = 308,
 	BAD_REQUEST = 400,
 	NOT_FOUND = 404,
@@ -29,7 +30,7 @@ public:
 	~HttpResponse();
 	HttpResponse(const HttpResponse& other);
 	HttpResponse& operator=(const HttpResponse& other);
-	const std::string createResponse();
+	const std::string concatenateComponents();
 	std::string statusCodeToStatusText(const STATUS_CODE code);
 	void setStatusCode(const STATUS_CODE& status_code);
 	void setHeaderValue(const std::string& key, const std::string& value);

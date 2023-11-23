@@ -6,6 +6,7 @@
 #include "http_response.hpp"
 #include <iostream>
 #include <string>
+#include <sys/stat.h>
 
 namespace server {
 
