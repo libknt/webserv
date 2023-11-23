@@ -45,6 +45,10 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 	return (*this);
 }
 
+std::string const& HttpRequest::getStreamLine() const {
+	return (stream_line_);
+}
+
 http_request_status::HTTP_REQUEST_STATUS const& HttpRequest::getStatus() const {
 	return (status_);
 }
@@ -101,7 +105,7 @@ std::map<std::string, std::string> const& HttpRequest::getHeader() const {
 	return header_;
 }
 
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType() {
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType() const {
 	return (body_message_type_);
 }
 
@@ -139,6 +143,18 @@ std::string HttpRequest::getUriQuery() const {
 		return (request_path_.substr(query_index + 1));
 	}
 	return (std::string(""));
+}
+
+void HttpRequest::appendStreamLine(std::string const& stream_line) {
+	stream_line_ += stream_line;
+}
+
+void HttpRequest::setStreamLine(std::string const& stream_line) {
+	stream_line_ = stream_line;
+}
+
+void HttpRequest::eraseStreamLine(std::string::size_type position, std::string::size_type n) {
+	stream_line_.erase(position, n);
 }
 
 void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
