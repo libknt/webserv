@@ -14,8 +14,6 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 		if (server_directive.getPort() == request.getServerPort()) {
 			LocationDirective location_directive =
 				server_directive.findLocation(request.getRequestPath());
-			std::vector<std::string> ret = location_directive.getReturn();
-			return setReturnResponse(ret[0], ret[1]);
 
 			if (method == "GET" && location_directive.isAllowMethod(method)) {
 				response = executeGet(request, location_directive);
@@ -24,7 +22,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
 				response = executeDelete(request, location_directive);
 			} else {
-				response = createErrorResponse(METHOD_NOT_ALLOWED, location_directive);
+				response = setErrorResponse(METHOD_NOT_ALLOWED, location_directive);
 			}
 			break;
 		}
@@ -53,33 +51,19 @@ HttpResponse executeDelete(const HttpRequest& request,
 
 	if (stat(request.getRequestPath().c_str(), &file_status) == -1) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
-		response.setStatusCode(NOT_FOUND);
-		return createErrorResponse(response, server_directive);
+		return setErrorResponse(NOT_FOUND, location_directive);
 	}
 
 	if (!(file_status.st_mode & S_IROTH) || !(file_status.st_mode & S_IWOTH)) {
 		std::cerr << "DELETE Error: Permission denied" << std::endl;
-		response.setStatusCode(BAD_REQUEST);
-		return createErrorResponse(response, server_directive);
+		return setErrorResponse(BAD_REQUEST, location_directive);
 	}
 
 	if (remove(request.getRequestPath().c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
-		response.setStatusCode(BAD_REQUEST);
-		return createErrorResponse(response, server_directive);
+		return setErrorResponse(BAD_REQUEST, location_directive);
 	}
 
-	return response;
-}
-
-HttpResponse setReturnResponse(std::string& status_code, std::string& location_directive) {
-	HttpResponse response;
-
-	std::stringstream stringstream;
-	stringstream << status_code;
-
-	response.setStatusCode(status_code);
-	response.setHeaderValue("Content-Type", "text/html");
 	return response;
 }
 
@@ -102,7 +86,7 @@ HttpResponse setErrorResponse(const STATUS_CODE status_code,
 		file_stream.close();
 	} else {
 		body_content =
-			"<html><body><h1> createErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
