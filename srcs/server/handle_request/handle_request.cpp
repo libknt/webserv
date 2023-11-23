@@ -8,7 +8,6 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 	std::vector<ServerDirective> servers = configuration.getServers();
 	HttpResponse response;
 
-	// エラー: リソースが存在しない(), 許されていないmethod
 	for (size_t i = 0; i < servers.size(); i++) {
 		ServerDirective server_directive = servers[i];
 		if (server_directive.getPort() == request.getServerPort()) {
