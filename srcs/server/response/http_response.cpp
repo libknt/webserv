@@ -20,7 +20,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 	return *this;
 }
 
-const std::string HttpResponse::createResponse() {
+const std::string HttpResponse::concatenateComponents() {
 	std::string response;
 	std::stringstream stringstream;
 	stringstream << status_code_;

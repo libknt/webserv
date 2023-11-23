@@ -8,7 +8,6 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 	std::vector<ServerDirective> servers = configuration.getServers();
 	HttpResponse response;
 
-	// エラー: リソースが存在しない(), 許されていないmethod
 	for (size_t i = 0; i < servers.size(); i++) {
 		ServerDirective server_directive = servers[i];
 		if (server_directive.getPort() == request.getServerPort()) {
@@ -22,7 +21,7 @@ HttpResponse handleRequest(const HttpRequest& request, const Configuration& conf
 			} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
 				response = executeDelete(request, location_directive);
 			} else {
-				response = setErrorResponse(METHOD_NOT_ALLOWED, location_directive);
+				response = createErrorResponse(METHOD_NOT_ALLOWED, location_directive);
 			}
 			break;
 		}
@@ -51,23 +50,23 @@ HttpResponse executeDelete(const HttpRequest& request,
 
 	if (stat(request.getRequestPath().c_str(), &file_status) == -1) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
-		return setErrorResponse(NOT_FOUND, location_directive);
+		return createErrorResponse(NOT_FOUND, location_directive);
 	}
 
 	if (!(file_status.st_mode & S_IROTH) || !(file_status.st_mode & S_IWOTH)) {
 		std::cerr << "DELETE Error: Permission denied" << std::endl;
-		return setErrorResponse(BAD_REQUEST, location_directive);
+		return createErrorResponse(BAD_REQUEST, location_directive);
 	}
 
 	if (remove(request.getRequestPath().c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
-		return setErrorResponse(BAD_REQUEST, location_directive);
+		return createErrorResponse(BAD_REQUEST, location_directive);
 	}
 
 	return response;
 }
 
-HttpResponse setErrorResponse(const STATUS_CODE status_code,
+HttpResponse createErrorResponse(const STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
 	HttpResponse response;
 

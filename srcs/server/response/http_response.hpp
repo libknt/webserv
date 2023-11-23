@@ -29,7 +29,7 @@ public:
 	~HttpResponse();
 	HttpResponse(const HttpResponse& other);
 	HttpResponse& operator=(const HttpResponse& other);
-	const std::string createResponse();
+	const std::string concatenateComponents();
 	std::string statusCodeToStatusText(const STATUS_CODE code);
 	void setStatusCode(const STATUS_CODE& status_code);
 	void setHeaderValue(const std::string& key, const std::string& value);
