@@ -1,4 +1,5 @@
 #include "server_manager.hpp"
+#include <sys/stat.h>
 
 namespace server {
 
@@ -184,16 +185,19 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 void ServerManager::determineResponseType(ClientSession& client_session) {
 	ServerDirective const& server_directive = client_session.getServerDirective();
-	std::string uri = client_session.getRequest().getUriPath();
+	HttpRequest &request = client_session.getRequest();
+	std::string uri = request.getUriPath();
 	LocationDirective const& location_directive = server_directive.findLocation(std::string(uri));
 	std::string extension;
+	struct stat file_info;
 	std::string::size_type index = uri.find(".");
 	if (index != std::string::npos) {
 		extension = uri.substr(index);
 	}
-	// todo file existsw
+	std::string file_name = location_directive.getRoot() + "/" + client_session.getRequest().getRequestPath();
+	int stat_status = stat(file_name.c_str(), &file_info);
 	
-	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(extension)) {
+	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(extension) && stat_status == 0) {
 		client_session.setStatus(CGI_PREPARING);
 	} else {
 		client_session.setStatus(RESPONSE_PREPARING);
