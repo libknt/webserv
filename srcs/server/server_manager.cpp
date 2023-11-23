@@ -149,7 +149,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					// 	// TODO cgi実行
 					// } else {
 					std::cout << "  create response" << std::endl;
-					response_[sd] = handle_request::handleRequest(http_request_parser_.getRequest(sd), configuration_);
+					response_[sd] = handle_request::handleRequest(
+						http_request_parser_.getRequest(sd), configuration_);
 					setWriteFd(sd);
 					// }
 				}
