@@ -39,6 +39,7 @@ private:
 	int sendResponse(ClientSession& client_session);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
+	void closeClientSession(ClientSession& client_session);
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
 

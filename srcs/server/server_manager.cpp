@@ -137,12 +137,13 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					return -1;
 				}
 			} else {
-				if (receiveAndParseHttpRequest(getClientSession(sd)) < 0) {
+				ClientSession& client_session = getClientSession(sd);
+				if (receiveAndParseHttpRequest(client_session) < 0) {
 					is_running = false;
 					return -1;
 				}
-				ClientSession& client_session = getClientSession(sd);
 				if (client_session.getStatus() == CLOSED) {
+					unregisterClientSession(client_session);
 					--ready_sds;
 					continue;
 				}
@@ -164,7 +165,11 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 		} else if (FD_ISSET(sd, &write_fds_)) {
 			ClientSession& client_session = getClientSession(sd);
 			sendResponse(client_session);
-			if (client_session.getStatus() == SESSION_COMPLETE) {
+			if (client_session.getStatus() == CLOSED) {
+				unregisterClientSession(client_session);
+				--ready_sds;
+				continue;
+			} else if (client_session.getStatus() == SESSION_COMPLETE) {
 				client_session.sessionCleanup();
 				FD_CLR(client_session.getSd(), &master_write_fds_);
 				std::cout << "  Connection Cleanup" << std::endl;
@@ -249,12 +254,12 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	int recv_result = recv(client_sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
 	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-		unregisterClientSession(client_session);
+		closeClientSession(client_session);
 		return -1;
 	}
 	if (recv_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		unregisterClientSession(client_session);
+		closeClientSession(client_session);
 		return 0;
 	}
 
@@ -285,12 +290,12 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
-		unregisterClientSession(client_session);
+		closeClientSession(client_session);
 		return -1;
 	}
 	if (send_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		unregisterClientSession(client_session);
+		closeClientSession(client_session);
 		return -1;
 	}
 	if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
@@ -299,7 +304,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	return 0;
 }
 
-int ServerManager::unregisterClientSession(ClientSession& client_session) {
+void ServerManager::closeClientSession(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	FD_CLR(client_sd, &master_read_fds_);
 	FD_CLR(client_sd, &master_write_fds_);
@@ -308,6 +313,11 @@ int ServerManager::unregisterClientSession(ClientSession& client_session) {
 			--highest_sd_;
 	}
 	close(client_sd);
+	client_session.setStatus(CLOSED);
+}
+
+int ServerManager::unregisterClientSession(ClientSession& client_session) {
+	int client_sd = client_session.getSd();
 	active_client_sessions_.erase(client_sd);
 	std::cout << "  Connection closed - " << client_sd << std::endl;
 	return 0;
