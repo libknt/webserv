@@ -25,7 +25,7 @@ ${OBJSDIR}/%.o:%.cpp
 	${CXX} ${CXXFLAGS} ${VERSION} ${INCLUDES} -D BUFFER_SIZE=$(BUFFER_SIZE) -c $< -o $@
 
 test:
-	@for number in `seq 2 1025`; do \
+	@for number in `seq 2 500 1025`; do \
 		$(MAKE) fclean; \
 		$(MAKE) BUFFER_SIZE=$$number ${NAME} || exit 1; \
 		find ${TESTDIR} -type f | while read file; do \
@@ -33,6 +33,14 @@ test:
 		done || break; \
 	done
 
+all_test:
+	@for number in `seq 2 1025`; do \
+		$(MAKE) fclean; \
+		$(MAKE) BUFFER_SIZE=$$number ${NAME} || exit 1; \
+		find ${TESTDIR} -type f | while read file; do \
+			./${NAME} "$$file" || exit 1; \
+		done || break; \
+	done
 
 clean:
 	rm -rf ${OBJSDIR}

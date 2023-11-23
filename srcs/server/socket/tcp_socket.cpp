@@ -158,8 +158,24 @@ int TcpSocket::startListening() {
 	return 0;
 }
 
+std::string const& TcpSocket::getIpAddress() const {
+	return ip_address_;
+}
+
+std::string const& TcpSocket::getPort() const {
+	return port_;
+}
+
 int TcpSocket::getListenSd() const {
 	return listen_sd_;
+}
+
+int TcpSocket::getBacklog() const {
+	return backlog_;
+}
+
+struct sockaddr_in const& TcpSocket::getSocketAddress() const {
+	return socket_address_;
 }
 
 }
