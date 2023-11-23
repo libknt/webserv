@@ -36,8 +36,6 @@ public:
 	std::string getIpAddress() const;
 	std::string getServerName() const;
 	std::string getDefaultErrorPage() const;
-	bool isCgiEnabled(std::string const& location) const;
-	bool isCgiExtension(std::string const& location, std::string const& extension) const;
 	const std::map<std::string, LocationDirective>& getLocations() const;
 	LocationDirective const& findLocation(std::string path) const;
 };
