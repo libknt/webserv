@@ -196,6 +196,24 @@ std::string ServerDirective::getDefaultErrorPage() const {
 	return default_error_page_;
 }
 
+bool ServerDirective::isCgiEnabled(std::string const& location) const {
+	std::cout << "location: " << location << std::endl;
+	std::map<std::string, LocationDirective>::const_iterator it = locations_.find(location);
+	if (it == locations_.end()) {
+		return false;
+	}
+	return it->second.isCgiEnabled();
+}
+
+bool ServerDirective::isCgiExtension(std::string const& location,
+	std::string const& extension) const {
+	std::map<std::string, LocationDirective>::const_iterator it = locations_.find(location);
+	if (it == locations_.end()) {
+		return false;
+	}
+	return it->second.isCgiExtension(extension);
+}
+
 const std::map<std::string, LocationDirective>& ServerDirective::getLocations() const {
 	return locations_;
 }

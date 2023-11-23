@@ -124,6 +124,10 @@ std::string ClientSession::getServerPort() const {
 	return ss.str();
 }
 
+ServerDirective const& ClientSession::getServerDirective() const {
+	return server_directive_;
+}
+
 void ClientSession::sessionCleanup() {
 	request_ = HttpRequest();
 	response_ = HttpResponse();

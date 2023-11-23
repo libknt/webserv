@@ -183,11 +183,18 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 }
 
 void ServerManager::determineResponseType(ClientSession& client_session) {
-	// この関数は,リファクタするので,今は仮実装
-	// isCgiRequest(client_session);
-	// client_session.setStatus(CGI_PREPARING);
-	// else
-	client_session.setStatus(RESPONSE_PREPARING);
+	ServerDirective const& server_directive = client_session.getServerDirective();
+	std::string path = client_session.getRequest().getUriPath();
+	std::string extension = ".py";
+	std::cout << client_session.getServerDirective() << std::endl;
+	if (server_directive.isCgiEnabled(path) && server_directive.isCgiExtension(path, extension)) {
+		std::cout << "  CGI Request" << std::endl;
+		client_session.setStatus(CGI_PREPARING);
+	} else {
+		std::cout << "  Static Request" << std::endl;
+		client_session.setStatus(RESPONSE_PREPARING);
+	}
+
 	return;
 }
 
@@ -266,12 +273,12 @@ void ServerManager::registerClientSession(int sd,
 	if (active_client_sessions_.find(sd) != active_client_sessions_.end()) {
 		return;
 	}
-	std::string client_ip_address = inet_ntoa(client_address.sin_addr);
+	std::string server_ip_address = inet_ntoa(server_address.sin_addr);
 	std::ostringstream port_stream;
-	port_stream << ntohs(client_address.sin_port);
+	port_stream << ntohs(server_address.sin_port);
 	std::string client_port = port_stream.str();
 	ServerDirective const& server_directive =
-		configuration_.getServerDirective(client_ip_address, client_port);
+		configuration_.getServerDirective(server_ip_address, client_port);
 	active_client_sessions_.insert(
 		std::make_pair(sd, ClientSession(sd, client_address, server_address, server_directive)));
 }
