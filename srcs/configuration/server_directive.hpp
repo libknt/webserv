@@ -37,6 +37,7 @@ public:
 	std::string getServerName() const;
 	std::string getDefaultErrorPage() const;
 	const std::map<std::string, LocationDirective>& getLocations() const;
+	LocationDirective& findLocation(std::string path);
 };
 
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive);
