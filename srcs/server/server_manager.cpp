@@ -143,17 +143,15 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				}
 				if (server_status_[sd] == server::PREPARING_RESPONSE) {
 					std::cout << "  Request received" << std::endl;
-					determineIfCgiRequest(sd);
-					if (http_request_parser_.getRequest(sd).getIsCgi()) {
-						std::cout << "  execute cgi" << std::endl;
-						// TODO cgi実行
-					} else {
-						std::cout << "  create response" << std::endl;
-						// TODO: Requestの実行, Responseの作成して送る
-						response_[sd] = handle_request::handleRequest(
-							http_request_parser_.getRequest(sd), configuration_);
-						setWriteFd(sd);
-					}
+					determineRequestType(sd);
+					// if (http_request_parser_.getRequest(sd).getIsCgi()) {
+					// 	std::cout << "  execute cgi" << std::endl;
+					// 	// TODO cgi実行
+					// } else {
+					std::cout << "  create response" << std::endl;
+					response_[sd] = handle_request::handleRequest(http_request_parser_.getRequest(sd), configuration_);
+					setWriteFd(sd);
+					// }
 				}
 			}
 			--ready_sds;
@@ -163,6 +161,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 		}
 	}
 	return 0;
+}
+
+void ServerManager::determineRequestType(int sd) {
+	// この関数は,リファクタするので,今は仮実装
+	(void)sd;
+	return;
 }
 
 bool ServerManager::isListeningSocket(int sd) {
@@ -215,7 +219,7 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 	return 0;
 }
 
-int ServerManager::createsServerStatus(int sd) {
+int ServerManager::createServerStatus(int sd) {
 	if (server_status_.find(sd) != server_status_.end()) {
 		return -1;
 	}
@@ -248,72 +252,6 @@ int ServerManager::receiveAndParseHttpRequest(int sd) {
 	return 0;
 }
 
-int ServerManager::determineIfCgiRequest(int sd) {
-	HttpRequest& request = http_request_parser_.getRequest(sd);
-	std::string ip_address = request.getServerIpAddress();
-	std::string port = request.getServerPort();
-	const ServerDirective& server_configuration =
-		configuration_.getServerConfiguration(ip_address, port);
-	std::string directory_path;
-	std::string path = request.getRequestPath();
-	if (path.empty()) {
-		return 0;
-	}
-	std::string script_name;
-	std::string location;
-	decomposeCgiUrl(path, location, script_name);
-	if (script_name.empty()) {
-		return 0;
-	}
-	if (server_configuration.isCgiLocation(location, script_name)) {
-		request.setIsCgi(true);
-	}
-	return 0;
-}
-
-void ServerManager::decomposeCgiUrl(const std::string& path,
-	std::string& location,
-	std::string& script_name) {
-	script_name = extractScriptFileName(path);
-	if (!script_name.empty()) {
-		location = extractParentDirectoryPath(path);
-	}
-}
-
-void ServerManager::sanitizePath(std::string& path) {
-	size_t query_position = path.find('?');
-	if (query_position != std::string::npos) {
-		path = path.substr(0, query_position);
-	}
-
-	size_t path_info_position = path.find('/');
-	if (path_info_position != std::string::npos) {
-		path = path.substr(0, path_info_position);
-	}
-}
-
-std::string ServerManager::extractScriptFileName(const std::string& path) {
-	size_t extension_dot_position = path.find('.');
-	if (extension_dot_position == std::string::npos) {
-		return std::string();
-	}
-
-	std::string script_name = path.substr(extension_dot_position);
-	sanitizePath(script_name);
-	return script_name;
-}
-
-std::string ServerManager::extractParentDirectoryPath(const std::string& path) {
-	size_t extension_dot_position = path.find('.');
-	if (extension_dot_position == std::string::npos) {
-		return path;
-	}
-
-	size_t last_slash_position = path.rfind('/', extension_dot_position);
-	return last_slash_position == std::string::npos ? path
-													: path.substr(0, last_slash_position + 1);
-}
-
 int ServerManager::setWriteFd(int sd) {
 	FD_SET(sd, &master_write_fds_);
 	return 0;
@@ -323,6 +261,7 @@ int ServerManager::sendResponse(int sd) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
 	std::string buffer = response_[sd].createResponse();
+	std::cout << buffer << std::endl;
 	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
 	int send_result = ::send(sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {

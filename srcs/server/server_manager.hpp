@@ -34,15 +34,9 @@ private:
 	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
-	int createsServerStatus(int sd);
+	int createServerStatus(int sd);
 	int receiveAndParseHttpRequest(int sd);
-	int determineIfCgiRequest(int sd);
-	void decomposeCgiUrl(const std::string& path,
-		std::string& location,
-		std::string& scriptFileName);
-	std::string extractScriptFileName(std::string const& path);
-	void sanitizePath(std::string& path);
-	std::string extractParentDirectoryPath(std::string const& path);
+	void determineRequestType(int sd);
 	int setWriteFd(int sd);
 	int sendResponse(int sd);
 	int requestCleanup(int sd);
