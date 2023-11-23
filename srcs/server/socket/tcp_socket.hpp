@@ -44,6 +44,8 @@ public:
 	struct sockaddr_in const& getSocketAddress() const;
 };
 
+std::ostream& operator<<(std::ostream& out, const TcpSocket& tcp_socket);
+
 }
 
 #endif

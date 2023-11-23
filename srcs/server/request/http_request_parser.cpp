@@ -17,7 +17,7 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 	return (*this);
 }
 
-SERVER_STATUS HttpRequestParser::handleBuffer(int sd, const char* buf) {
+int HttpRequestParser::handleBuffer(int sd, const char* buf) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
@@ -26,7 +26,7 @@ SERVER_STATUS HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
 	if (it == http_request_map_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		return PROCESSING_ERROR;
+		return -1;
 	}
 	// TODO ここに宣言するのが微妙ではある。
 	HttpRequest& request = it->second;
@@ -46,28 +46,14 @@ SERVER_STATUS HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	}
 
 	if (request.getStatus() == http_request_status::FINISHED) {
-		return PREPARING_RESPONSE;
+		return 1;
 	}
-	return RECEIVING_REQUEST;
+	return 0;
 }
 
 HttpRequest& HttpRequestParser::getRequest(int sd) {
 	std::map<int, server::HttpRequest>::iterator it = http_request_map_.find(sd);
 	return it->second;
-}
-
-int HttpRequestParser::addAcceptClientInfo(int sd,
-	sockaddr_in client_address,
-	sockaddr_in server_address) {
-
-	if (http_request_map_.find(sd) != http_request_map_.end()) {
-		// TODO Error リクエストのデータが残っているのにacceptされている。
-		std::cerr << "Error: リクエストのデータが残っているのにacceptされている。" << std::endl;
-		http_request_map_.erase(sd);
-	}
-	HttpRequest request(client_address, server_address);
-	http_request_map_.insert(std::pair<int, HttpRequest>(sd, request));
-	return (0);
 }
 
 int HttpRequestParser::parseRequest(int sd, std::string const& line) {
@@ -220,15 +206,6 @@ int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 		return (-1);
 	}
 	return (0);
-}
-
-int HttpRequestParser::httpRequestCleanup(int sd) {
-	std::map<int, HttpRequest>::iterator it = http_request_map_.find(sd);
-	if (it == http_request_map_.end()) {
-		return -1;
-	}
-	it->second.cleanup();
-	return 0;
 }
 
 int HttpRequestParser::httpRequestErase(int sd) {

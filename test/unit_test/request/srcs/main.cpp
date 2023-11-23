@@ -12,13 +12,10 @@ int main(int argc, char* argv[]) {
 	std::vector<int> fd(argc);
 	bool is_all_read = false;
 	char buffer[BUFFER_SIZE];
-	sockaddr_in server_address;
-	sockaddr_in client_address;
 
 	std::cout << "BUFFER_SIZE: " << BUFFER_SIZE << std::endl;
 	for (int i = 1; i < argc; i++) {
 		fd[i] = open(argv[i], O_RDWR);
-		http_request_parser.addAcceptClientInfo(fd[i], client_address, server_address);
 	}
 	while (!is_all_read) {
 		is_all_read = true;
