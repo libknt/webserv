@@ -61,7 +61,7 @@ void HttpResponse::setHeaderValue(const std::string& key, const std::string& val
 	header_.insert(std::make_pair(key, value));
 }
 
-void HttpResponse::setBody(const std::string &body) {
+void HttpResponse::setBody(const std::string& body) {
 	body_ += body;
 }
 
