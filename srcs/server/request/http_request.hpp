@@ -87,6 +87,7 @@ public:
 	HttpRequest& operator=(HttpRequest const& request);
 	void appendStreamLine(std::string const& stream_line);
 	void setStreamLine(std::string const& stream_line);
+	void eraseStreamLine(std::string::size_type position, std::string::size_type n);
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	int setMethod(std::string const& method);

@@ -153,6 +153,10 @@ void HttpRequest::setStreamLine(std::string const& stream_line) {
 	stream_line_ = stream_line;
 }
 
+void HttpRequest::eraseStreamLine(std::string::size_type position, std::string::size_type n) {
+	stream_line_.erase(position, n);
+}
+
 void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& status) {
 	status_ = status;
 }
