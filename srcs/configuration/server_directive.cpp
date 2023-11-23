@@ -218,6 +218,16 @@ const std::map<std::string, LocationDirective>& ServerDirective::getLocations() 
 	return locations_;
 }
 
+LocationDirective& ServerDirective::findLocation(std::string request_path) {
+	for (size_t i = 0; i < request_path.size(); ++i) {
+		std::string path = request_path.substr(0, request_path.size() - i);
+		if (locations_.count(path)) {
+			return locations_[path];
+		}
+	}
+	return locations_["/"];
+}
+
 std::ostream& operator<<(std::ostream& out, const ServerDirective& server_directive) {
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;

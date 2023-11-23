@@ -1,7 +1,7 @@
 #ifndef HTTP_RESPONSE_HPP
 #define HTTP_RESPONSE_HPP
 
-#include "define.hpp"
+#include "webserv.hpp"
 #include <cstring>
 #include <iostream>
 #include <map>
