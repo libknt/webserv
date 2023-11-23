@@ -63,6 +63,8 @@ HttpResponse executeDelete(const HttpRequest& request,
 		return createErrorResponse(BAD_REQUEST, location_directive);
 	}
 
+	response.setStatusCode(NO_CONTENT);
+
 	return response;
 }
 

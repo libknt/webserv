@@ -42,6 +42,8 @@ std::string HttpResponse::statusCodeToStatusText(const STATUS_CODE code) {
 			return "OK";
 		case CREATED:
 			return "CREATED";
+		case NO_CONTENT:
+			return "NO_CONTENT";
 		case PERMANENT_REDIRECT:
 			return "PERMANENT_REDIRECT";
 		case BAD_REQUEST:
