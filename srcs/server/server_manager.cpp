@@ -217,6 +217,12 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			}
 			break;
 		}
+
+		if (setNonBlocking(client_sd) < 0) {
+			std::cerr << "setNonBlocking() failed" << std::endl;
+			return -1;
+		}
+
 		sockaddr_in connected_server_address;
 		socklen_t server_socket_address_len = sizeof(connected_server_address);
 
@@ -235,6 +241,22 @@ int ServerManager::acceptIncomingConnection(int listen_sd) {
 			highest_sd_ = client_sd;
 
 	} while (client_sd != -1);
+	return 0;
+}
+
+int ServerManager::setNonBlocking(int sd) {
+	int flags = fcntl(sd, F_GETFL, 0);
+	if (flags < 0) {
+		std::cerr << "fcntl() get flags failed: " << strerror(errno) << std::endl;
+		return -1;
+	}
+
+	flags |= O_NONBLOCK;
+	flags = fcntl(sd, F_SETFL, flags);
+	if (flags < 0) {
+		std::cerr << "fcntl() set flags failed: " << strerror(errno) << std::endl;
+		return -1;
+	}
 	return 0;
 }
 

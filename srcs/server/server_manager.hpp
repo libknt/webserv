@@ -33,6 +33,7 @@ private:
 	int dispatchSocketEvents(int ready_sds);
 	bool isListeningSocket(int sd);
 	int acceptIncomingConnection(int listen_sd);
+	int setNonBlocking(int sd);
 	int receiveAndParseHttpRequest(ClientSession& client_session);
 	void determineResponseType(ClientSession& client_session);
 	int setWriteFd(int sd);
