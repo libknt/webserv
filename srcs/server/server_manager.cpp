@@ -183,21 +183,35 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 	return 0;
 }
 
-void ServerManager::determineResponseType(ClientSession& client_session) {
-	ServerDirective const& server_directive = client_session.getServerDirective();
-	HttpRequest &request = client_session.getRequest();
-	std::string uri = request.getUriPath();
-	LocationDirective const& location_directive = server_directive.findLocation(std::string(uri));
-	std::string extension;
+static bool doesFileExist(std::string const& file_name) {
 	struct stat file_info;
+	int stat_status = stat(file_name.c_str(), &file_info);
+	if (stat_status == 0) {
+		return true;
+	}
+	return false;
+}
+
+static std::string extractExtension(std::string const& uri) {
+	std::string extension;
 	std::string::size_type index = uri.find(".");
 	if (index != std::string::npos) {
 		extension = uri.substr(index);
 	}
-	std::string file_name = location_directive.getRoot() + "/" + client_session.getRequest().getRequestPath();
-	int stat_status = stat(file_name.c_str(), &file_info);
-	
-	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(extension) && stat_status == 0) {
+	return extension;
+}
+
+void ServerManager::determineResponseType(ClientSession& client_session) {
+	ServerDirective const& server_directive = client_session.getServerDirective();
+	HttpRequest& request = client_session.getRequest();
+	LocationDirective const& location_directive =
+		server_directive.findLocation(request.getUriPath());
+	std::string extension = extractExtension(request.getRequestPath());
+	std::string file_name =
+		location_directive.getRoot() + "/" + client_session.getRequest().getRequestPath();
+
+	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(extension) &&
+		doesFileExist(file_name)) {
 		client_session.setStatus(CGI_PREPARING);
 	} else {
 		client_session.setStatus(RESPONSE_PREPARING);
