@@ -113,42 +113,42 @@ int main() {
 			assert(tcp_socket2.prepareSocketForListening() < 0);
 			std::cout << BLUE << "passed" << RESET << std::endl;
 		}
-		{ { std::cout << GREEN << "bindAddressToSocket test: valid address and port: ";
-		server::TcpSocket tcp_socket("127.0.0.1", "8080");
-		assert(tcp_socket.prepareSocketForListening() == 0);
-		std::cout << BLUE << "passed" << RESET << std::endl;
+		{
+			std::cout << GREEN << "bindAddressToSocket test: valid address and port: ";
+			server::TcpSocket tcp_socket("127.0.0.1", "8080");
+			assert(tcp_socket.prepareSocketForListening() == 0);
+			std::cout << BLUE << "passed" << RESET << std::endl;
+		}
+		{
+			std::cout << GREEN << "bindAddressToSocket test: invalid address and port: ";
+			server::TcpSocket tcp_socket_invalid("invalid_address", "invalid_port");
+			assert(tcp_socket_invalid.prepareSocketForListening() < 0);
+			server::TcpSocket tcp_socket("127.0.0.1", "8080");
+			assert(tcp_socket.prepareSocketForListening() == 0);
+			assert(tcp_socket_invalid.startListening() < 0);
+			server::TcpSocket tcp_socket2("127.0.0.1", "8080");
+			assert(tcp_socket2.prepareSocketForListening() == 0);
+			std::cout << BLUE << "passed" << RESET << std::endl;
+		}
+		{
+			{
+				std::cout << GREEN << "startListening test: valid: ";
+				server::TcpSocket tcp_socket("127.0.0.1", "8080");
+				assert(tcp_socket.prepareSocketForListening() == 0);
+				assert(tcp_socket.startListening() == 0);
+				std::cout << BLUE << "passed" << RESET << std::endl;
+			}
+			{
+				std::cout << GREEN << "startListening test: already in use";
+				server::TcpSocket tcp_socket("127.0.0.1", "8080");
+				assert(tcp_socket.prepareSocketForListening() == 0);
+				assert(tcp_socket.startListening() == 0);
+				server::TcpSocket tcp_socket2("127.0.0.1", "8080");
+				assert(tcp_socket2.prepareSocketForListening() < 0);
+				std::cout << BLUE << "passed" << RESET << std::endl;
+			}
+		}
 	}
-	{
-		std::cout << GREEN << "bindAddressToSocket test: invalid address and port: ";
-		server::TcpSocket tcp_socket_invalid("invalid_address", "invalid_port");
-		assert(tcp_socket_invalid.prepareSocketForListening() < 0);
-		server::TcpSocket tcp_socket("127.0.0.1", "8080");
-		assert(tcp_socket.prepareSocketForListening() == 0);
-		assert(tcp_socket_invalid.startListening() < 0);
-		server::TcpSocket tcp_socket2("127.0.0.1", "8080");
-		assert(tcp_socket2.prepareSocketForListening() == 0);
-		std::cout << BLUE << "passed" << RESET << std::endl;
-	}
-}
-{
-	{
-		std::cout << GREEN << "startListening test: valid: ";
-		server::TcpSocket tcp_socket("127.0.0.1", "8080");
-		assert(tcp_socket.prepareSocketForListening() == 0);
-		assert(tcp_socket.startListening() == 0);
-		std::cout << BLUE << "passed" << RESET << std::endl;
-	}
-	{
-		std::cout << GREEN << "startListening test: already in use";
-		server::TcpSocket tcp_socket("127.0.0.1", "8080");
-		assert(tcp_socket.prepareSocketForListening() == 0);
-		assert(tcp_socket.startListening() == 0);
-		server::TcpSocket tcp_socket2("127.0.0.1", "8080");
-		assert(tcp_socket2.prepareSocketForListening() < 0);
-		std::cout << BLUE << "passed" << RESET << std::endl;
-	}
-}
-}
 
-return 0;
+	return 0;
 }
