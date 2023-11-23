@@ -3,6 +3,7 @@
 
 #include "http_request.hpp"
 #include "http_response.hpp"
+#include "server_directive.hpp"
 #include <arpa/inet.h>
 #include <iostream>
 
@@ -26,9 +27,10 @@ private:
 	const int sd_;
 	const sockaddr_in client_address_;
 	const sockaddr_in server_address_;
+
+	ServerDirective const& server_directive_;
 	HttpRequest request_;
 	HttpResponse response_;
-
 	CLIENT_SESSION_STATUS status_;
 
 	ClientSession();
@@ -36,10 +38,12 @@ private:
 public:
 	explicit ClientSession(int const sd,
 		sockaddr_in const& client_address,
-		sockaddr_in const& server_address);
+		sockaddr_in const& server_address,
+		ServerDirective const& server_directive);
 	explicit ClientSession(int const sd,
 		sockaddr_in const& client_address,
 		sockaddr_in const& server_address,
+		ServerDirective const& server_directive,
 		CLIENT_SESSION_STATUS const& status);
 	~ClientSession();
 	ClientSession(const ClientSession& other);

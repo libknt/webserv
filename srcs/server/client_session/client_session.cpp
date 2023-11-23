@@ -4,10 +4,12 @@ namespace server {
 
 ClientSession::ClientSession(int const sd,
 	sockaddr_in const& client_address,
-	sockaddr_in const& server_address)
+	sockaddr_in const& server_address,
+	ServerDirective const& server_directive)
 	: sd_(sd)
 	, client_address_(client_address)
 	, server_address_(server_address)
+	, server_directive_(server_directive)
 	, request_(HttpRequest())
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
@@ -15,10 +17,12 @@ ClientSession::ClientSession(int const sd,
 ClientSession::ClientSession(int const sd,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address,
+	ServerDirective const& server_directive,
 	CLIENT_SESSION_STATUS const& status)
 	: sd_(sd)
 	, client_address_(client_address)
 	, server_address_(server_address)
+	, server_directive_(server_directive)
 	, request_(HttpRequest())
 	, response_(HttpResponse())
 	, status_(status) {}
@@ -29,6 +33,7 @@ ClientSession::ClientSession(const ClientSession& other)
 	: sd_(other.sd_)
 	, client_address_(other.client_address_)
 	, server_address_(other.server_address_)
+	, server_directive_(other.server_directive_)
 	, request_(other.request_)
 	, response_(other.response_)
 	, status_(other.status_) {}

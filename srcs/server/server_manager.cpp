@@ -266,8 +266,14 @@ void ServerManager::registerClientSession(int sd,
 	if (active_client_sessions_.find(sd) != active_client_sessions_.end()) {
 		return;
 	}
+	std::string client_ip_address = inet_ntoa(client_address.sin_addr);
+	std::ostringstream port_stream;
+	port_stream << ntohs(client_address.sin_port);
+	std::string client_port = port_stream.str();
+	ServerDirective const& server_directive =
+		configuration_.getServerDirective(client_ip_address, client_port);
 	active_client_sessions_.insert(
-		std::make_pair(sd, ClientSession(sd, client_address, server_address)));
+		std::make_pair(sd, ClientSession(sd, client_address, server_address, server_directive)));
 }
 
 int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
@@ -345,7 +351,9 @@ ClientSession& ServerManager::getClientSession(int const sd) {
 	std::map<int, ClientSession>::iterator it = active_client_sessions_.find(sd);
 	if (it == active_client_sessions_.end()) {
 		std::cerr << "map find() err: " << __FILE__ << " : " << __LINE__ << std::endl;
-		static ClientSession dummy_client_session(-1, sockaddr_in(), sockaddr_in(), CLOSED);
+		static ServerDirective dummy_server_directive;
+		static ClientSession dummy_client_session(
+			-1, sockaddr_in(), sockaddr_in(), dummy_server_directive, CLOSED);
 		return dummy_client_session;
 	}
 	return it->second;
