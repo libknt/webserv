@@ -11,7 +11,7 @@ ServerManager::ServerManager(const Configuration& configuration)
 	FD_ZERO(&master_write_fds_);
 	FD_ZERO(&read_fds_);
 	FD_ZERO(&write_fds_);
-	timeout_.tv_sec = 10;
+	timeout_.tv_sec = 30;
 	timeout_.tv_usec = 0;
 }
 
@@ -115,13 +115,15 @@ int ServerManager::monitorSocketEvents() {
 		}
 
 		if (select_result == 0) {
-			std::cout << "select() timed out.  End program." << std::endl;
-			timeout_.tv_sec = 10;
+			std::cout << "select() timed out. continue" << std::endl;
+			timeout_.tv_sec = 30;
 			timeout_.tv_usec = 0;
 			continue;
 		}
+
 		if (dispatchSocketEvents(select_result) < 0) {
-			continue;
+			std::cerr << "dispatchSocketEvents() failed" << std::endl;
+			break;
 		}
 	}
 	return 0;
