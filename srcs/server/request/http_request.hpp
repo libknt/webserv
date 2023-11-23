@@ -109,7 +109,7 @@ public:
 	std::string const& getRequestPath() const;
 	std::string const getHeaderValue(std::string const& key) const;
 	std::map<std::string, std::string> const& getHeader() const;
-	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType();
+	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType() const;
 	size_t const& getContentLength() const;
 	chunked_status::CHUNKED_STATUS const& getChunkedStatus() const;
 	size_t getChunkedSize() const;

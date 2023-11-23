@@ -105,7 +105,7 @@ std::map<std::string, std::string> const& HttpRequest::getHeader() const {
 	return header_;
 }
 
-http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType() {
+http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& HttpRequest::getBodyMessageType() const{
 	return (body_message_type_);
 }
 

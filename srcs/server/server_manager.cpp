@@ -289,8 +289,6 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 
 	HttpRequest& request = client_session.getRequest();
 	HttpRequestParser::parse(request, recv_buffer);
-	std::cout << request << std::endl;
-
 	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;
