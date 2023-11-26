@@ -1,10 +1,10 @@
 #ifndef HANDLE_REQUEST_HPP
 #define HANDLE_REQUEST_HPP
 
+#include "client_session.hpp"
 #include "configuration.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
-#include "client_session.hpp"
 #include <iostream>
 #include <string>
 #include <sys/stat.h>
