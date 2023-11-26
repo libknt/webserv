@@ -97,6 +97,23 @@ int CgiMetaVariables::gatewayInterface() {
 	return 0;
 }
 
+int CgiMetaVariables::pathInfo() {
+	const std::string path = request_.getUriPath();
+	const std::string::size_type extension_position = path.find(".");
+
+	if (extension_position != std::string::npos) {
+		const std::string::size_type slash_position = path.find("/", extension_position + 1);
+		if (slash_position != std::string::npos) {
+			const std::string path_info = path.substr(slash_position);
+			meta_variables_.insert(std::make_pair("PATH_INFO", path_info));
+			return 0;
+		}
+	}
+
+	meta_variables_.insert(std::make_pair("PATH_INFO", ""));
+	return 0;
+}
+
 int CgiMetaVariables::queryString() {
 	std::string const query = request_.getUriQuery();
 	meta_variables_.insert(std::make_pair("QUERY_STRING", query));
