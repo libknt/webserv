@@ -255,6 +255,35 @@ int CgiMetaVariables::serverSoftware() {
 	return 0;
 }
 
+int CgiMetaVariables::createEnviron() {
+	size_t size = meta_variables_.size();
+
+	environ_ = new (std::nothrow) char*[size + 1];
+	if (!environ_) {
+		return -1;
+	}
+
+	size_t i = 0;
+	for (std::map<std::string, std::string>::const_iterator it = meta_variables_.begin();
+		 it != meta_variables_.end();
+		 ++it) {
+		std::string env = it->first + "=" + it->second;
+		environ_[i] = new (std::nothrow) char[env.size() + 1];
+		if (!environ_[i]) {
+			for (size_t j = 0; j < i; ++j) {
+				delete[] environ_[j];
+			}
+			delete[] environ_;
+			environ_ = NULL;
+			return -1;
+		}
+		std::strcpy(environ_[i], env.c_str());
+		++i;
+	}
+	environ_[i] = NULL;
+	return 0;
+}
+
 std::string const CgiMetaVariables::getMetaVariable(std::string const& key) const {
 	std::map<std::string, std::string>::const_iterator it = meta_variables_.find(key);
 	if (it != meta_variables_.end()) {
