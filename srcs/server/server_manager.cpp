@@ -192,7 +192,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
 
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
-		Utils::isFilePresent(file_path)) {
+		Utils::fileExists(file_path)) {
 		session.setStatus(CGI_PREPARING);
 	} else {
 		session.setStatus(RESPONSE_PREPARING);

@@ -15,7 +15,7 @@ Utils& Utils::operator=(const Utils& other) {
 	return *this;
 }
 
-bool Utils::isFilePresent(const std::string& path) {
+bool Utils::fileExists(const std::string& path) {
 	struct stat buffer;
 	return (stat(path.c_str(), &buffer) == 0);
 }
