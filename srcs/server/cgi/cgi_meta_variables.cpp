@@ -24,7 +24,6 @@ CgiMetaVariables& CgiMetaVariables::operator=(CgiMetaVariables const& other) {
 CgiMetaVariables::~CgiMetaVariables() {
 	if (environ_) {
 		delete[] environ_;
-		delete[] environ_;
 	}
 }
 
