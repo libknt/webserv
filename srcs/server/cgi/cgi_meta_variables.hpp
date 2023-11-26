@@ -22,6 +22,26 @@ public:
 	CgiMetaVariables(CgiMetaVariables const& other);
 	CgiMetaVariables& operator=(CgiMetaVariables const& other);
 	~CgiMetaVariables();
+
+	int authType();
+	int contentLength();
+	int contentType();
+	int gatewayInterface();
+	int pathInfo();
+	int pathTranslated();
+	int queryString();
+	int remoteAddr();
+	int remoteHost();
+	int remoteIdet();
+	inline bool isBase64(unsigned char c);
+	std::string base64Decode(std::string const& encoded_string);
+	int remoteUser();
+	int requestMethod();
+	int scriptName();
+	int serverName();
+	int serverPort();
+	int serverProtocol();
+	int serverSoftware();
 };
 
 } // namespace server
