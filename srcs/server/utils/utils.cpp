@@ -20,7 +20,7 @@ bool Utils::fileExists(const std::string& path) {
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
-std::string Utils::getUriExtension(const std::string& uri) {
+std::string Utils::extructUriExtension(const std::string& uri) {
 	std::string extension = "";
 	size_t dot_pos = uri.find_last_of(".");
 	if (dot_pos != std::string::npos) {

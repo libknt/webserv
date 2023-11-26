@@ -16,7 +16,7 @@ private:
 
 public:
 	static bool fileExists(const std::string& path);
-	static std::string getUriExtension(const std::string& uri);
+	static std::string extructUriExtension(const std::string& uri);
 	template<typename T>
 	static std::string toString(const T& value);
 };
