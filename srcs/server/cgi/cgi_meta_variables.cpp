@@ -97,6 +97,12 @@ int CgiMetaVariables::gatewayInterface() {
 	return 0;
 }
 
+int CgiMetaVariables::queryString() {
+	std::string const query = request_.getUriQuery();
+	meta_variables_.insert(std::make_pair("QUERY_STRING", query));
+	return 0;
+}
+
 int CgiMetaVariables::remoteAddr() {
 	uint32_t addr = ntohl(client_address_.sin_addr.s_addr);
 	std::ostringstream ip_stream;
