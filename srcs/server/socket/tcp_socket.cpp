@@ -158,8 +158,37 @@ int TcpSocket::startListening() {
 	return 0;
 }
 
+std::string const& TcpSocket::getIpAddress() const {
+	return ip_address_;
+}
+
+std::string const& TcpSocket::getPort() const {
+	return port_;
+}
+
 int TcpSocket::getListenSd() const {
 	return listen_sd_;
+}
+
+int TcpSocket::getBacklog() const {
+	return backlog_;
+}
+
+struct sockaddr_in const& TcpSocket::getSocketAddress() const {
+	return socket_address_;
+}
+
+std::ostream& operator<<(std::ostream& out, const TcpSocket& tcp_socket) {
+	out << "TcpSocket: " << std::endl;
+	out << "  ip_address: " << tcp_socket.getIpAddress() << std::endl;
+	out << "  port: " << tcp_socket.getPort() << std::endl;
+	out << "  listen_sd: " << tcp_socket.getListenSd() << std::endl;
+	out << "  backlog: " << tcp_socket.getBacklog() << std::endl;
+	out << "  socket_address: " << std::endl;
+	out << "    sin_family: " << tcp_socket.getSocketAddress().sin_family << std::endl;
+	out << "    sin_port: " << tcp_socket.getSocketAddress().sin_port << std::endl;
+	out << "    sin_addr: " << tcp_socket.getSocketAddress().sin_addr.s_addr << std::endl;
+	return out;
 }
 
 }

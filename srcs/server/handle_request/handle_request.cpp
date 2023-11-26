@@ -3,30 +3,25 @@
 namespace server {
 
 namespace handle_request {
-HttpResponse handleRequest(const HttpRequest& request, const Configuration& configuration) {
-	std::string method = request.getMethod();
-	std::vector<ServerDirective> servers = configuration.getServers();
+void handleRequest(ClientSession const& client_session) {
+	HttpRequest request = client_session.getRequest();
 	HttpResponse response;
 
-	for (size_t i = 0; i < servers.size(); i++) {
-		ServerDirective server_directive = servers[i];
-		if (server_directive.getPort() == request.getServerPort()) {
-			LocationDirective location_directive =
-				server_directive.findLocation(request.getRequestPath());
+	if (client_session.getClientPort() == client_session.getServerPort()) {
+		ServerDirective server_directive = client_session.getServerDirective();
+		LocationDirective location_directive = server_directive.findLocation(request.getRequestPath());
+		std::string const method = request.getMethod();
 
-			if (method == "GET" && location_directive.isAllowMethod(method)) {
-				response = executeGet(request, location_directive);
-			} else if (method == "POST" && location_directive.isAllowMethod(method)) {
-				response = executePost(request, location_directive);
-			} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
-				response = executeDelete(request, location_directive);
-			} else {
-				response = createErrorResponse(METHOD_NOT_ALLOWED, location_directive);
-			}
-			break;
+		if (method == "GET" && location_directive.isAllowMethod(method)) {
+			response = executeGet(request, location_directive);
+		} else if (method == "POST" && location_directive.isAllowMethod(method)) {
+			response = executePost(request, location_directive);
+		} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
+			response = executeDelete(request, location_directive);
+		} else {
+			response = createErrorResponse(http_status_code::METHOD_NOT_ALLOWED, location_directive);
 		}
 	}
-	return response;
 }
 
 HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive) {
@@ -50,25 +45,25 @@ HttpResponse executeDelete(const HttpRequest& request,
 
 	if (stat(request.getRequestPath().c_str(), &file_status) == -1) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
-		return createErrorResponse(NOT_FOUND, location_directive);
+		return createErrorResponse(http_status_code::NOT_FOUND, location_directive);
 	}
 
 	if (!(file_status.st_mode & S_IROTH) || !(file_status.st_mode & S_IWOTH)) {
 		std::cerr << "DELETE Error: Permission denied" << std::endl;
-		return createErrorResponse(BAD_REQUEST, location_directive);
+		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
 
 	if (remove(request.getRequestPath().c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
-		return createErrorResponse(BAD_REQUEST, location_directive);
+		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
 
-	response.setStatusCode(NO_CONTENT);
+	response.setStatusCode(http_status_code::NO_CONTENT);
 
 	return response;
 }
 
-HttpResponse createErrorResponse(const STATUS_CODE status_code,
+HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
 	HttpResponse response;
 

@@ -75,6 +75,23 @@ jobs:
         name: cppcheck-report
         path: cppcheck.txt
 
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install required packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ make
+    
+    - name: Run unit tests
+      run: |
+        cd test/unit_test/
+        make
+
 # google-test:
 #   runs-on: ubuntu-latest
 
