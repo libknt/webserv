@@ -81,4 +81,9 @@ int CgiMetaVariables::contentLength() {
 	return 0;
 }
 
+int CgiMetaVariables::contentType() {
+	setMetaVariables("CONTENT_TYPE", request_.getHeaderValue("Content-Type"));
+	return 0;
+}
+
 } // namespace server
