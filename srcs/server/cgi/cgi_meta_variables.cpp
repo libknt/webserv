@@ -178,4 +178,10 @@ int CgiMetaVariables::remoteUser() {
 	return 0;
 }
 
+int CgiMetaVariables::requestMethod() {
+	std::string method = request_.getMethod();
+	setMetaVariables("REQUEST_METHOD", method);
+	return 0;
+}
+
 } // namespace server
