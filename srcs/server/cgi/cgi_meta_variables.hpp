@@ -47,7 +47,7 @@ public:
 	CgiMetaVariables(CgiMetaVariables const& other);
 	CgiMetaVariables& operator=(CgiMetaVariables const& other);
 	~CgiMetaVariables();
-	int setupCgiMetaVaroables();
+	int setupCgiMetaVariables();
 	int createEnviron();
 	char** getCgiEnviron() const;
 	std::string const getMetaVariable(std::string const& key) const;

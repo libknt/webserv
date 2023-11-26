@@ -270,7 +270,7 @@ int CgiMetaVariables::serverSoftware() {
 	return 0;
 }
 
-int CgiMetaVariables::setupCgiMetaVaroables() {
+int CgiMetaVariables::setupCgiMetaVariables() {
 	MetaVariableFunc functions[] = {
 		&CgiMetaVariables::authType,
 		&CgiMetaVariables::contentLength,
