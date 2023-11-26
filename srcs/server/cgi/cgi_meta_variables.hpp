@@ -53,6 +53,10 @@ public:
 	std::string const getMetaVariable(std::string const& key) const;
 };
 
+std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables);
+
+char** DeepCopyCharPointerArray(char** source);
+
 } // namespace server
 
 #endif

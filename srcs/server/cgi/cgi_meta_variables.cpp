@@ -2,8 +2,6 @@
 
 namespace server {
 
-char** DeepCopyCharPointerArray(char** source);
-
 CgiMetaVariables::CgiMetaVariables(HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
@@ -339,6 +337,16 @@ std::string const CgiMetaVariables::getMetaVariable(std::string const& key) cons
 		return it->second;
 	}
 	return std::string("");
+}
+
+std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
+	char** iterator = cgi_meta_variables.getCgiEnviron();
+	out << "CgiMetaVariables: " << std::endl;
+
+	for (size_t i = 0; iterator[i]; ++i) {
+		out << iterator[i] << std::endl;
+	}
+	return out;
 }
 
 } // namespace server
