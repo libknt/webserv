@@ -196,4 +196,13 @@ int CgiMetaVariables::serverName() {
 	return 0;
 }
 
+int CgiMetaVariables::serverPort() {
+	int port = ntohs(server_address_.sin_port);
+	std::stringstream ss;
+	ss << port;
+	std::string port_str = ss.str();
+	setMetaVariables("SERVER_PORT", port_str);
+	return 0;
+}
+
 } // namespace server
