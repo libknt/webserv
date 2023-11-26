@@ -211,4 +211,9 @@ int CgiMetaVariables::serverProtocol() {
 	return 0;
 }
 
+int CgiMetaVariables::serverSoftware() {
+	setMetaVariables("SERVER_SOFTWARE", "webserv/1.0");
+	return 0;
+}
+
 } // namespace server
