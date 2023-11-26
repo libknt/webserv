@@ -12,13 +12,17 @@ class CgiMetaVariables {
 private:
 	HttpRequest const& request_;
 	std::map<std::string, std::string> meta_variables_;
+	sockaddr_in const& client_address_;
+	sockaddr_in const& server_address_;
 	char** environ_;
 
 	CgiMetaVariables();
 	void setMetaVariables(std::string const& key, std::string const& value);
 
 public:
-	CgiMetaVariables(HttpRequest const& request);
+	CgiMetaVariables(HttpRequest const& request,
+		sockaddr_in const& client_address,
+		sockaddr_in const& server_address);
 	CgiMetaVariables(CgiMetaVariables const& other);
 	CgiMetaVariables& operator=(CgiMetaVariables const& other);
 	~CgiMetaVariables();

@@ -4,14 +4,20 @@ namespace server {
 
 char** DeepCopyCharPointerArray(char** source);
 
-CgiMetaVariables::CgiMetaVariables(HttpRequest const& request)
+CgiMetaVariables::CgiMetaVariables(HttpRequest const& request,
+	sockaddr_in const& client_address,
+	sockaddr_in const& server_address)
 	: request_(request)
 	, meta_variables_(std::map<std::string, std::string>())
+	, client_address_(client_address)
+	, server_address_(server_address)
 	, environ_(NULL) {}
 
 CgiMetaVariables::CgiMetaVariables(CgiMetaVariables const& other)
 	: request_(other.request_)
 	, meta_variables_(other.meta_variables_)
+	, client_address_(other.client_address_)
+	, server_address_(other.server_address_)
 	, environ_(other.environ_) {}
 
 CgiMetaVariables& CgiMetaVariables::operator=(CgiMetaVariables const& other) {
@@ -88,6 +94,15 @@ int CgiMetaVariables::contentType() {
 
 int CgiMetaVariables::gatewayInterface() {
 	setMetaVariables("GATEWAY_INTERFACE", "CGI/1.1");
+	return 0;
+}
+
+int CgiMetaVariables::remoteAddr() {
+	uint32_t addr = ntohl(client_address_.sin_addr.s_addr);
+	std::ostringstream ip_stream;
+	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
+			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
+	setMetaVariables("REMOTE_ADDR", ip_stream.str());
 	return 0;
 }
 
