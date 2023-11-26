@@ -86,4 +86,9 @@ int CgiMetaVariables::contentType() {
 	return 0;
 }
 
+int CgiMetaVariables::gatewayInterface() {
+	setMetaVariables("GATEWAY_INTERFACE", "CGI/1.1");
+	return 0;
+}
+
 } // namespace server
