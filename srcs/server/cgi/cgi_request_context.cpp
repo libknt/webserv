@@ -1,8 +1,8 @@
-#include "cgi_meta_variables.hpp"
+#include "cgi_request_context.hpp"
 
 namespace server {
 
-CgiMetaVariables::CgiMetaVariables(HttpRequest const& request,
+CgiRequestContext::CgiRequestContext(HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
 	: request_(request)
@@ -11,14 +11,14 @@ CgiMetaVariables::CgiMetaVariables(HttpRequest const& request,
 	, server_address_(server_address)
 	, environ_(NULL) {}
 
-CgiMetaVariables::CgiMetaVariables(CgiMetaVariables const& other)
+CgiRequestContext::CgiRequestContext(CgiRequestContext const& other)
 	: request_(other.request_)
 	, meta_variables_(other.meta_variables_)
 	, client_address_(other.client_address_)
 	, server_address_(other.server_address_)
 	, environ_(other.environ_) {}
 
-CgiMetaVariables& CgiMetaVariables::operator=(CgiMetaVariables const& other) {
+CgiRequestContext& CgiRequestContext::operator=(CgiRequestContext const& other) {
 	if (this != &other) {
 		meta_variables_ = meta_variables_;
 		environ_ = DeepCopyCharPointerArray(other.environ_);
@@ -58,7 +58,7 @@ char** DeepCopyCharPointerArray(char** source) {
 	return destination;
 }
 
-CgiMetaVariables::~CgiMetaVariables() {
+CgiRequestContext::~CgiRequestContext() {
 	if (environ_) {
 		for (size_t i = 0; environ_[i]; ++i) {
 			delete[] environ_[i];
@@ -67,11 +67,11 @@ CgiMetaVariables::~CgiMetaVariables() {
 	}
 }
 
-void CgiMetaVariables::setMetaVariables(std::string const& key, std::string const& value) {
+void CgiRequestContext::setMetaVariables(std::string const& key, std::string const& value) {
 	meta_variables_.insert(std::make_pair(key, value));
 }
 
-int CgiMetaVariables::authType() {
+int CgiRequestContext::authType() {
 	std::string auth_type = request_.getHeaderValue("Authorization");
 	if (auth_type.compare("") != 0) {
 		auth_type = auth_type.substr(0, auth_type.find(' '));
@@ -80,22 +80,22 @@ int CgiMetaVariables::authType() {
 	return 0;
 }
 
-int CgiMetaVariables::contentLength() {
+int CgiRequestContext::contentLength() {
 	setMetaVariables("CONTENT_LENGTH", request_.getHeaderValue("Content-Length"));
 	return 0;
 }
 
-int CgiMetaVariables::contentType() {
+int CgiRequestContext::contentType() {
 	setMetaVariables("CONTENT_TYPE", request_.getHeaderValue("Content-Type"));
 	return 0;
 }
 
-int CgiMetaVariables::gatewayInterface() {
+int CgiRequestContext::gatewayInterface() {
 	setMetaVariables("GATEWAY_INTERFACE", "CGI/1.1");
 	return 0;
 }
 
-int CgiMetaVariables::pathInfo() {
+int CgiRequestContext::pathInfo() {
 	const std::string path = request_.getUriPath();
 	const std::string::size_type extension_position = path.find(".");
 
@@ -112,7 +112,7 @@ int CgiMetaVariables::pathInfo() {
 	return 0;
 }
 
-int CgiMetaVariables::pathTranslated() {
+int CgiRequestContext::pathTranslated() {
 	// TODO serverのドキュメントルートに合わせる.
 	// サーバー上の実際のファイルパス
 	// PATH_INFO
@@ -128,13 +128,13 @@ int CgiMetaVariables::pathTranslated() {
 	return 0;
 }
 
-int CgiMetaVariables::queryString() {
+int CgiRequestContext::queryString() {
 	std::string const query = request_.getUriQuery();
 	meta_variables_.insert(std::make_pair("QUERY_STRING", query));
 	return 0;
 }
 
-int CgiMetaVariables::remoteAddr() {
+int CgiRequestContext::remoteAddr() {
 	uint32_t addr = ntohl(client_address_.sin_addr.s_addr);
 	std::ostringstream ip_stream;
 	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
@@ -143,23 +143,23 @@ int CgiMetaVariables::remoteAddr() {
 	return 0;
 }
 
-int CgiMetaVariables::remoteHost() {
+int CgiRequestContext::remoteHost() {
 	// TODO 取得する関数が、使用可能関数にない
 	setMetaVariables("REMOTE_HOST", "");
 	return 0;
 }
 
-int CgiMetaVariables::remoteIdet() {
+int CgiRequestContext::remoteIdet() {
 	// TODO 推奨されてないので空
 	setMetaVariables("REMOTE_IDENT", "");
 	return 0;
 }
 
-inline bool CgiMetaVariables::isBase64(unsigned char c) {
+inline bool CgiRequestContext::isBase64(unsigned char c) {
 	return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-std::string CgiMetaVariables::base64Decode(std::string const& encoded_string) {
+std::string CgiRequestContext::base64Decode(std::string const& encoded_string) {
 	static const std::string base64_chars =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	int in_len = encoded_string.size();
@@ -204,7 +204,7 @@ std::string CgiMetaVariables::base64Decode(std::string const& encoded_string) {
 	return ret;
 }
 
-int CgiMetaVariables::remoteUser() {
+int CgiRequestContext::remoteUser() {
 	std::string remote_user = request_.getHeaderValue("Authorization");
 	if (remote_user.compare("") != 0) {
 		remote_user = remote_user.substr(remote_user.find(' ') + 1);
@@ -215,13 +215,13 @@ int CgiMetaVariables::remoteUser() {
 	return 0;
 }
 
-int CgiMetaVariables::requestMethod() {
+int CgiRequestContext::requestMethod() {
 	std::string method = request_.getMethod();
 	setMetaVariables("REQUEST_METHOD", method);
 	return 0;
 }
 
-int CgiMetaVariables::scriptName() {
+int CgiRequestContext::scriptName() {
 	std::string uri = request_.getUriPath();
 	std::string script_name(uri);
 	std::string path_info = getMetaVariable("PATH_INFO");
@@ -236,7 +236,7 @@ int CgiMetaVariables::scriptName() {
 	return 0;
 }
 
-int CgiMetaVariables::serverName() {
+int CgiRequestContext::serverName() {
 
 	uint32_t addr = ntohl(server_address_.sin_addr.s_addr);
 
@@ -248,7 +248,7 @@ int CgiMetaVariables::serverName() {
 	return 0;
 }
 
-int CgiMetaVariables::serverPort() {
+int CgiRequestContext::serverPort() {
 	int port = ntohs(server_address_.sin_port);
 	std::stringstream ss;
 	ss << port;
@@ -257,36 +257,36 @@ int CgiMetaVariables::serverPort() {
 	return 0;
 }
 
-int CgiMetaVariables::serverProtocol() {
+int CgiRequestContext::serverProtocol() {
 	std::string protocol = request_.getVersion();
 	setMetaVariables("SERVER_PROTOCOL", protocol);
 	return 0;
 }
 
-int CgiMetaVariables::serverSoftware() {
+int CgiRequestContext::serverSoftware() {
 	setMetaVariables("SERVER_SOFTWARE", "webserv/1.0");
 	return 0;
 }
 
-int CgiMetaVariables::setupCgiMetaVariables() {
+int CgiRequestContext::setupCgiMetaVariables() {
 	MetaVariableFunc functions[] = {
-		&CgiMetaVariables::authType,
-		&CgiMetaVariables::contentLength,
-		&CgiMetaVariables::contentType,
-		&CgiMetaVariables::gatewayInterface,
-		&CgiMetaVariables::pathInfo,
-		&CgiMetaVariables::pathTranslated,
-		&CgiMetaVariables::queryString,
-		&CgiMetaVariables::remoteAddr,
-		&CgiMetaVariables::remoteHost,
-		&CgiMetaVariables::remoteIdet,
-		&CgiMetaVariables::remoteUser,
-		&CgiMetaVariables::requestMethod,
-		&CgiMetaVariables::scriptName,
-		&CgiMetaVariables::serverName,
-		&CgiMetaVariables::serverPort,
-		&CgiMetaVariables::serverProtocol,
-		&CgiMetaVariables::serverSoftware,
+		&CgiRequestContext::authType,
+		&CgiRequestContext::contentLength,
+		&CgiRequestContext::contentType,
+		&CgiRequestContext::gatewayInterface,
+		&CgiRequestContext::pathInfo,
+		&CgiRequestContext::pathTranslated,
+		&CgiRequestContext::queryString,
+		&CgiRequestContext::remoteAddr,
+		&CgiRequestContext::remoteHost,
+		&CgiRequestContext::remoteIdet,
+		&CgiRequestContext::remoteUser,
+		&CgiRequestContext::requestMethod,
+		&CgiRequestContext::scriptName,
+		&CgiRequestContext::serverName,
+		&CgiRequestContext::serverPort,
+		&CgiRequestContext::serverProtocol,
+		&CgiRequestContext::serverSoftware,
 	};
 
 	int funcSize = sizeof(functions) / sizeof(MetaVariableFunc);
@@ -298,7 +298,7 @@ int CgiMetaVariables::setupCgiMetaVariables() {
 	return 0;
 }
 
-int CgiMetaVariables::createEnviron() {
+int CgiRequestContext::createEnviron() {
 	size_t size = meta_variables_.size();
 
 	environ_ = new (std::nothrow) char*[size + 1];
@@ -327,11 +327,11 @@ int CgiMetaVariables::createEnviron() {
 	return 0;
 }
 
-char** CgiMetaVariables::getCgiEnviron() const {
+char** CgiRequestContext::getCgiEnviron() const {
 	return environ_;
 }
 
-std::string const CgiMetaVariables::getMetaVariable(std::string const& key) const {
+std::string const CgiRequestContext::getMetaVariable(std::string const& key) const {
 	std::map<std::string, std::string>::const_iterator it = meta_variables_.find(key);
 	if (it != meta_variables_.end()) {
 		return it->second;
@@ -339,7 +339,7 @@ std::string const CgiMetaVariables::getMetaVariable(std::string const& key) cons
 	return std::string("");
 }
 
-std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables) {
+std::ostream& operator<<(std::ostream& out, const CgiRequestContext& cgi_meta_variables) {
 	char** iterator = cgi_meta_variables.getCgiEnviron();
 	out << "CgiMetaVariables: " << std::endl;
 

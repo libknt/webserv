@@ -1,5 +1,5 @@
-#ifndef CGI_META_VARIABLES_HPP
-#define CGI_META_VARIABLES_HPP
+#ifndef CGI_REQUEST_CONTEXT_HPP
+#define CGI_REQUEST_CONTEXT_HPP
 
 #include "http_request.hpp"
 #include <cstring>
@@ -8,7 +8,7 @@
 
 namespace server {
 
-class CgiMetaVariables {
+class CgiRequestContext {
 private:
 	HttpRequest const& request_;
 	std::map<std::string, std::string> meta_variables_;
@@ -16,9 +16,9 @@ private:
 	sockaddr_in const& server_address_;
 	char** environ_;
 
-	typedef int (CgiMetaVariables::*MetaVariableFunc)();
+	typedef int (CgiRequestContext::*MetaVariableFunc)();
 
-	CgiMetaVariables();
+	CgiRequestContext();
 	void setMetaVariables(std::string const& key, std::string const& value);
 	int authType();
 	int contentLength();
@@ -41,19 +41,19 @@ private:
 	int serverSoftware();
 
 public:
-	CgiMetaVariables(HttpRequest const& request,
+	CgiRequestContext(HttpRequest const& request,
 		sockaddr_in const& client_address,
 		sockaddr_in const& server_address);
-	CgiMetaVariables(CgiMetaVariables const& other);
-	CgiMetaVariables& operator=(CgiMetaVariables const& other);
-	~CgiMetaVariables();
+	CgiRequestContext(CgiRequestContext const& other);
+	CgiRequestContext& operator=(CgiRequestContext const& other);
+	~CgiRequestContext();
 	int setupCgiMetaVariables();
 	int createEnviron();
 	char** getCgiEnviron() const;
 	std::string const getMetaVariable(std::string const& key) const;
 };
 
-std::ostream& operator<<(std::ostream& out, const CgiMetaVariables& cgi_meta_variables);
+std::ostream& operator<<(std::ostream& out, const CgiRequestContext& cgi_meta_variables);
 
 char** DeepCopyCharPointerArray(char** source);
 
