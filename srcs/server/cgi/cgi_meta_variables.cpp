@@ -112,4 +112,10 @@ int CgiMetaVariables::remoteHost() {
 	return 0;
 }
 
+int CgiMetaVariables::remoteIdet() {
+	// TODO 推奨されてないので空
+	setMetaVariables("REMOTE_IDENT", "");
+	return 0;
+}
+
 } // namespace server
