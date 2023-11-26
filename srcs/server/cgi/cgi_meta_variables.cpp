@@ -76,4 +76,9 @@ int CgiMetaVariables::authType() {
 	return 0;
 }
 
+int CgiMetaVariables::contentLength() {
+	setMetaVariables("CONTENT_LENGTH", request_.getHeaderValue("Content-Length"));
+	return 0;
+}
+
 } // namespace server
