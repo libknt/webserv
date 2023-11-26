@@ -106,4 +106,10 @@ int CgiMetaVariables::remoteAddr() {
 	return 0;
 }
 
+int CgiMetaVariables::remoteHost() {
+	// TODO 取得する関数が、使用可能関数にない
+	setMetaVariables("REMOTE_HOST", "");
+	return 0;
+}
+
 } // namespace server
