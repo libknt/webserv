@@ -5,6 +5,7 @@
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include <dirent.h>
+#include <sys/stat.h>
 #include <iostream>
 #include <string>
 

@@ -1,5 +1,4 @@
 #include "handle_request.hpp"
-#include <sys/stat.h>
 
 namespace server {
 
