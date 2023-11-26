@@ -18,15 +18,6 @@ private:
 
 	CgiMetaVariables();
 	void setMetaVariables(std::string const& key, std::string const& value);
-
-public:
-	CgiMetaVariables(HttpRequest const& request,
-		sockaddr_in const& client_address,
-		sockaddr_in const& server_address);
-	CgiMetaVariables(CgiMetaVariables const& other);
-	CgiMetaVariables& operator=(CgiMetaVariables const& other);
-	~CgiMetaVariables();
-
 	int authType();
 	int contentLength();
 	int contentType();
@@ -46,6 +37,15 @@ public:
 	int serverPort();
 	int serverProtocol();
 	int serverSoftware();
+
+public:
+	CgiMetaVariables(HttpRequest const& request,
+		sockaddr_in const& client_address,
+		sockaddr_in const& server_address);
+	CgiMetaVariables(CgiMetaVariables const& other);
+	CgiMetaVariables& operator=(CgiMetaVariables const& other);
+	~CgiMetaVariables();
+	std::string const getMetaVariable(std::string const& key) const;
 };
 
 } // namespace server

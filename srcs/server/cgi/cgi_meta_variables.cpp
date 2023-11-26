@@ -114,6 +114,22 @@ int CgiMetaVariables::pathInfo() {
 	return 0;
 }
 
+int CgiMetaVariables::pathTranslated() {
+	// TODO serverのドキュメントルートに合わせる.
+	// サーバー上の実際のファイルパス
+	// PATH_INFO
+	// のパスがサーバーのドキュメントルートを基準とした物理的なファイルパスに変換されたもの.
+	std::string path_info = getMetaVariable("PATH_INFO");
+	std::string path_translated("");
+	if (!path_info.empty()) {
+		// root_path + path_info
+		//  一旦
+		path_translated = "/var/www/html/additional" + path_info;
+	}
+	meta_variables_.insert(std::make_pair("PATH_TRANSLATED", path_translated));
+	return 0;
+}
+
 int CgiMetaVariables::queryString() {
 	std::string const query = request_.getUriQuery();
 	meta_variables_.insert(std::make_pair("QUERY_STRING", query));
@@ -237,6 +253,14 @@ int CgiMetaVariables::serverProtocol() {
 int CgiMetaVariables::serverSoftware() {
 	setMetaVariables("SERVER_SOFTWARE", "webserv/1.0");
 	return 0;
+}
+
+std::string const CgiMetaVariables::getMetaVariable(std::string const& key) const {
+	std::map<std::string, std::string>::const_iterator it = meta_variables_.find(key);
+	if (it != meta_variables_.end()) {
+		return it->second;
+	}
+	return std::string("");
 }
 
 } // namespace server
