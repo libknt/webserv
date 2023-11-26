@@ -7,10 +7,11 @@ void handleRequest(ClientSession const& client_session) {
 	HttpRequest request = client_session.getRequest();
 	HttpResponse response;
 
-	if (client_session.getClientPort() == client_session.getServerPort()) {
-		ServerDirective server_directive = client_session.getServerDirective();
-		LocationDirective location_directive =
-			server_directive.findLocation(request.getRequestPath());
+	ServerDirective server_directive = client_session.getServerDirective();
+	std::cout << "directive: " << server_directive.getPort() << std::endl;
+
+	if (server_directive.getPort() == client_session.getServerPort()) {
+		LocationDirective location_directive = server_directive.findLocation(request.getRequestPath());
 		std::string const method = request.getMethod();
 
 		if (method == "GET" && location_directive.isAllowMethod(method)) {

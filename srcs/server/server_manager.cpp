@@ -270,6 +270,8 @@ void ServerManager::registerClientSession(int sd,
 	std::ostringstream port_stream;
 	port_stream << ntohs(client_address.sin_port);
 	std::string client_port = port_stream.str();
+
+	// server_directiveが取得できてないためセグフォが起きている
 	ServerDirective const& server_directive =
 		configuration_.getServerDirective(client_ip_address, client_port);
 	active_client_sessions_.insert(
@@ -295,6 +297,7 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 
 	HttpRequest request = client_session.getRequest();
 	HttpRequestParser::parse(request, recv_buffer);
+	client_session.setRequest(request);
 	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;

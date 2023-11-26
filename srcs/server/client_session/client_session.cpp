@@ -128,6 +128,10 @@ std::string ClientSession::getServerPort() const {
 	return ss.str();
 }
 
+void ClientSession::setRequest(HttpRequest const& request) {
+	request_ = request;
+}
+
 void ClientSession::sessionCleanup() {
 	request_ = HttpRequest();
 	response_ = HttpResponse();
