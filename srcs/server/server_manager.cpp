@@ -1,5 +1,4 @@
 #include "server_manager.hpp"
-#include <sys/stat.h>
 
 namespace server {
 
