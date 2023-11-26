@@ -67,4 +67,13 @@ void CgiMetaVariables::setMetaVariables(std::string const& key, std::string cons
 	meta_variables_.insert(std::make_pair(key, value));
 }
 
+int CgiMetaVariables::authType() {
+	std::string auth_type = request_.getHeaderValue("Authorization");
+	if (auth_type.compare("") != 0) {
+		auth_type = auth_type.substr(0, auth_type.find(' '));
+	}
+	setMetaVariables("AUTH_TYPE", auth_type);
+	return 0;
+}
+
 } // namespace server
