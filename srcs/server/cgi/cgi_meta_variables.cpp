@@ -184,4 +184,16 @@ int CgiMetaVariables::requestMethod() {
 	return 0;
 }
 
+int CgiMetaVariables::serverName() {
+
+	uint32_t addr = ntohl(server_address_.sin_addr.s_addr);
+
+	std::ostringstream ip_stream;
+	ip_stream << ((addr >> 24) & 0xFF) << "." << ((addr >> 16) & 0xFF) << "."
+			  << ((addr >> 8) & 0xFF) << "." << (addr & 0xFF);
+
+	setMetaVariables("SERVER_NAME", ip_stream.str());
+	return 0;
+}
+
 } // namespace server
