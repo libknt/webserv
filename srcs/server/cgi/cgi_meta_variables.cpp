@@ -205,4 +205,10 @@ int CgiMetaVariables::serverPort() {
 	return 0;
 }
 
+int CgiMetaVariables::serverProtocol() {
+	std::string protocol = request_.getVersion();
+	setMetaVariables("SERVER_PROTOCOL", protocol);
+	return 0;
+}
+
 } // namespace server
