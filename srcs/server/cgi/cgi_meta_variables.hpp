@@ -2,6 +2,7 @@
 #define CGI_META_VARIABLES_HPP
 
 #include "http_request.hpp"
+#include <cstring>
 #include <map>
 #include <string>
 
