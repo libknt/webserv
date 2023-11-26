@@ -223,6 +223,21 @@ int CgiMetaVariables::requestMethod() {
 	return 0;
 }
 
+int CgiMetaVariables::scriptName() {
+	std::string uri = request_.getUriPath();
+	std::string script_name(uri);
+	std::string path_info = getMetaVariable("PATH_INFO");
+	if (!path_info.empty()) {
+		uri.erase(path_info.size());
+	}
+	std::string::size_type position = uri.rfind("/");
+	if (position != std::string::npos) {
+		script_name.erase(position);
+	}
+	setMetaVariables("SCRIPT_NAME", script_name);
+	return 0;
+}
+
 int CgiMetaVariables::serverName() {
 
 	uint32_t addr = ntohl(server_address_.sin_addr.s_addr);
@@ -255,6 +270,36 @@ int CgiMetaVariables::serverSoftware() {
 	return 0;
 }
 
+int CgiMetaVariables::setupCgiMetaVaroables() {
+	MetaVariableFunc functions[] = {
+		&CgiMetaVariables::authType,
+		&CgiMetaVariables::contentLength,
+		&CgiMetaVariables::contentType,
+		&CgiMetaVariables::gatewayInterface,
+		&CgiMetaVariables::pathInfo,
+		&CgiMetaVariables::pathTranslated,
+		&CgiMetaVariables::queryString,
+		&CgiMetaVariables::remoteAddr,
+		&CgiMetaVariables::remoteHost,
+		&CgiMetaVariables::remoteIdet,
+		&CgiMetaVariables::remoteUser,
+		&CgiMetaVariables::requestMethod,
+		&CgiMetaVariables::scriptName,
+		&CgiMetaVariables::serverName,
+		&CgiMetaVariables::serverPort,
+		&CgiMetaVariables::serverProtocol,
+		&CgiMetaVariables::serverSoftware,
+	};
+
+	int funcSize = sizeof(functions) / sizeof(MetaVariableFunc);
+
+	for (int i = 0; i < funcSize; ++i) {
+		(this->*functions[i])();
+	}
+
+	return 0;
+}
+
 int CgiMetaVariables::createEnviron() {
 	size_t size = meta_variables_.size();
 
@@ -282,6 +327,10 @@ int CgiMetaVariables::createEnviron() {
 	}
 	environ_[i] = NULL;
 	return 0;
+}
+
+char** CgiMetaVariables::getCgiEnviron() const {
+	return environ_;
 }
 
 std::string const CgiMetaVariables::getMetaVariable(std::string const& key) const {

@@ -16,6 +16,8 @@ private:
 	sockaddr_in const& server_address_;
 	char** environ_;
 
+	typedef int (CgiMetaVariables::*MetaVariableFunc)();
+
 	CgiMetaVariables();
 	void setMetaVariables(std::string const& key, std::string const& value);
 	int authType();
@@ -45,7 +47,9 @@ public:
 	CgiMetaVariables(CgiMetaVariables const& other);
 	CgiMetaVariables& operator=(CgiMetaVariables const& other);
 	~CgiMetaVariables();
+	int setupCgiMetaVaroables();
 	int createEnviron();
+	char** getCgiEnviron() const;
 	std::string const getMetaVariable(std::string const& key) const;
 };
 
