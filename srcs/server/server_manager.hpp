@@ -9,6 +9,7 @@
 #include "webserv.hpp"
 #include <iostream>
 #include <map>
+#include <sys/stat.h>
 #include <vector>
 
 namespace server {

@@ -15,12 +15,12 @@ Utils& Utils::operator=(const Utils& other) {
 	return *this;
 }
 
-bool Utils::isFilePresent(const std::string& path) {
+bool Utils::fileExists(const std::string& path) {
 	struct stat buffer;
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
-std::string Utils::getUriExtension(const std::string& uri) {
+std::string Utils::extructUriExtension(const std::string& uri) {
 	std::string extension = "";
 	size_t dot_pos = uri.find_last_of(".");
 	if (dot_pos != std::string::npos) {

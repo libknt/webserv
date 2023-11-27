@@ -1,5 +1,4 @@
 #include "server_manager.hpp"
-#include <sys/stat.h>
 
 namespace server {
 
@@ -188,11 +187,11 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	const HttpRequest& request = session.getRequest();
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getUriPath());
-	std::string file_extension = Utils::getUriExtension(request.getUriPath());
+	std::string file_extension = Utils::extructUriExtension(request.getUriPath());
 	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
 
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
-		Utils::isFilePresent(file_path)) {
+		Utils::fileExists(file_path)) {
 		session.setStatus(CGI_PREPARING);
 	} else {
 		session.setStatus(RESPONSE_PREPARING);
