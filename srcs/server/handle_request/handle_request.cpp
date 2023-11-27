@@ -77,9 +77,31 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 
 HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive) {
 	HttpResponse response;
-	(void)request;
-	(void)location_directive;
-	return (response);
+	struct stat file_info;
+	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
+	if (stat(file_path.c_str(), &file_info) != 0) {
+		return (createErrorResponse(NOT_FOUND, location_directive));
+	} else if (S_ISREG(file_info.st_mode)) {
+		std::ofstream file_stream(file_path);
+		if (!file_stream.is_open()) {
+			return (createErrorResponse(FORBIDDEN, location_directive));
+		}
+		file_stream << request.getBody() << std::endl;
+		file_stream.close();
+		response.setStatusCode(CREATED);
+		return (response);
+	} else if (S_ISDIR(file_info.st_mode)) {
+		std::time_t time_val = std::time(NULL);
+		std::ofstream file_stream(file_path + std::to_string(time_val));
+		if (!file_stream.is_open()) {
+			return (createErrorResponse(FORBIDDEN, location_directive));
+		}
+		file_stream << request.getBody() << std::endl;
+		file_stream.close();
+		response.setStatusCode(CREATED);
+		return (response);
+	}
+	return (createErrorResponse(FORBIDDEN, location_directive));
 }
 
 HttpResponse executeDelete(const HttpRequest& request,

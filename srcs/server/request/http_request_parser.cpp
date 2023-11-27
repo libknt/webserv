@@ -33,6 +33,9 @@ SERVER_STATUS HttpRequestParser::handleBuffer(int sd, const char* buf) {
 	if (!(request.getStatus() == http_request_status::BODY) ||
 		!(request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)) {
 		while ((index = http_line_stream_[sd].find("\r\n")) != std::string::npos) {
+			if (request.getStatus() == http_request_status::BODY &&
+				request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
+				break;
 			std::string line = http_line_stream_[sd].substr(0, index);
 			http_line_stream_[sd] = http_line_stream_[sd].substr(index + 2);
 			parseRequest(sd, line);
