@@ -51,6 +51,8 @@ public:
 	std::map<std::string, std::string> const& getReturn() const;
 	std::string getChunkedTransferEncoding() const;
 	std::string getCgi() const;
+	bool isCgiExtension(const std::string& extension) const;
+	bool isCgiEnabled() const;
 	const std::vector<std::string>& getCgiExtensions() const;
 };
 
