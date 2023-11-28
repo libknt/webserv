@@ -24,7 +24,7 @@ std::string Utils::extructUriExtension(const std::string& uri) {
 	std::string extension = "";
 	size_t dot_pos = uri.find_last_of(".");
 	if (dot_pos != std::string::npos) {
-		extension = uri.substr(dot_pos + 1);
+		extension = uri.substr(dot_pos);
 	}
 	return extension;
 }
