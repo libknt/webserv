@@ -268,6 +268,16 @@ int CgiRequestContext::serverSoftware() {
 	return 0;
 }
 
+int CgiRequestContext::setup() {
+	if (setupCgiMetaVariables() < 0) {
+		return -1;
+	}
+	if (createEnviron() < 0) {
+		return -1;
+	}
+	return 0;
+}
+
 int CgiRequestContext::setupCgiMetaVariables() {
 	MetaVariableFunc functions[] = {
 		&CgiRequestContext::authType,
