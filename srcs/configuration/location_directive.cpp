@@ -131,7 +131,7 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 			std::cerr << "Parse Error: parseErrorPageDirective1" << std::endl;
 			return -1;
 		}
-		error_pages_[tokens[i]] = tokens[tokens.size() - 1];
+		error_pages_.insert(std::make_pair(tokens[i], tokens[tokens.size() - 1]));
 	}
 	return 0;
 }

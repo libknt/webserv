@@ -61,7 +61,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 				return -1;
 			}
 			if (locations_.find(location_path) == locations_.end()) {
-				locations_[location_path] = location_directive;
+				locations_.insert(std::make_pair(location_path, location_directive));
 			}
 		} else {
 			std::cerr << "Parse Error: serverDirective" << std::endl;
@@ -70,7 +70,7 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 		args.clear();
 	}
 	if (locations_.find("/") == locations_.end()) {
-		locations_["/"] = LocationDirective();
+		locations_.insert(std::make_pair("/", LocationDirective()));
 	}
 	return 0;
 }
