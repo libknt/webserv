@@ -72,7 +72,7 @@ void CgiRequestContext::setMetaVariables(std::string const& key, std::string con
 }
 
 int CgiRequestContext::authType() {
-	std::string auth_type = request_.getHeaderValue("Authorization");
+	std::string auth_type = request_.getHeaderValue("authorization");
 	if (auth_type.compare("") != 0) {
 		auth_type = auth_type.substr(0, auth_type.find(' '));
 	}
@@ -81,12 +81,12 @@ int CgiRequestContext::authType() {
 }
 
 int CgiRequestContext::contentLength() {
-	setMetaVariables("CONTENT_LENGTH", request_.getHeaderValue("Content-Length"));
+	setMetaVariables("CONTENT_LENGTH", request_.getHeaderValue("content-length"));
 	return 0;
 }
 
 int CgiRequestContext::contentType() {
-	setMetaVariables("CONTENT_TYPE", request_.getHeaderValue("Content-Type"));
+	setMetaVariables("CONTENT_TYPE", request_.getHeaderValue("content-type"));
 	return 0;
 }
 
@@ -205,7 +205,7 @@ std::string CgiRequestContext::base64Decode(std::string const& encoded_string) {
 }
 
 int CgiRequestContext::remoteUser() {
-	std::string remote_user = request_.getHeaderValue("Authorization");
+	std::string remote_user = request_.getHeaderValue("authorization");
 	if (remote_user.compare("") != 0) {
 		remote_user = remote_user.substr(remote_user.find(' ') + 1);
 		remote_user = base64Decode(remote_user);
