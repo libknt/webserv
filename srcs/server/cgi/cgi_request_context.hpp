@@ -47,6 +47,7 @@ public:
 	CgiRequestContext(CgiRequestContext const& other);
 	CgiRequestContext& operator=(CgiRequestContext const& other);
 	~CgiRequestContext();
+	int setup();
 	int setupCgiMetaVariables();
 	int createEnviron();
 	char** getCgiEnviron() const;
