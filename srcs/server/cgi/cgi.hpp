@@ -1,15 +1,15 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 #include "cgi_request_context.hpp"
+#include "webserv.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
 #include <sys/socket.h>
-#include <unistd.h>
 #include <sys/wait.h>
-#include "webserv.hpp"
+#include <unistd.h>
 
 namespace server {
 
@@ -34,7 +34,7 @@ public:
 	int setup();
 	int executeCgi();
 	int readCgiOutput();
-	int getSocketFd() const;	
+	int getSocketFd() const;
 	std::string const& getCgiOutput() const;
 };
 

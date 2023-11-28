@@ -122,7 +122,7 @@ int Cgi::readCgiOutput() {
 	return 0;
 }
 
-int Cgi::getSocketFd() const{
+int Cgi::getSocketFd() const {
 	return socket_vector_[0];
 }
 
