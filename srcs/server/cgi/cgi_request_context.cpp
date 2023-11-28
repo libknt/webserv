@@ -9,7 +9,6 @@ CgiRequestContext::CgiRequestContext(HttpRequest const& request,
 	, meta_variables_(std::map<std::string, std::string>())
 	, client_address_(client_address)
 	, server_address_(server_address)
-	, execve_path_("")
 	, execve_argv_(NULL)
 	, environ_(NULL) {}
 
@@ -18,14 +17,12 @@ CgiRequestContext::CgiRequestContext(CgiRequestContext const& other)
 	, meta_variables_(other.meta_variables_)
 	, client_address_(other.client_address_)
 	, server_address_(other.server_address_)
-	, execve_path_(other.execve_path_)
 	, execve_argv_(other.execve_argv_)
 	, environ_(other.environ_) {}
 
 CgiRequestContext& CgiRequestContext::operator=(CgiRequestContext const& other) {
 	if (this != &other) {
 		meta_variables_ = meta_variables_;
-		execve_path_ = other.execve_path_;
 		execve_argv_ = DeepCopyCharPointerArray(other.execve_argv_);
 		environ_ = DeepCopyCharPointerArray(other.environ_);
 	}
@@ -296,7 +293,6 @@ int CgiRequestContext::setup() {
 }
 
 int CgiRequestContext::setupExecveArgv() {
-	execve_path_ = "/usr/bin/python3";
 	execve_argv_ = new (std::nothrow) char*[3];
 	if (!execve_argv_) {
 		return -1;
@@ -383,6 +379,10 @@ int CgiRequestContext::createEnviron() {
 	}
 	environ_[i] = NULL;
 	return 0;
+}
+
+char** CgiRequestContext::getExecveArgv() const {
+	return execve_argv_;
 }
 
 char** CgiRequestContext::getCgiEnviron() const {

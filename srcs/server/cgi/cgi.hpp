@@ -1,11 +1,13 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 #include "cgi_request_context.hpp"
+#include <cstdlib>
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
 #include <sys/socket.h>
+#include <unistd.h>
 
 namespace server {
 
@@ -27,6 +29,7 @@ public:
 	Cgi& operator=(const Cgi& other);
 	~Cgi();
 	int setup();
+	int executeCgi();
 };
 
 } // namespace server

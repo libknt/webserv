@@ -81,4 +81,25 @@ int Cgi::setup() {
 	return 0;
 }
 
+int Cgi::executeCgi() {
+	char** environ = cgi_request_context_.getCgiEnviron();
+	char** argv = cgi_request_context_.getExecveArgv();
+	pid_ = fork();
+	if (pid_ == -1) {
+		std::cerr << "fork() failed: " << strerror(errno) << std::endl;
+		return -1;
+	}
+
+	if (pid_ == 0) {
+		close(socket_vector_[0]);
+		if (dup2(socket_vector_[1], STDOUT_FILENO) < 0) {
+			std::exit(EXIT_FAILURE);
+		}
+		execve(argv[0], argv, environ);
+		std::exit(EXIT_FAILURE);
+	}
+
+	return 0;
+}
+
 } // namespace server

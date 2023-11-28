@@ -14,7 +14,6 @@ private:
 	std::map<std::string, std::string> meta_variables_;
 	sockaddr_in const& client_address_;
 	sockaddr_in const& server_address_;
-	std::string execve_path_;
 	char** execve_argv_;
 	char** environ_;
 
@@ -54,6 +53,7 @@ public:
 	~CgiRequestContext();
 	int setup();
 	int createEnviron();
+	char** getExecveArgv() const;
 	char** getCgiEnviron() const;
 	std::string const getMetaVariable(std::string const& key) const;
 };
