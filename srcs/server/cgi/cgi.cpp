@@ -102,4 +102,39 @@ int Cgi::executeCgi() {
 	return 0;
 }
 
+int Cgi::readCgiOutput() {
+	int sd = socket_vector_[0];
+	char recv_buffer[BUFFER_SIZE];
+	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
+
+	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+	if (recv_result < 0) {
+		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
+		// Todo : server error
+		return -1;
+	}
+	cgi_output_ += std::string(recv_buffer);
+	if (recv_result == 0) {
+		std::cout << "  Connection closed" << std::endl;
+		waitpid(pid_, &status_, 0);
+		return 0;
+	}
+	return 0;
+}
+
+int Cgi::getSocketFd() const{
+	return socket_vector_[0];
+}
+
+std::string const& Cgi::getCgiOutput() const {
+	return cgi_output_;
+}
+
+std::ostream& operator<<(std::ostream& out, const Cgi& cgi) {
+
+	out << "Cgi: " << std::endl;
+	out << cgi.getCgiOutput() << std::endl;
+	return out;
+}
+
 } // namespace server

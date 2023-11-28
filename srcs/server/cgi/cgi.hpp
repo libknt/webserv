@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include "webserv.hpp"
 
 namespace server {
 
@@ -17,6 +19,7 @@ private:
 	int socket_vector_[2];
 	int pid_;
 	int status_;
+	std::string cgi_output_;
 	int setNonBlocking(int sd);
 	int setupCgiRequestContext();
 	int setupInterProcessCommunication();
@@ -30,7 +33,12 @@ public:
 	~Cgi();
 	int setup();
 	int executeCgi();
+	int readCgiOutput();
+	int getSocketFd() const;	
+	std::string const& getCgiOutput() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const Cgi& cgi);
 
 } // namespace server
 

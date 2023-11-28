@@ -161,6 +161,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					if (client_session.getCgi().setup() < 0) {
 						// todo
 					}
+					setWriteFd(client_session.getCgi().getSocketFd());
+
+					if (client_session.getCgi().executeCgi() < 0) {
+						// todo
+					}
+					client_session.setStatus(SENDING_CGI_RESPONSE);	
 				}
 				if (client_session.getStatus() == SENDING_RESPONSE) {
 					setWriteFd(sd);
@@ -178,6 +184,11 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				client_session.sessionCleanup();
 				FD_CLR(client_session.getSd(), &master_write_fds_);
 				std::cout << "  Connection Cleanup" << std::endl;
+			} else if (client_session.getStatus() == SENDING_CGI_RESPONSE) {
+				if (client_session.getCgi().readCgiOutput() < 0) {
+					// todo
+				}
+				std::cout << client_session.getCgi() << std::endl;
 			}
 			--ready_sds;
 		}
