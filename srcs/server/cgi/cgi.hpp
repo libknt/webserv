@@ -16,6 +16,7 @@ private:
 	int pid_;
 	int status_;
 	int setNonBlocking(int sd);
+	int setupCgiRequestContext();
 
 public:
 	Cgi(HttpRequest const& request,
