@@ -5,6 +5,7 @@
 #include "http_response.hpp"
 #include "server_directive.hpp"
 #include <arpa/inet.h>
+#include <cgi.hpp>
 #include <iostream>
 
 namespace server {
@@ -30,6 +31,7 @@ private:
 
 	ServerDirective const& server_directive_;
 	HttpRequest request_;
+	Cgi cgi_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
 
@@ -50,6 +52,7 @@ public:
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
 	HttpRequest& getRequest();
+	Cgi& getCgi();
 	HttpResponse& getResponse();
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;

@@ -11,6 +11,7 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
+	, cgi_(Cgi(request_, client_address, server_address))
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
 
@@ -24,6 +25,7 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
+	, cgi_(Cgi(request_, client_address, server_address))
 	, response_(HttpResponse())
 	, status_(status) {}
 
@@ -35,12 +37,14 @@ ClientSession::ClientSession(const ClientSession& other)
 	, server_address_(other.server_address_)
 	, server_directive_(other.server_directive_)
 	, request_(other.request_)
+	, cgi_(other.cgi_)
 	, response_(other.response_)
 	, status_(other.status_) {}
 
 ClientSession& ClientSession::operator=(const ClientSession& other) {
 	if (this != &other) {
 		request_ = other.request_;
+		cgi_ = other.cgi_;
 		response_ = other.response_;
 		status_ = other.status_;
 	}
@@ -53,6 +57,10 @@ int ClientSession::getSd() const {
 
 HttpRequest& ClientSession::getRequest() {
 	return request_;
+}
+
+Cgi& ClientSession::getCgi() {
+	return cgi_;
 }
 
 HttpResponse& ClientSession::getResponse() {

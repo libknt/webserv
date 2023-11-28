@@ -17,6 +17,7 @@ private:
 	int status_;
 	int setNonBlocking(int sd);
 	int setupCgiRequestContext();
+	int setupInterProcessCommunication();
 
 public:
 	Cgi(HttpRequest const& request,
@@ -25,7 +26,7 @@ public:
 	Cgi(const Cgi& other);
 	Cgi& operator=(const Cgi& other);
 	~Cgi();
-	int setupInterProcessCommunication();
+	int setup();
 };
 
 } // namespace server

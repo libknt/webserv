@@ -71,4 +71,14 @@ int Cgi::setupCgiRequestContext() {
 	return 0;
 }
 
+int Cgi::setup() {
+	if (setupInterProcessCommunication() == -1) {
+		return -1;
+	}
+	if (setupCgiRequestContext() == -1) {
+		return -1;
+	}
+	return 0;
+}
+
 } // namespace server

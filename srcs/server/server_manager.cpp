@@ -158,6 +158,9 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					client_session.setStatus(SENDING_RESPONSE);
 				} else if (client_session.getStatus() == CGI_PREPARING) {
 					// cgiの準備
+					if (client_session.getCgi().setup() < 0) {
+						// todo
+					}
 				}
 				if (client_session.getStatus() == SENDING_RESPONSE) {
 					setWriteFd(sd);
