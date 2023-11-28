@@ -14,6 +14,8 @@ private:
 	std::map<std::string, std::string> meta_variables_;
 	sockaddr_in const& client_address_;
 	sockaddr_in const& server_address_;
+	std::string execve_path_;
+	char** execve_argv_;
 	char** environ_;
 
 	typedef int (CgiRequestContext::*MetaVariableFunc)();
@@ -40,6 +42,9 @@ private:
 	int serverProtocol();
 	int serverSoftware();
 
+	int setupCgiMetaVariables();
+	int setupExecveArgv();
+
 public:
 	CgiRequestContext(HttpRequest const& request,
 		sockaddr_in const& client_address,
@@ -48,7 +53,6 @@ public:
 	CgiRequestContext& operator=(CgiRequestContext const& other);
 	~CgiRequestContext();
 	int setup();
-	int setupCgiMetaVariables();
 	int createEnviron();
 	char** getCgiEnviron() const;
 	std::string const getMetaVariable(std::string const& key) const;

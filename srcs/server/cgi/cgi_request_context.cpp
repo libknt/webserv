@@ -9,6 +9,8 @@ CgiRequestContext::CgiRequestContext(HttpRequest const& request,
 	, meta_variables_(std::map<std::string, std::string>())
 	, client_address_(client_address)
 	, server_address_(server_address)
+	, execve_path_("")
+	, execve_argv_(NULL)
 	, environ_(NULL) {}
 
 CgiRequestContext::CgiRequestContext(CgiRequestContext const& other)
@@ -16,11 +18,15 @@ CgiRequestContext::CgiRequestContext(CgiRequestContext const& other)
 	, meta_variables_(other.meta_variables_)
 	, client_address_(other.client_address_)
 	, server_address_(other.server_address_)
+	, execve_path_(other.execve_path_)
+	, execve_argv_(other.execve_argv_)
 	, environ_(other.environ_) {}
 
 CgiRequestContext& CgiRequestContext::operator=(CgiRequestContext const& other) {
 	if (this != &other) {
 		meta_variables_ = meta_variables_;
+		execve_path_ = other.execve_path_;
+		execve_argv_ = DeepCopyCharPointerArray(other.execve_argv_);
 		environ_ = DeepCopyCharPointerArray(other.environ_);
 	}
 	return *this;
@@ -59,6 +65,14 @@ char** DeepCopyCharPointerArray(char** source) {
 }
 
 CgiRequestContext::~CgiRequestContext() {
+
+	if (execve_argv_) {
+		for (size_t i = 0; execve_argv_[i]; ++i) {
+			delete[] execve_argv_[i];
+		}
+		delete[] execve_argv_;
+	}
+
 	if (environ_) {
 		for (size_t i = 0; environ_[i]; ++i) {
 			delete[] environ_[i];
@@ -272,9 +286,43 @@ int CgiRequestContext::setup() {
 	if (setupCgiMetaVariables() < 0) {
 		return -1;
 	}
+	if (setupExecveArgv() < 0) {
+		return -1;
+	}
 	if (createEnviron() < 0) {
 		return -1;
 	}
+	return 0;
+}
+
+int CgiRequestContext::setupExecveArgv() {
+	execve_path_ = "/usr/bin/python3";
+	execve_argv_ = new (std::nothrow) char*[3];
+	if (!execve_argv_) {
+		return -1;
+	}
+
+	std::string path = "/usr/bin/python3";
+
+	execve_argv_[0] = new (std::nothrow) char[path.size() + 1];
+	if (!execve_argv_[0]) {
+		delete[] execve_argv_;
+		return -1;
+	}
+	std::strcpy(execve_argv_[0], path.c_str());
+
+	std::string script = getMetaVariable("SCRIPT_NAME");
+	script = "/home/ubuntu2204/Documents/prg/42tokyo/webserv" + script;
+	execve_argv_[1] = new (std::nothrow) char[script.size() + 1];
+	if (!execve_argv_[1]) {
+		delete[] execve_argv_[0];
+		delete[] execve_argv_;
+		return -1;
+	}
+	std::strcpy(execve_argv_[1], script.c_str());
+
+	execve_argv_[2] = NULL;
+
 	return 0;
 }
 
