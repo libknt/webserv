@@ -3,14 +3,15 @@
 namespace server {
 
 namespace handle_request {
-void handleRequest(ClientSession &client_session) {
-	HttpRequest &request = client_session.getRequest();
-	HttpResponse &response = client_session.getResponse();
+void handleRequest(ClientSession& client_session) {
+	HttpRequest& request = client_session.getRequest();
+	HttpResponse& response = client_session.getResponse();
 
 	ServerDirective server_directive = client_session.getServerDirective();
 
 	if (server_directive.getPort() == client_session.getServerPort()) {
-		LocationDirective location_directive = server_directive.findLocation(request.getRequestPath());
+		LocationDirective location_directive =
+			server_directive.findLocation(request.getRequestPath());
 		std::string const method = request.getMethod();
 
 		if (method == "GET" && location_directive.isAllowMethod(method)) {

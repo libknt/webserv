@@ -47,8 +47,8 @@ public:
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
-	HttpRequest &getRequest() ;
-	HttpResponse &getResponse() ;
+	HttpRequest& getRequest();
+	HttpResponse& getResponse();
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
 	std::string getClientIpAddress() const;
