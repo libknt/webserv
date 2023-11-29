@@ -20,14 +20,14 @@ void HttpRequestParser::parse(HttpRequest& request, const char* buf) {
 	std::string::size_type index;
 
 	request.appendStreamLine(buffer);
-	if (!(request.getStatus() == http_request_status::BODY) ||
-		!(request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)) {
-		while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
-			std::string line = request.getStreamLine().substr(0, index);
-			request.eraseStreamLine(0, index + 2);
-			if (parseRequest(request, line) == -1) {
-				return;
-			}
+	while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
+		if (request.getStatus() == http_request_status::BODY &&
+			request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
+			break;
+		std::string line = request.getStreamLine().substr(0, index);
+		request.eraseStreamLine(0, index + 2);
+		if (parseRequest(request, line) == -1) {
+			return;
 		}
 	}
 

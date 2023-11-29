@@ -37,7 +37,7 @@ const std::string HttpResponse::concatenateComponents() {
 		response += it->first + ": " + it->second + "\r\n";
 	}
 	response += "\r\n";
-	response += body_ + "\r\n";
+	response += body_;
 	return response;
 }
 
@@ -72,6 +72,9 @@ void HttpResponse::setBody(const std::string& body) {
 	body_ = body;
 }
 
+void HttpResponse::appendBody(const std::string& body) {
+	body_ += body;
+}
 http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 	return status_code_;
 }
