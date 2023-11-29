@@ -11,7 +11,7 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
-	, cgi_(Cgi(request_, client_address, server_address))
+	, cgi_(NULL)
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
 
@@ -25,11 +25,15 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
-	, cgi_(Cgi(request_, client_address, server_address))
+	, cgi_(NULL)
 	, response_(HttpResponse())
 	, status_(status) {}
 
-ClientSession::~ClientSession() {}
+ClientSession::~ClientSession() {
+	if (cgi_ != NULL) {
+		delete cgi_;
+	}
+}
 
 ClientSession::ClientSession(const ClientSession& other)
 	: sd_(other.sd_)
@@ -60,7 +64,7 @@ HttpRequest& ClientSession::getRequest() {
 }
 
 Cgi& ClientSession::getCgi() {
-	return cgi_;
+	return *cgi_;
 }
 
 HttpResponse& ClientSession::getResponse() {

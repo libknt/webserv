@@ -31,7 +31,7 @@ private:
 
 	ServerDirective const& server_directive_;
 	HttpRequest request_;
-	Cgi cgi_;
+	Cgi* cgi_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
 
