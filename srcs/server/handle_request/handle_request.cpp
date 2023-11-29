@@ -38,7 +38,7 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 		stat(location_path.c_str(), &location_stat_info) != 0) {
 		return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
 	} else if (S_ISREG(request_stat_info.st_mode)) {
-		std::ifstream file_stream(file_path);
+		std::ifstream file_stream(file_path.c_str());
 		std::string body;
 		if (file_stream.is_open()) {
 			response.setStatusCode(http_status_code::OK);
@@ -53,9 +53,9 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	} else if (S_ISDIR(request_stat_info.st_mode)) {
 
 		if (location_stat_info.st_ino == request_stat_info.st_ino) {
-			std::ifstream default_file_stream(location_directive.getRoot() + "/" +
+			std::ifstream default_file_stream(std::string(location_directive.getRoot() + "/" +
 											  location_directive.getLocationPath() + "/" +
-											  location_directive.getIndex());
+											  location_directive.getIndex()).c_str());
 			std::string body;
 			if (default_file_stream.is_open()) {
 				response.setStatusCode(http_status_code::OK);
@@ -80,7 +80,7 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 	if (stat(file_path.c_str(), &file_info) != 0) {
 		return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
 	} else if (S_ISREG(file_info.st_mode)) {
-		std::ofstream file_stream(file_path);
+		std::ofstream file_stream(file_path.c_str());
 		if (!file_stream.is_open()) {
 			return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
 		}
@@ -90,7 +90,7 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 		return (response);
 	} else if (S_ISDIR(file_info.st_mode)) {
 		std::time_t time_val = std::time(NULL);
-		std::ofstream file_stream(file_path + Utils::toString(time_val));
+		std::ofstream file_stream(std::string(file_path + Utils::toString(time_val)).c_str());
 		if (!file_stream.is_open()) {
 			return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
 		}

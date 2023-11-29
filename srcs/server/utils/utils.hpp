@@ -20,9 +20,7 @@ public:
 	template<typename T>
 	static std::string toString(const T& value);
 };
-
 #include "utils.tpp"
-
 } // namespace server
 
 #endif // UTILS_HPP
