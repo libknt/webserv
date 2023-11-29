@@ -5,6 +5,7 @@
 #include "configuration.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+#include "utils.hpp"
 #include <ctime>
 #include <dirent.h>
 #include <iostream>

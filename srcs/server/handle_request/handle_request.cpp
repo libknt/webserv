@@ -43,7 +43,7 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 		if (file_stream.is_open()) {
 			response.setStatusCode(http_status_code::OK);
 			std::getline(file_stream, body, static_cast<char>(EOF));
-			response.setHeaderValue("Content-Length", std::to_string(body.size()));
+			response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 			response.setBody(body);
 			return (response);
 		} else {
@@ -60,7 +60,7 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 			if (default_file_stream.is_open()) {
 				response.setStatusCode(http_status_code::OK);
 				std::getline(default_file_stream, body, static_cast<char>(EOF));
-				response.setHeaderValue("Content-Length", std::to_string(body.size()));
+				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 				response.setBody(body);
 				return (response);
 			}
@@ -90,7 +90,7 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 		return (response);
 	} else if (S_ISDIR(file_info.st_mode)) {
 		std::time_t time_val = std::time(NULL);
-		std::ofstream file_stream(file_path + std::to_string(time_val));
+		std::ofstream file_stream(file_path + Utils::toString(time_val));
 		if (!file_stream.is_open()) {
 			return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
 		}
@@ -150,7 +150,7 @@ HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
-	response.setHeaderValue("Content-Length", std::to_string(body_content.size()));
+	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
 	response.setBody(body_content);
 	return response;
 }
@@ -183,7 +183,7 @@ HttpResponse makeAutoIndex(HttpRequest const& request,
 			   location_directive.getLocationPath() + "<h1>\n<hr>\n<pre>\n" + body;
 		body += ("</pre>\n</hr>\n</body>\n</html>\n");
 		response.setStatusCode(http_status_code::OK);
-		response.setHeaderValue("Content-Length", std::to_string(body.size()));
+		response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 		response.setBody(body);
 	}
 	closedir(dir);
