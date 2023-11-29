@@ -54,8 +54,9 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 
 		if (location_stat_info.st_ino == request_stat_info.st_ino) {
 			std::ifstream default_file_stream(std::string(location_directive.getRoot() + "/" +
-											  location_directive.getLocationPath() + "/" +
-											  location_directive.getIndex()).c_str());
+														  location_directive.getLocationPath() +
+														  "/" + location_directive.getIndex())
+												  .c_str());
 			std::string body;
 			if (default_file_stream.is_open()) {
 				response.setStatusCode(http_status_code::OK);
