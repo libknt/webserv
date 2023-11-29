@@ -69,9 +69,12 @@ void HttpResponse::setHeaderValue(const std::string& key, const std::string& val
 }
 
 void HttpResponse::setBody(const std::string& body) {
-	body_ += body;
+	body_ = body;
 }
 
+void HttpResponse::appendBody(const std::string& body) {
+	body_ += body;
+}
 http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 	return status_code_;
 }
