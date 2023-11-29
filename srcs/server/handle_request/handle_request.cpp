@@ -43,10 +43,10 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 
 HttpResponse executeDelete(const HttpRequest& request,
 	const LocationDirective& location_directive) {
-	HttpResponse response;
 	struct stat file_status;
+	std::string request_path = location_directive.getRoot() + request.getRequestPath();
 
-	if (stat(request.getRequestPath().c_str(), &file_status) == -1) {
+	if (stat(request_path.c_str(), &file_status) == -1) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
 		return createErrorResponse(http_status_code::NOT_FOUND, location_directive);
 	}
@@ -56,13 +56,13 @@ HttpResponse executeDelete(const HttpRequest& request,
 		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
 
-	if (remove(request.getRequestPath().c_str()) != 0) {
+	if (remove(request_path.c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
 		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
 
+	HttpResponse response;
 	response.setStatusCode(http_status_code::NO_CONTENT);
-
 	return response;
 }
 
