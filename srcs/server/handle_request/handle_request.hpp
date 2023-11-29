@@ -19,7 +19,6 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive);
 HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive);
 HttpResponse makeAutoIndex(HttpRequest const& request, const LocationDirective& location_directive);
-HttpResponse createErrorResponse(const STATUS_CODE status_code,
 HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive);
 };
