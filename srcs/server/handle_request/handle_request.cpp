@@ -3,12 +3,11 @@
 namespace server {
 
 namespace handle_request {
-void handleRequest(ClientSession const& client_session) {
-	HttpRequest request = client_session.getRequest();
-	HttpResponse response;
+void handleRequest(ClientSession &client_session) {
+	HttpRequest &request = client_session.getRequest();
+	HttpResponse &response = client_session.getResponse();
 
 	ServerDirective server_directive = client_session.getServerDirective();
-	std::cout << "directive: " << server_directive.getPort() << std::endl;
 
 	if (server_directive.getPort() == client_session.getServerPort()) {
 		LocationDirective location_directive = server_directive.findLocation(request.getRequestPath());
@@ -89,6 +88,7 @@ HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
+	response.setHeaderValue("Content-Length", std::to_string(body_content.size()));
 	response.setBody(body_content);
 	return response;
 }

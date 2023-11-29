@@ -12,7 +12,7 @@
 namespace server {
 
 namespace handle_request {
-void handleRequest(ClientSession const& client_session);
+void handleRequest(ClientSession &client_session);
 HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive);
 HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive);
 HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive);

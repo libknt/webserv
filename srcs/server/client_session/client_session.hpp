@@ -48,8 +48,8 @@ public:
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
 	ServerDirective const& getServerDirective() const;
-	HttpRequest getRequest() const;
-	HttpResponse getResponse() const;
+	HttpRequest &getRequest() ;
+	HttpResponse &getResponse() ;
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
 	std::string getClientIpAddress() const;

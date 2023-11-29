@@ -55,11 +55,11 @@ ServerDirective const& ClientSession::getServerDirective() const {
 	return server_directive_;
 }
 
-HttpRequest ClientSession::getRequest() const {
+HttpRequest &ClientSession::getRequest() {
 	return request_;
 }
 
-HttpResponse ClientSession::getResponse() const {
+HttpResponse &ClientSession::getResponse() {
 	return response_;
 }
 

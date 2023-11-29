@@ -295,9 +295,8 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 		return 0;
 	}
 
-	HttpRequest request = client_session.getRequest();
+	HttpRequest &request = client_session.getRequest();
 	HttpRequestParser::parse(request, recv_buffer);
-	client_session.setRequest(request);
 	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;
@@ -325,9 +324,9 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		closeClientSession(client_session);
 		return -1;
 	}
-	if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
+	//if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
 		client_session.setStatus(SESSION_COMPLETE);
-	}
+	//}
 	return 0;
 }
 
