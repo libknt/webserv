@@ -266,14 +266,14 @@ void ServerManager::registerClientSession(int sd,
 	if (active_client_sessions_.find(sd) != active_client_sessions_.end()) {
 		return;
 	}
-	std::string client_ip_address = inet_ntoa(client_address.sin_addr);
+	std::string server_ip_address = inet_ntoa(client_address.sin_addr);
 	std::ostringstream port_stream;
-	port_stream << ntohs(client_address.sin_port);
-	std::string client_port = port_stream.str();
+	port_stream << ntohs(server_address.sin_port);
+	std::string server_port = port_stream.str();
 
 	// server_directiveが取得できてないためセグフォが起きている
 	ServerDirective const& server_directive =
-		configuration_.getServerDirective(client_ip_address, client_port);
+		configuration_.getServerDirective(server_ip_address, server_port);
 	active_client_sessions_.insert(
 		std::make_pair(sd, ClientSession(sd, client_address, server_address, server_directive)));
 }
