@@ -47,7 +47,8 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 			response.setBody(body);
 			return (response);
 		} else {
-			return (createErrorResponse(http_status_code::INTERNAL_SERVER_ERROR, location_directive));
+			return (
+				createErrorResponse(http_status_code::INTERNAL_SERVER_ERROR, location_directive));
 		}
 	} else if (S_ISDIR(request_stat_info.st_mode)) {
 
