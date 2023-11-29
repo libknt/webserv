@@ -47,7 +47,6 @@ public:
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
-	ServerDirective const& getServerDirective() const;
 	HttpRequest &getRequest() ;
 	HttpResponse &getResponse() ;
 	sockaddr_in const& getClientAddress() const;

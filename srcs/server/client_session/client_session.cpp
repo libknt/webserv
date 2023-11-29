@@ -132,10 +132,6 @@ void ClientSession::setRequest(HttpRequest const& request) {
 	request_ = request;
 }
 
-ServerDirective const& ClientSession::getServerDirective() const {
-	return server_directive_;
-}
-
 void ClientSession::sessionCleanup() {
 	request_ = HttpRequest();
 	response_ = HttpResponse();
