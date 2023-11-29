@@ -17,7 +17,7 @@ private:
 	std::string root_;
 	std::string index_;
 	std::string autoindex_;
-	std::map<std::string, std::string> return_;
+	std::vector<std::string> return_;
 	std::string chunked_transfer_encoding_;
 	std::string cgi_;
 	std::vector<std::string> cgi_extensions_;
@@ -51,9 +51,11 @@ public:
 	std::string getRoot() const;
 	std::string getIndex() const;
 	std::string getAutoindex() const;
-	std::map<std::string, std::string> const& getReturn() const;
+	std::vector<std::string> const& getReturn() const;
 	std::string getChunkedTransferEncoding() const;
 	std::string getCgi() const;
+	bool isCgiExtension(const std::string& extension) const;
+	bool isCgiEnabled() const;
 	const std::vector<std::string>& getCgiExtensions() const;
 	bool isValidCgiExtensions(const std::string& extension) const;
 	bool isAllowMethod(const std::string& method);

@@ -36,8 +36,15 @@ public:
 	virtual ~TcpSocket();
 	int prepareSocketForListening();
 	int startListening();
+
+	std::string const& getIpAddress() const;
+	std::string const& getPort() const;
 	int getListenSd() const;
+	int getBacklog() const;
+	struct sockaddr_in const& getSocketAddress() const;
 };
+
+std::ostream& operator<<(std::ostream& out, const TcpSocket& tcp_socket);
 
 }
 
