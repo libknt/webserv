@@ -141,7 +141,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			} else {
 				int client_sd = sd;
 				if (cgi_socket_pairs_.find(sd) != cgi_socket_pairs_.end()) {
-					client_sd = cgi_socket_pairs_[sd];
+					client_sd = cgi_socket_pairs_.find(sd)->second;
 				}
 				ClientSession& client_session = getClientSession(client_sd);
 				if (client_session.getStatus() != CGI_RECEIVEING) {
@@ -170,12 +170,22 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						if (client_session.getCgi().executeCgi() < 0) {
 							// todo
 						}
+						if (client_session.getCgi().getHttpRequest().getHttpMethod() ==
+							http_method::POST) {
+							client_session.setStatus(CGI_BODY_SENDING);
+							int cgi_sd = client_session.getCgi().getSocketFd();
+							setWriteFd(cgi_sd);
+							cgi_socket_pairs_.insert(
+								std::make_pair(cgi_sd, client_session.getSd()));
 
-						client_session.setStatus(CGI_RECEIVEING);
-						// setReadFd(client_session.getCgi().getSocketFd());
-						int cgi_sd = client_session.getCgi().getSocketFd();
-						setReadFd(cgi_sd);
-						cgi_socket_pairs_.insert(std::make_pair(cgi_sd, client_session.getSd()));
+						} else {
+							client_session.setStatus(CGI_RECEIVEING);
+							// setReadFd(client_session.getCgi().getSocketFd());
+							int cgi_sd = client_session.getCgi().getSocketFd();
+							setReadFd(cgi_sd);
+							cgi_socket_pairs_.insert(
+								std::make_pair(cgi_sd, client_session.getSd()));
+						}
 					}
 					if (client_session.getStatus() == SENDING_RESPONSE) {
 						setWriteFd(sd);
@@ -189,7 +199,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						// todo
 						cgi_socket_pairs_.erase(sd);
 						int client_sd = client_session.getCgi().getSocketFd();
-						// FD_CLR(sd, &master_read_fds_)
 						clearFds(client_sd);
 
 						close(client_session.getCgi().getSocketFd());
@@ -201,7 +210,27 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
-			ClientSession& client_session = getClientSession(sd);
+			int client_sd = sd;
+			if (cgi_socket_pairs_.find(sd) != cgi_socket_pairs_.end()) {
+				client_sd = cgi_socket_pairs_.find(sd)->second;
+			}
+			ClientSession& client_session = getClientSession(client_sd);
+			if (client_session.getStatus() == CGI_BODY_SENDING) {
+				std::string body = client_session.getRequest().getBody();
+				int send_result = send(sd, body.c_str(), body.length(), 0);
+				if (send_result < 0) {
+					std::cerr << "send() failed: " << strerror(errno) << std::endl;
+					return -1;
+				}
+				if (send_result == 0) {
+					std::cout << "  Connection closed" << std::endl;
+					return -1;
+				}
+				int client_sd = client_session.getCgi().getSocketFd();
+				clearFds(client_sd);
+				setReadFd(client_sd);
+				client_session.setStatus(CGI_RECEIVEING);
+			}
 			if (client_session.getStatus() == SENDING_RESPONSE ||
 				client_session.getStatus() == SENDING_CGI_RESPONSE) {
 				sendResponse(client_session);

@@ -16,6 +16,7 @@ namespace server {
 namespace cgi_status {
 
 enum CGI_STATUS {
+	BODY_SENDING,
 	CGI_RECEVICEING_COMPLETE,
 	CGI_SENDING_COMPLETE,
 	ERROR_OCCURRED,

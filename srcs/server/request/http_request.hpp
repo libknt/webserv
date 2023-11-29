@@ -105,6 +105,7 @@ public:
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
 	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;
 	std::string const getMethod() const;
+	http_method::HTTP_METHOD getHttpMethod() const;
 	std::string const getVersion() const;
 	std::string const& getRequestPath() const;
 	std::string const getHeaderValue(std::string const& key) const;

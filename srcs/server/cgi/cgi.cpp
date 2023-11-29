@@ -86,6 +86,8 @@ int Cgi::setup() {
 int Cgi::executeCgi() {
 	char** environ = cgi_request_context_.getCgiEnviron();
 	char** argv = cgi_request_context_.getExecveArgv();
+	http_method::HTTP_METHOD method = cgi_request_context_.getHttpRequest().getHttpMethod();
+
 	pid_ = fork();
 	if (pid_ == -1) {
 		std::cerr << "fork() failed: " << strerror(errno) << std::endl;
@@ -96,10 +98,17 @@ int Cgi::executeCgi() {
 		if (dup2(socket_vector_[1], STDOUT_FILENO) < 0) {
 			std::exit(EXIT_FAILURE);
 		}
+		if (method == http_method::POST) {
+			if (dup2(socket_vector_[1], STDERR_FILENO) < 0) {
+				std::exit(EXIT_FAILURE);
+			}
+		}
 		execve(argv[0], argv, environ);
 		std::exit(EXIT_FAILURE);
 	}
-	close(socket_vector_[1]);
+	if (method == http_method::GET) {
+		close(socket_vector_[1]);
+	}
 	return 0;
 }
 
