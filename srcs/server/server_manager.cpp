@@ -140,41 +140,56 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				}
 			} else {
 				ClientSession& client_session = getClientSession(sd);
-				if (receiveAndParseHttpRequest(client_session) < 0) {
-					is_running = false;
-					return -1;
-				}
-				if (client_session.getStatus() == CLOSED) {
-					unregisterClientSession(client_session);
-					--ready_sds;
-					continue;
-				}
-				if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
-					setClientResponseStage(client_session);
-				}
-				if (client_session.getStatus() == RESPONSE_PREPARING) {
-					// レスポンスの準備
-					client_session.getResponse().createResponse();
-					client_session.setStatus(SENDING_RESPONSE);
-				} else if (client_session.getStatus() == CGI_PREPARING) {
-					// cgiの準備
-					if (client_session.getCgi().setup() < 0) {
-						// todo
+				if (client_session.getStatus() != SENDING_CGI_RESPONSE) {
+					if (receiveAndParseHttpRequest(client_session) < 0) {
+						is_running = false;
+						return -1;
 					}
-					setWriteFd(client_session.getCgi().getSocketFd());
+					if (client_session.getStatus() == CLOSED) {
+						unregisterClientSession(client_session);
+						--ready_sds;
+						continue;
+					}
+					if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
+						setClientResponseStage(client_session);
+					}
+					if (client_session.getStatus() == RESPONSE_PREPARING) {
+						// レスポンスの準備
+						client_session.getResponse().createResponse();
+						client_session.setStatus(SENDING_RESPONSE);
+					} else if (client_session.getStatus() == CGI_PREPARING) {
+						// cgiの準備
+						if (client_session.getCgi().setup() < 0) {
+							// todo
+						}
 
-					if (client_session.getCgi().executeCgi() < 0) {
+						if (client_session.getCgi().executeCgi() < 0) {
+							// todo
+						}
+
+						client_session.setStatus(SENDING_CGI_RESPONSE);
+						// setReadFd(client_session.getCgi().getSocketFd());
+						int sd = client_session.getCgi().getSocketFd();
+						std::cout << "setReadFd: " << sd << std::endl;
+						setReadFd(sd);
+					}
+					if (client_session.getStatus() == SENDING_RESPONSE) {
+						setWriteFd(sd);
+					}
+				} else {
+					std::cout << "  SENDING_CGI_RESPONSE" << std::endl;
+					if (client_session.getCgi().readCgiOutput() < 0) {
 						// todo
 					}
-					client_session.setStatus(SENDING_CGI_RESPONSE);
-				}
-				if (client_session.getStatus() == SENDING_RESPONSE) {
-					setWriteFd(sd);
+					int sd = client_session.getCgi().getSocketFd();
+					FD_CLR(sd, &master_read_fds_);
+					// std::cout << client_session.getCgi() << std::endl;
 				}
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
 			ClientSession& client_session = getClientSession(sd);
+			std::cout << "client_session: " << client_session << std::endl;
 			sendResponse(client_session);
 			if (client_session.getStatus() == CLOSED) {
 				unregisterClientSession(client_session);
@@ -184,11 +199,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				client_session.sessionCleanup();
 				FD_CLR(client_session.getSd(), &master_write_fds_);
 				std::cout << "  Connection Cleanup" << std::endl;
-			} else if (client_session.getStatus() == SENDING_CGI_RESPONSE) {
-				if (client_session.getCgi().readCgiOutput() < 0) {
-					// todo
-				}
-				std::cout << client_session.getCgi() << std::endl;
 			}
 			--ready_sds;
 		}
@@ -328,6 +338,15 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 
 int ServerManager::setWriteFd(int sd) {
 	FD_SET(sd, &master_write_fds_);
+	if (sd > highest_sd_)
+		highest_sd_ = sd;
+	return 0;
+}
+
+int ServerManager::setReadFd(int sd) {
+	FD_SET(sd, &master_read_fds_);
+	if (sd > highest_sd_)
+		highest_sd_ = sd;
 	return 0;
 }
 

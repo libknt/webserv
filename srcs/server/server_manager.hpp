@@ -39,6 +39,7 @@ private:
 	int receiveAndParseHttpRequest(ClientSession& client_session);
 	void setClientResponseStage(ClientSession& session);
 	int setWriteFd(int sd);
+	int setReadFd(int sd);
 	int sendResponse(ClientSession& client_session);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);

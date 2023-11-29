@@ -239,10 +239,10 @@ int CgiRequestContext::scriptName() {
 	if (!path_info.empty()) {
 		uri.erase(path_info.size());
 	}
-	std::string::size_type position = uri.rfind("/");
-	if (position != std::string::npos) {
-		script_name.erase(position);
-	}
+	// std::string::size_type position = uri.rfind("/");
+	// if (position != std::string::npos) {
+	// 	script_name.erase(0, position);
+	// }
 	setMetaVariables("SCRIPT_NAME", script_name);
 	return 0;
 }
