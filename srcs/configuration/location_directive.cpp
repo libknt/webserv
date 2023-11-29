@@ -301,6 +301,19 @@ std::string LocationDirective::getCgi() const {
 	return cgi_;
 }
 
+bool LocationDirective::isCgiEnabled() const {
+	return cgi_ == "on";
+}
+
+bool LocationDirective::isCgiExtension(const std::string& extension) const {
+	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
+		if (cgi_extensions_[i] == extension) {
+			return true;
+		}
+	}
+	return false;
+}
+
 const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
 }

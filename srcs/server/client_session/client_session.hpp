@@ -57,6 +57,7 @@ public:
 	std::string getServerIpAddress() const;
 	std::string getClientPort() const;
 	std::string getServerPort() const;
+	ServerDirective const& getServerDirective() const;
 	void setStatus(CLIENT_SESSION_STATUS const& status);
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
