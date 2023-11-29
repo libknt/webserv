@@ -59,8 +59,16 @@ int ClientSession::getSd() const {
 	return sd_;
 }
 
+HttpRequest const& ClientSession::getRequest() const {
+	return request_;
+}
+
 HttpRequest& ClientSession::getRequest() {
 	return request_;
+}
+
+Cgi const& ClientSession::getCgi() const {
+	return *cgi_;
 }
 
 Cgi& ClientSession::getCgi() {
@@ -145,6 +153,10 @@ void ClientSession::sessionCleanup() {
 	response_ = HttpResponse();
 }
 
+void ClientSession::setCgi(Cgi* cgi) {
+	cgi_ = cgi;
+}
+
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session) {
 	out << "ClientSession: " << std::endl;
 	out << "  sd: " << client_session.getSd() << std::endl;
@@ -153,10 +165,12 @@ std::ostream& operator<<(std::ostream& out, const ClientSession& client_session)
 	out << "  server_address: " << client_session.getServerIpAddress() << ":"
 		<< client_session.getServerPort() << std::endl;
 	out << "  status: " << client_session.getStatus() << std::endl;
-	// out << "  request: " << std::endl;
-	// out << client_session.getRequest() << std::endl;
-	// out << "  response: " << std::endl;
-	// out << client_session.getResponse();
+	std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	out << "  request: " << std::endl;
+	out << &client_session.getRequest() << std::endl;
+	out << "  cgi: request: " << std::endl;
+	out << &client_session.getCgi().getHttpRequest() << std::endl;
+	std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	return out;
 }
 

@@ -389,6 +389,10 @@ char** CgiRequestContext::getCgiEnviron() const {
 	return environ_;
 }
 
+HttpRequest const& CgiRequestContext::getHttpRequest() const {
+	return request_;
+}
+
 std::string const CgiRequestContext::getMetaVariable(std::string const& key) const {
 	std::map<std::string, std::string>::const_iterator it = meta_variables_.find(key);
 	if (it != meta_variables_.end()) {

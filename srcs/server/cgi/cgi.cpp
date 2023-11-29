@@ -126,6 +126,10 @@ int Cgi::getSocketFd() const {
 	return socket_vector_[0];
 }
 
+HttpRequest const& Cgi::getHttpRequest() const {
+	return cgi_request_context_.getHttpRequest();
+}
+
 std::string const& Cgi::getCgiOutput() const {
 	return cgi_output_;
 }

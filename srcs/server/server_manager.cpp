@@ -161,12 +161,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					if (client_session.getCgi().setup() < 0) {
 						// todo
 					}
-					// setWriteFd(client_session.getCgi().getSocketFd());
+					setWriteFd(client_session.getCgi().getSocketFd());
 
-					// if (client_session.getCgi().executeCgi() < 0) {
-					// 	// todo
-					// }
-					// client_session.setStatus(SENDING_CGI_RESPONSE);
+					if (client_session.getCgi().executeCgi() < 0) {
+						// todo
+					}
+					client_session.setStatus(SENDING_CGI_RESPONSE);
 				}
 				if (client_session.getStatus() == SENDING_RESPONSE) {
 					setWriteFd(sd);
@@ -206,6 +206,9 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
+		Cgi* cgi =
+			new Cgi(session.getRequest(), session.getClientAddress(), session.getServerAddress());
+		session.setCgi(cgi);
 		session.setStatus(CGI_PREPARING);
 	} else {
 		session.setStatus(RESPONSE_PREPARING);
@@ -295,9 +298,8 @@ void ServerManager::registerClientSession(int sd,
 	std::string client_port = port_stream.str();
 	ServerDirective const& server_directive =
 		configuration_.getServerDirective(server_ip_address, client_port);
-	ClientSession* client_session =
-		new ClientSession(sd, client_address, server_address, server_directive);
-	active_client_sessions_.insert(std::make_pair(sd, *client_session));
+	active_client_sessions_.insert(
+		std::make_pair(sd, ClientSession(sd, client_address, server_address, server_directive)));
 }
 
 int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {

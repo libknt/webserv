@@ -55,6 +55,7 @@ public:
 	int createEnviron();
 	char** getExecveArgv() const;
 	char** getCgiEnviron() const;
+	HttpRequest const& getHttpRequest() const;
 	std::string const getMetaVariable(std::string const& key) const;
 };
 

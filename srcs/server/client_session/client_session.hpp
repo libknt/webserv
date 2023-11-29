@@ -51,7 +51,9 @@ public:
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
+	HttpRequest const& getRequest() const;
 	HttpRequest& getRequest();
+	Cgi const& getCgi() const;
 	Cgi& getCgi();
 	HttpResponse& getResponse();
 	sockaddr_in const& getClientAddress() const;
@@ -65,6 +67,7 @@ public:
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
+	void setCgi(Cgi* cgi);
 };
 
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session);

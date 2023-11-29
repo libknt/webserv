@@ -35,6 +35,7 @@ public:
 	int executeCgi();
 	int readCgiOutput();
 	int getSocketFd() const;
+	HttpRequest const& getHttpRequest() const;
 	std::string const& getCgiOutput() const;
 };
 
