@@ -54,6 +54,8 @@ public:
 	std::vector<std::string> const& getReturn() const;
 	std::string getChunkedTransferEncoding() const;
 	std::string getCgi() const;
+	bool isCgiExtension(const std::string& extension) const;
+	bool isCgiEnabled() const;
 	const std::vector<std::string>& getCgiExtensions() const;
 	bool isValidCgiExtensions(const std::string& extension) const;
 	bool isAllowMethod(const std::string& method);

@@ -6,9 +6,11 @@
 #include "handle_request.hpp"
 #include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
+#include "utils.hpp"
 #include "webserv.hpp"
 #include <iostream>
 #include <map>
+#include <sys/stat.h>
 #include <vector>
 
 namespace server {
@@ -36,7 +38,7 @@ private:
 	int acceptIncomingConnection(int listen_sd);
 	int setNonBlocking(int sd);
 	int receiveAndParseHttpRequest(ClientSession& client_session);
-	void determineResponseType(ClientSession& client_session);
+	void setClientResponseStage(ClientSession& session);
 	int setWriteFd(int sd);
 	int sendResponse(ClientSession& client_session);
 

@@ -145,7 +145,7 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 			std::cerr << "Parse Error: parseErrorPageDirective1" << std::endl;
 			return -1;
 		}
-		error_pages_[tokens[i]] = tokens[tokens.size() - 1];
+		error_pages_.insert(std::make_pair(tokens[i], tokens[tokens.size() - 1]));
 	}
 	return 0;
 }
@@ -314,6 +314,19 @@ std::string LocationDirective::getChunkedTransferEncoding() const {
 
 std::string LocationDirective::getCgi() const {
 	return cgi_;
+}
+
+bool LocationDirective::isCgiEnabled() const {
+	return cgi_ == "on";
+}
+
+bool LocationDirective::isCgiExtension(const std::string& extension) const {
+	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
+		if (cgi_extensions_[i] == extension) {
+			return true;
+		}
+	}
+	return false;
 }
 
 const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
