@@ -13,8 +13,20 @@
 
 namespace server {
 
+namespace cgi_status {
+
+enum CGI_STATUS {
+	CGI_RECEVICEING_COMPLETE,
+	CGI_SENDING_COMPLETE,
+	ERROR_OCCURRED,
+	UNDIFINED,
+};
+
+} // namespace cgi_status
+
 class Cgi {
 private:
+	cgi_status::CGI_STATUS cgi_status_;
 	CgiRequestContext cgi_request_context_;
 	int socket_vector_[2];
 	int pid_;
@@ -37,6 +49,9 @@ public:
 	int getSocketFd() const;
 	HttpRequest const& getHttpRequest() const;
 	std::string const& getCgiOutput() const;
+	void setStatus(cgi_status::CGI_STATUS const status);
+	cgi_status::CGI_STATUS getStatus() const;
+	std::string const sendResponse();
 };
 
 std::ostream& operator<<(std::ostream& out, const Cgi& cgi);

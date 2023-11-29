@@ -139,8 +139,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					return -1;
 				}
 			} else {
-				ClientSession& client_session = getClientSession(sd);
-				if (client_session.getStatus() != SENDING_CGI_RESPONSE) {
+				int client_sd = sd;
+				if (cgi_socket_pairs_.find(sd) != cgi_socket_pairs_.end()) {
+					client_sd = cgi_socket_pairs_[sd];
+				}
+				ClientSession& client_session = getClientSession(client_sd);
+				if (client_session.getStatus() != CGI_RECEIVEING) {
 					if (receiveAndParseHttpRequest(client_session) < 0) {
 						is_running = false;
 						return -1;
@@ -167,38 +171,49 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 							// todo
 						}
 
-						client_session.setStatus(SENDING_CGI_RESPONSE);
+						client_session.setStatus(CGI_RECEIVEING);
 						// setReadFd(client_session.getCgi().getSocketFd());
-						int sd = client_session.getCgi().getSocketFd();
-						std::cout << "setReadFd: " << sd << std::endl;
-						setReadFd(sd);
+						int cgi_sd = client_session.getCgi().getSocketFd();
+						setReadFd(cgi_sd);
+						cgi_socket_pairs_.insert(std::make_pair(cgi_sd, client_session.getSd()));
 					}
 					if (client_session.getStatus() == SENDING_RESPONSE) {
 						setWriteFd(sd);
 					}
 				} else {
-					std::cout << "  SENDING_CGI_RESPONSE" << std::endl;
 					if (client_session.getCgi().readCgiOutput() < 0) {
 						// todo
 					}
-					int sd = client_session.getCgi().getSocketFd();
-					FD_CLR(sd, &master_read_fds_);
+					if (client_session.getCgi().getStatus() ==
+						cgi_status::CGI_RECEVICEING_COMPLETE) {
+						// todo
+						cgi_socket_pairs_.erase(sd);
+						int client_sd = client_session.getCgi().getSocketFd();
+						// FD_CLR(sd, &master_read_fds_)
+						clearFds(client_sd);
+
+						close(client_session.getCgi().getSocketFd());
+						setWriteFd(client_session.getSd());
+						client_session.setStatus(SENDING_CGI_RESPONSE);
+					}
 					// std::cout << client_session.getCgi() << std::endl;
 				}
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
 			ClientSession& client_session = getClientSession(sd);
-			std::cout << "client_session: " << client_session << std::endl;
-			sendResponse(client_session);
+			if (client_session.getStatus() == SENDING_RESPONSE ||
+				client_session.getStatus() == SENDING_CGI_RESPONSE) {
+				sendResponse(client_session);
+			}
 			if (client_session.getStatus() == CLOSED) {
 				unregisterClientSession(client_session);
 				--ready_sds;
 				continue;
 			} else if (client_session.getStatus() == SESSION_COMPLETE) {
+				clearFds(client_session.getSd());
 				client_session.sessionCleanup();
-				FD_CLR(client_session.getSd(), &master_write_fds_);
-				std::cout << "  Connection Cleanup" << std::endl;
+				// FD_CLR(client_session.getSd(), &master_write_fds_);
 			}
 			--ready_sds;
 		}
@@ -324,7 +339,6 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 		return -1;
 	}
 	if (recv_result == 0) {
-		std::cout << "  Connection closed" << std::endl;
 		closeClientSession(client_session);
 		return 0;
 	}
@@ -354,8 +368,13 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	std::string buffer = client_session.getResponse().sendResponse();
-	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
+	if (client_session.getStatus() == SENDING_CGI_RESPONSE) {
+		std::string buffer = client_session.getCgi().sendResponse();
+		std::memcpy(send_buffer, buffer.c_str(), buffer.length());
+	} else {
+		std::string buffer = client_session.getResponse().sendResponse();
+		std::memcpy(send_buffer, buffer.c_str(), buffer.length());
+	}
 	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
@@ -367,28 +386,42 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		closeClientSession(client_session);
 		return -1;
 	}
-	if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
-		client_session.setStatus(SESSION_COMPLETE);
+	if (client_session.getStatus() == SENDING_CGI_RESPONSE) {
+		if (client_session.getCgi().getStatus() == cgi_status::CGI_SENDING_COMPLETE) {
+			client_session.setStatus(SESSION_COMPLETE);
+			std::cout << "\033[31m"
+					  << "  CGI SENDING: complete"
+					  << "\033[0m" << std::endl;
+		}
+	} else if (client_session.getStatus() == SENDING_RESPONSE) {
+		if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
+			client_session.setStatus(SESSION_COMPLETE);
+		}
+		std::cout << "\033[31m"
+				  << "  SENDING: complete"
+				  << "\033[0m" << std::endl;
 	}
 	return 0;
 }
 
 void ServerManager::closeClientSession(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
-	FD_CLR(client_sd, &master_read_fds_);
-	FD_CLR(client_sd, &master_write_fds_);
-	if (client_sd == highest_sd_) {
-		while (!FD_ISSET(highest_sd_, &master_read_fds_))
-			--highest_sd_;
-	}
+	// FD_CLR(client_sd, &master_read_fds_);
+	// FD_CLR(client_sd, &master_write_fds_);
+	clearFds(client_sd);
+	// if (client_sd == highest_sd_) {
+	// 	while (!FD_ISSET(highest_sd_, &master_read_fds_))
+	// 		--highest_sd_;
+	// }
 	close(client_sd);
 	client_session.setStatus(CLOSED);
+	std::cout << "  						Connection closed - " << client_sd << std::endl;
 }
 
 int ServerManager::unregisterClientSession(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
-	active_client_sessions_.erase(client_sd);
 	std::cout << "  Connection closed - " << client_sd << std::endl;
+	active_client_sessions_.erase(client_sd);
 	return 0;
 }
 
@@ -438,6 +471,21 @@ int ServerManager::getHighestSd() const {
 
 bool ServerManager::getIsRunning() const {
 	return is_running;
+}
+
+void ServerManager::clearFds(int sd) {
+	if (FD_ISSET(sd, &master_read_fds_)) {
+		FD_CLR(sd, &master_read_fds_);
+	}
+	if (FD_ISSET(sd, &master_write_fds_)) {
+		FD_CLR(sd, &master_write_fds_);
+	}
+	if (highest_sd_ == sd) {
+		while (!FD_ISSET(highest_sd_, &master_read_fds_) &&
+			   !FD_ISSET(highest_sd_, &master_write_fds_)) {
+			--highest_sd_;
+		}
+	}
 }
 
 struct timeval const& ServerManager::getTimeout() const {

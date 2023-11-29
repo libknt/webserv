@@ -20,6 +20,7 @@ private:
 	const Configuration& configuration_;
 	std::vector<server::TcpSocket> sockets_;
 	std::map<int, ClientSession> active_client_sessions_;
+	std::map<int, int> cgi_socket_pairs_;
 	fd_set master_read_fds_;
 	fd_set master_write_fds_;
 	fd_set read_fds_;
@@ -61,6 +62,7 @@ public:
 	fd_set const& getMasterWriteFds() const;
 	fd_set const& getReadFds() const;
 	fd_set const& getWriteFds() const;
+	void clearFds(int sd);
 	int getHighestSd() const;
 	bool getIsRunning() const;
 	struct timeval const& getTimeout() const;

@@ -5,7 +5,8 @@ namespace server {
 Cgi::Cgi(HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
-	: cgi_request_context_(CgiRequestContext(request, client_address, server_address))
+	: cgi_status_(cgi_status::UNDIFINED)
+	, cgi_request_context_(CgiRequestContext(request, client_address, server_address))
 	, pid_(-1)
 	, status_(-1) {
 	socket_vector_[0] = -1;
@@ -13,7 +14,8 @@ Cgi::Cgi(HttpRequest const& request,
 }
 
 Cgi::Cgi(const Cgi& other)
-	: cgi_request_context_(other.cgi_request_context_)
+	: cgi_status_(other.cgi_status_)
+	, cgi_request_context_(other.cgi_request_context_)
 	, pid_(other.pid_)
 	, status_(other.status_) {
 	socket_vector_[0] = other.socket_vector_[0];
@@ -103,15 +105,18 @@ int Cgi::executeCgi() {
 
 int Cgi::readCgiOutput() {
 	int sd = socket_vector_[0];
-	std::cout << "readCgiOutput() sd: " << sd << std::endl;
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	std::cout << "  Reading CGI output" << std::endl;
 	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
 	if (recv_result > 0) {
-		std::cout << "  Received " << recv_result << " bytes" << std::endl;
-		cgi_output_ += std::string(recv_buffer);
+		std::string recv_string(recv_buffer);
+		for (int i = 0; i < recv_result; i++) {
+			if (recv_string[i] == '\n' && recv_string[i - 1] != '\r') {
+				recv_string.insert(i - 1, "\r");
+			}
+		}
+		cgi_output_ += recv_string;
 	} else if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		// Todo : server error
@@ -121,12 +126,12 @@ int Cgi::readCgiOutput() {
 		waitpid(pid_, &status_, 0);
 		if (WIFEXITED(status_)) {
 			std::cout << "CGI process exited with status " << WEXITSTATUS(status_) << std::endl;
+			setStatus(cgi_status::CGI_RECEVICEING_COMPLETE);
 		} else if (WIFSIGNALED(status_)) {
 			std::cout << "CGI process killed by signal " << WTERMSIG(status_) << std::endl;
 		}
 		return 0;
 	}
-	std::cout << "  Received " << cgi_output_ << " bytes" << std::endl;
 	return 0;
 }
 
@@ -140,6 +145,23 @@ HttpRequest const& Cgi::getHttpRequest() const {
 
 std::string const& Cgi::getCgiOutput() const {
 	return cgi_output_;
+}
+
+void Cgi::setStatus(cgi_status::CGI_STATUS const status) {
+	cgi_status_ = status;
+}
+
+cgi_status::CGI_STATUS Cgi::getStatus() const {
+	return cgi_status_;
+}
+
+std::string const Cgi::sendResponse() {
+	std::string tmp = cgi_output_.substr(0, BUFFER_SIZE - 1);
+	cgi_output_ = cgi_output_.erase(0, BUFFER_SIZE - 1);
+	if (cgi_output_.empty()) {
+		setStatus(cgi_status::CGI_SENDING_COMPLETE);
+	}
+	return tmp;
 }
 
 std::ostream& operator<<(std::ostream& out, const Cgi& cgi) {

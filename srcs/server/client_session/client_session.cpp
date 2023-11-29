@@ -30,6 +30,7 @@ ClientSession::ClientSession(int const sd,
 	, status_(status) {}
 
 ClientSession::~ClientSession() {
+	std::cout << "ClientSession destructor called" << std::endl;
 	if (cgi_ != NULL) {
 		delete cgi_;
 	}
@@ -151,6 +152,11 @@ ServerDirective const& ClientSession::getServerDirective() const {
 void ClientSession::sessionCleanup() {
 	request_ = HttpRequest();
 	response_ = HttpResponse();
+	if (cgi_ != NULL) {
+		delete cgi_;
+		cgi_ = NULL;
+	}
+	std::cout << "  						Connection Cleanup" << std::endl;
 }
 
 void ClientSession::setCgi(Cgi* cgi) {
