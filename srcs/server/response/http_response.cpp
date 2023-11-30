@@ -79,8 +79,11 @@ http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 	return status_code_;
 }
 
-const std::string HttpResponse::getHeaderValue(const std::string& key) {
-	return header_[key];
+const std::string HttpResponse::getHeaderValue(const std::string& key) const {
+	std::map<std::string, std::string>::const_iterator it = header_.find(key);
+	if (it == header_.end())
+		return (std::string(""));
+	return it->second;
 }
 
 const std::map<std::string, std::string>& HttpResponse::getHeader() const {

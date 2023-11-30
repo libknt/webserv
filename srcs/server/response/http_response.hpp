@@ -51,7 +51,7 @@ public:
 	void setBody(const std::string& body);
 	void appendBody(const std::string& body);
 	http_status_code::STATUS_CODE getStatusCode() const;
-	const std::string getHeaderValue(const std::string& key);
+	const std::string getHeaderValue(const std::string& key) const;
 	const std::map<std::string, std::string>& getHeader() const;
 	const std::string& getBody() const;
 	http_response_status::HTTP_RESPONSE_STATUS const& getStatus() const;
