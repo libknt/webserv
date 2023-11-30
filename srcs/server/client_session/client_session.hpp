@@ -27,13 +27,11 @@ private:
 	const int sd_;
 	const sockaddr_in client_address_;
 	const sockaddr_in server_address_;
-
 	ServerDirective const& server_directive_;
+
 	HttpRequest request_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
-
-	ClientSession();
 
 public:
 	explicit ClientSession(int const sd,

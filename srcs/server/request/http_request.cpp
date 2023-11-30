@@ -5,7 +5,6 @@ namespace server {
 
 HttpRequest::HttpRequest()
 	: status_(http_request_status::METHOD)
-	, error_status_(http_error_status::UNDEFINED)
 	, method_(http_method::UNDEFINED)
 	, version_(http_version::UNDEFINED)
 	, body_message_type_(http_body_message_type::UNDEFINED)
@@ -17,7 +16,6 @@ HttpRequest::~HttpRequest(){};
 
 HttpRequest::HttpRequest(HttpRequest const& other)
 	: status_(other.status_)
-	, error_status_(other.error_status_)
 	, method_(other.method_)
 	, request_path_(other.request_path_)
 	, version_(other.version_)
@@ -31,7 +29,6 @@ HttpRequest::HttpRequest(HttpRequest const& other)
 HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 	if (this != &other) {
 		status_ = other.status_;
-		error_status_ = other.error_status_;
 		method_ = other.method_;
 		request_path_ = other.request_path_;
 		version_ = other.version_;

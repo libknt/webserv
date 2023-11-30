@@ -3,6 +3,7 @@
 
 #include "client_session.hpp"
 #include "configuration.hpp"
+#include "handle_request.hpp"
 #include "http_request_parser.hpp"
 #include "tcp_socket.hpp"
 #include "utils.hpp"
