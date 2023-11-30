@@ -8,8 +8,7 @@ void handleRequest(ClientSession& client_session) {
 	HttpResponse& response = client_session.getResponse();
 
 	ServerDirective server_directive = client_session.getServerDirective();
-	LocationDirective location_directive =
-		server_directive.findLocation(request.getRequestPath());
+	LocationDirective location_directive = server_directive.findLocation(request.getRequestPath());
 	std::string const method = request.getMethod();
 
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
@@ -19,8 +18,7 @@ void handleRequest(ClientSession& client_session) {
 	} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
 		response = executeDelete(request, location_directive);
 	} else {
-		response =
-			createErrorResponse(http_status_code::METHOD_NOT_ALLOWED, location_directive);
+		response = createErrorResponse(http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
 }
 
