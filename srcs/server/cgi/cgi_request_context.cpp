@@ -22,8 +22,7 @@ CgiRequestContext::CgiRequestContext(CgiRequestContext const& other)
 
 CgiRequestContext& CgiRequestContext::operator=(CgiRequestContext const& other) {
 	if (this != &other) {
-		meta_variables_ = meta_variables_;
-		execve_argv_ = DeepCopyCharPointerArray(other.execve_argv_);
+		meta_variables_ = other.meta_variables_;
 		environ_ = DeepCopyCharPointerArray(other.environ_);
 	}
 	return *this;

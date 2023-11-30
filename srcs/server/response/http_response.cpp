@@ -21,63 +21,88 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 		status_code_ = other.status_code_;
 		header_ = other.header_;
 		body_ = other.body_;
-		status_ = other.status_;
 	}
-	return (*this);
+	return *this;
 }
 
-void HttpResponse::createResponse() {
-	std::string buffer =
-		"HTTP/1.1 200 OK\r\n"
-		"Date: Wed, 09 Nov 2023 12:00:00 GMT\r\n"
-		"Server: MyServer\r\n"
-		"Content-Type: text/html; charset=UTF-8\r\n"
-		"Content-Length: 1054\r\n"
-		"\r\n"
-		"<html>\r\n"
-		"<head>\r\n"
-		"<title>Simple Page</title>\r\n"
-		"</head>\r\n"
-		"<body>\r\n"
-		"<h1>Hello, World!</h1>   \r\n"
-		"<p>Welcome to our website! Here you can find various resources and information.</p>\r\n"
-		"<h2>About Us</h2>\r\n"
-		"<p>We are a team dedicated to providing the best content and services to our community. "
-		"Our mission is to deliver informative and engaging content.</p>\r\n"
-		"<h2>Features</h2>\r\n"
-		"<ul>\r\n"
-		"   <li>Quality Articles</li>\r\n"
-		"   <li>Interactive Tutorials</li>\r\n"
-		"   <li>Community Forums</li>\r\n"
-		"   <li>Latest News and Updates</li>\r\n"
-		"</ul>\r\n"
-		"<h2>Gallery</h2>\r\n"
-		"<img src=\"image1.jpg\" alt=\"Description of image 1\">\r\n"
-		"<img src=\"image2.jpg\" alt=\"Description of image 2\">\r\n"
-		"<img src=\"image3.jpg\" alt=\"Description of image 3\">\r\n"
-		"<h2>Contact Us</h2>\r\n"
-		"<p>Have questions or feedback? Reach out to us at <a "
-		"href=\"mailto:contact@example.com\">contact@example.com</a>.</p>\r\n"
-		"<footer>\r\n"
-		"   <p>&copy; 2023 Our Website. All rights reserved.</p>\r\n"
-		"</footer>\r\n"
-		"</body>\r\n"
+void HttpResponse::concatenateComponents() {
 
-		"</html>\r\n";
-	body_ = buffer;
-}
-
-std::string HttpResponse::sendResponse() {
-	std::string tmp = body_.substr(0, BUFFER_SIZE - 1);
-	body_ = body_.erase(0, BUFFER_SIZE - 1);
-	if (body_.empty()) {
-		status_ = http_response_status::FINISHED;
+	stream_ << "HTTP/1.1 " + Utils::toString(status_code_) + " " +
+				   statusCodeToStatusText(status_code_) + "\r\n";
+	for (std::map<std::string, std::string>::const_iterator it = header_.begin();
+		 it != header_.end();
+		 ++it) {
+		stream_ << it->first + ": " + it->second + "\r\n";
 	}
-	return tmp;
+	stream_ << "\r\n";
+	stream_ << body_;
 }
 
-http_response_status::HTTP_RESPONSE_STATUS HttpResponse::getStatus() const {
+std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_CODE code) {
+	switch (code) {
+		case http_status_code::OK:
+			return "OK";
+		case http_status_code::CREATED:
+			return "CREATED";
+		case http_status_code::NO_CONTENT:
+			return "NO_CONTENT";
+		case http_status_code::PERMANENT_REDIRECT:
+			return "PERMANENT_REDIRECT";
+		case http_status_code::BAD_REQUEST:
+			return "BAD_REQUEST";
+		case http_status_code::NOT_FOUND:
+			return "NOT_FOUND";
+		default:
+			return "UNKNOWN";
+	}
+}
+
+void HttpResponse::setStatus(const http_response_status::HTTP_RESPONSE_STATUS& status) {
+	status_ = status;
+}
+
+void HttpResponse::setStatusCode(const http_status_code::STATUS_CODE& status_code) {
+	status_code_ = status_code;
+}
+
+void HttpResponse::setHeaderValue(const std::string& key, const std::string& value) {
+	header_.insert(std::make_pair(key, value));
+}
+
+void HttpResponse::setBody(const std::string& body) {
+	body_ = body;
+}
+
+void HttpResponse::appendBody(const std::string& body) {
+	body_ += body;
+}
+http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
+	return status_code_;
+}
+
+const std::string HttpResponse::getHeaderValue(const std::string& key) const {
+	std::map<std::string, std::string>::const_iterator it = header_.find(key);
+	if (it == header_.end())
+		return (std::string(""));
+	return it->second;
+}
+
+const std::map<std::string, std::string>& HttpResponse::getHeader() const {
+	return header_;
+}
+
+const std::string& HttpResponse::getBody() const {
+	return body_;
+}
+
+http_response_status::HTTP_RESPONSE_STATUS const& HttpResponse::getStatus() const {
 	return status_;
 }
 
+void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
+	stream_.read(buffer, buffer_size);
+	if (stream_.eof()) {
+		setStatus(http_response_status::FINISHED);
+	}
+}
 } // namespace server

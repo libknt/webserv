@@ -64,6 +64,10 @@ HttpRequest const& ClientSession::getRequest() const {
 	return request_;
 }
 
+ServerDirective const& ClientSession::getServerDirective() const {
+	return server_directive_;
+}
+
 HttpRequest& ClientSession::getRequest() {
 	return request_;
 }
@@ -143,10 +147,6 @@ std::string ClientSession::getServerPort() const {
 	std::stringstream ss;
 	ss << server_port;
 	return ss.str();
-}
-
-ServerDirective const& ClientSession::getServerDirective() const {
-	return server_directive_;
 }
 
 void ClientSession::sessionCleanup() {

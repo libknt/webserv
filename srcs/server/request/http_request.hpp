@@ -82,7 +82,7 @@ private:
 
 public:
 	HttpRequest();
-	explicit HttpRequest(HttpRequest const& other);
+	HttpRequest(HttpRequest const& other);
 	virtual ~HttpRequest();
 	HttpRequest& operator=(HttpRequest const& request);
 	void appendStreamLine(std::string const& stream_line);

@@ -159,7 +159,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					}
 					if (client_session.getStatus() == RESPONSE_PREPARING) {
 						// レスポンスの準備
-						client_session.getResponse().createResponse();
+						handle_request::handleRequest(client_session);
 						client_session.setStatus(SENDING_RESPONSE);
 					} else if (client_session.getStatus() == CGI_PREPARING) {
 						// cgiの準備
@@ -401,8 +401,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		std::string buffer = client_session.getCgi().sendResponse();
 		std::memcpy(send_buffer, buffer.c_str(), buffer.length());
 	} else {
-		std::string buffer = client_session.getResponse().sendResponse();
-		std::memcpy(send_buffer, buffer.c_str(), buffer.length());
+		client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE);
 	}
 	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {

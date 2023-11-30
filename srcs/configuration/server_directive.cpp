@@ -3,8 +3,7 @@
 ServerDirective::ServerDirective()
 	: ip_address_("127.0.0.1")
 	, port_("80")
-	, server_name_("localhost")
-	, default_error_page_("error_page.html") {}
+	, server_name_("localhost") {}
 
 ServerDirective::~ServerDirective() {}
 
@@ -12,7 +11,6 @@ ServerDirective::ServerDirective(const ServerDirective& other)
 	: ip_address_(other.ip_address_)
 	, port_(other.port_)
 	, server_name_(other.server_name_)
-	, default_error_page_(other.default_error_page_)
 	, locations_(other.locations_) {}
 
 ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
@@ -20,7 +18,6 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 		port_ = other.port_;
 		ip_address_ = other.ip_address_;
 		server_name_ = other.server_name_;
-		default_error_page_ = other.default_error_page_;
 		locations_ = other.locations_;
 	}
 	return *this;
@@ -42,11 +39,6 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 		} else if (tokens.front() == "server_name") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseServerNameDirective(args) == -1) {
-				return -1;
-			}
-		} else if (tokens.front() == "default_error_page") {
-			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			if (parseDefaultErrorPageDirective(args) == -1) {
 				return -1;
 			}
 		} else if (tokens.front() == "location") {
@@ -141,15 +133,6 @@ int ServerDirective::parseServerNameDirective(std::vector<std::string>& tokens) 
 	return 0;
 }
 
-int ServerDirective::parseDefaultErrorPageDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 1) {
-		std::cerr << "Parse Error: parseDefaultErrorPageDirective" << std::endl;
-		return -1;
-	}
-	default_error_page_ = tokens.front();
-	return 0;
-}
-
 std::string ServerDirective::parseLocationPath(std::vector<std::string>& tokens) {
 	if (tokens.empty()) {
 		std::cerr << "Parse Error: parseLocationPath" << std::endl;
@@ -192,20 +175,17 @@ std::string ServerDirective::getServerName() const {
 	return server_name_;
 }
 
-std::string ServerDirective::getDefaultErrorPage() const {
-	return default_error_page_;
-}
-
 const std::map<std::string, LocationDirective>& ServerDirective::getLocations() const {
 	return locations_;
 }
 
 LocationDirective const& ServerDirective::findLocation(std::string const& request_path) const {
+	std::string path = request_path;
 	for (size_t i = 0; i < request_path.size(); ++i) {
-		std::string path = request_path.substr(0, request_path.size() - i);
 		if (locations_.count(path)) {
 			return locations_.at(path);
 		}
+		path.erase(path.end() - 1);
 	}
 	return locations_.at("/");
 }
@@ -214,7 +194,6 @@ std::ostream& operator<<(std::ostream& out, const ServerDirective& server_direct
 	out << "IPAddress: " << server_directive.getIpAddress() << std::endl;
 	out << "Port: " << server_directive.getPort() << std::endl;
 	out << "ServerName: " << server_directive.getServerName() << std::endl;
-	out << "DefaultErrorPage: " << server_directive.getDefaultErrorPage() << std::endl;
 
 	std::map<std::string, LocationDirective> locations = server_directive.getLocations();
 	size_t i = 0;
