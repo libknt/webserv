@@ -106,7 +106,7 @@ void executeDelete(const HttpRequest& request,
 	struct stat file_info;
 	std::string request_path = location_directive.getRoot() + request.getRequestPath();
 
-	if (stat(request_path.c_str(), &file_info) == -1) {
+	if (stat(request_path.c_str(), &file_info) != 0) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
 		return createErrorResponse(response, http_status_code::NOT_FOUND, location_directive);
 	}
