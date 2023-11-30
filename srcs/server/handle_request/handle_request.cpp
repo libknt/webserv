@@ -32,7 +32,7 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	struct stat location_stat_info;
 	struct stat request_stat_info;
 	std::string file_path = location_directive.getRoot() + request.getRequestPath();
-	std::string location_path = location_directive.getRoot() + location_directive.getLocationPath();
+	std::string location_path = location_directive.getRoot() + "/" + location_directive.getLocationPath();
 
 	if (stat(file_path.c_str(), &request_stat_info) != 0 ||
 		stat(location_path.c_str(), &location_stat_info) != 0) {
