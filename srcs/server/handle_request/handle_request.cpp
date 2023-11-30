@@ -40,6 +40,7 @@ void executeGet(const HttpRequest& request, HttpResponse &response, const Locati
 				std::getline(file_stream, body, static_cast<char>(EOF));
 				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 				response.setBody(body);
+				response.setStatus(http_response_status::RESPONSE_SENDING);
 				return ;
 			}
 		} else if (S_ISDIR(request_stat_info.st_mode)) {
@@ -52,6 +53,7 @@ void executeGet(const HttpRequest& request, HttpResponse &response, const Locati
 					std::getline(default_file_stream, body, static_cast<char>(EOF));
 					response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 					response.setBody(body);
+					response.setStatus(http_response_status::RESPONSE_SENDING);
 					return ;
 				}
 			}
@@ -72,6 +74,7 @@ void executePost(const HttpRequest& request, HttpResponse& response, const Locat
 				file_stream << request.getBody() << std::endl;
 				file_stream.close();
 				response.setStatusCode(http_status_code::CREATED);
+				response.setStatus(http_response_status::RESPONSE_SENDING);
 				return ;
 			}
 		} else if (S_ISDIR(file_info.st_mode)) {
@@ -81,6 +84,7 @@ void executePost(const HttpRequest& request, HttpResponse& response, const Locat
 				file_stream << request.getBody() << std::endl;
 				file_stream.close();
 				response.setStatusCode(http_status_code::CREATED);
+				response.setStatus(http_response_status::RESPONSE_SENDING);
 				return ;
 			}
 		}
@@ -108,6 +112,7 @@ void executeDelete(const HttpRequest& request, HttpResponse &response,
 		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
 	response.setStatusCode(http_status_code::NO_CONTENT);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
 void createErrorResponse(HttpResponse &response, http_status_code::STATUS_CODE status_code,
@@ -133,6 +138,7 @@ void createErrorResponse(HttpResponse &response, http_status_code::STATUS_CODE s
 	response.setHeaderValue("Content-Type", "text/html");
 	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
 	response.setBody(body_content);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
 void makeAutoIndex(HttpRequest const& request, HttpResponse &response,
@@ -166,6 +172,7 @@ void makeAutoIndex(HttpRequest const& request, HttpResponse &response,
 		response.setBody(body);
 	}
 	closedir(dir);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 };
 };

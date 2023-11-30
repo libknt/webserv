@@ -60,6 +60,10 @@ std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_
 	}
 }
 
+void HttpResponse::setStatus(const http_response_status::HTTP_RESPONSE_STATUS &status) {
+	status_ = status;
+}
+
 void HttpResponse::setStatusCode(const http_status_code::STATUS_CODE& status_code) {
 	status_code_ = status_code;
 }

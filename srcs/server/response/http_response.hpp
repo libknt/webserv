@@ -46,6 +46,7 @@ public:
 	HttpResponse& operator=(const HttpResponse& other);
 	const std::string concatenateComponents();
 	std::string statusCodeToStatusText(const http_status_code::STATUS_CODE code);
+	void setStatus(const http_response_status::HTTP_RESPONSE_STATUS &status);
 	void setStatusCode(const http_status_code::STATUS_CODE& status_code);
 	void setHeaderValue(const std::string& key, const std::string& value);
 	void setBody(const std::string& body);
