@@ -179,19 +179,6 @@ const std::map<std::string, LocationDirective>& ServerDirective::getLocations() 
 	return locations_;
 }
 
-bool ServerDirective::isCgiLocation(const std::string& location,
-	const std::string& script_name) const {
-	for (std::map<std::string, LocationDirective>::const_iterator it = locations_.begin();
-		 it != locations_.end();
-		 ++it) {
-		if (it->first == location && it->second.getCgi() == "on") {
-			if (it->second.isValidCgiExtensions(script_name))
-				return true;
-		}
-	}
-	return false;
-}
-
 LocationDirective const& ServerDirective::findLocation(std::string const& request_path) const {
 	std::string path = request_path;
 	for (size_t i = 0; i < request_path.size(); ++i) {
