@@ -8,22 +8,19 @@ void handleRequest(ClientSession& client_session) {
 	HttpResponse& response = client_session.getResponse();
 
 	ServerDirective server_directive = client_session.getServerDirective();
+	LocationDirective location_directive =
+		server_directive.findLocation(request.getRequestPath());
+	std::string const method = request.getMethod();
 
-	if (server_directive.getPort() == client_session.getServerPort()) {
-		LocationDirective location_directive =
-			server_directive.findLocation(request.getRequestPath());
-		std::string const method = request.getMethod();
-
-		if (method == "GET" && location_directive.isAllowMethod(method)) {
-			response = executeGet(request, location_directive);
-		} else if (method == "POST" && location_directive.isAllowMethod(method)) {
-			response = executePost(request, location_directive);
-		} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
-			response = executeDelete(request, location_directive);
-		} else {
-			response =
-				createErrorResponse(http_status_code::METHOD_NOT_ALLOWED, location_directive);
-		}
+	if (method == "GET" && location_directive.isAllowMethod(method)) {
+		response = executeGet(request, location_directive);
+	} else if (method == "POST" && location_directive.isAllowMethod(method)) {
+		response = executePost(request, location_directive);
+	} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
+		response = executeDelete(request, location_directive);
+	} else {
+		response =
+			createErrorResponse(http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
 }
 
