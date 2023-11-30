@@ -99,15 +99,15 @@ HttpResponse executePost(const HttpRequest& request, const LocationDirective& lo
 
 HttpResponse executeDelete(const HttpRequest& request,
 	const LocationDirective& location_directive) {
-	struct stat file_status;
+	struct stat file_info;
 	std::string request_path = location_directive.getRoot() + request.getRequestPath();
 
-	if (stat(request_path.c_str(), &file_status) == -1) {
+	if (stat(request_path.c_str(), &file_info) == -1) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
 		return createErrorResponse(http_status_code::NOT_FOUND, location_directive);
 	}
 
-	if (!(file_status.st_mode & S_IROTH) || !(file_status.st_mode & S_IWOTH)) {
+	if (!(file_info.st_mode & S_IROTH) || !(file_info.st_mode & S_IWOTH)) {
 		std::cerr << "DELETE Error: Permission denied" << std::endl;
 		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
