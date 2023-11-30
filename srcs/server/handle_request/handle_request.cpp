@@ -30,40 +30,34 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	std::string location_path =
 		location_directive.getRoot() + "/" + location_directive.getLocationPath();
 
-	if (stat(file_path.c_str(), &request_stat_info) != 0 ||
-		stat(location_path.c_str(), &location_stat_info) != 0) {
-		return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
-	} else if (S_ISREG(request_stat_info.st_mode)) {
-		std::ifstream file_stream(file_path.c_str());
-		std::string body;
-		if (file_stream.is_open()) {
-			response.setStatusCode(http_status_code::OK);
-			std::getline(file_stream, body, static_cast<char>(EOF));
-			response.setHeaderValue("Content-Length", Utils::toString(body.size()));
-			response.setBody(body);
-			return (response);
-		} else {
-			return (
-				createErrorResponse(http_status_code::INTERNAL_SERVER_ERROR, location_directive));
-		}
-	} else if (S_ISDIR(request_stat_info.st_mode)) {
-
-		if (location_stat_info.st_ino == request_stat_info.st_ino) {
-			std::ifstream default_file_stream(
-				std::string(location_path + "/" + location_directive.getIndex()).c_str());
-			if (default_file_stream.is_open()) {
-				std::string body;
+	if (stat(file_path.c_str(), &request_stat_info) == 0 &&
+		stat(location_path.c_str(), &location_stat_info) == 0) {
+		if (S_ISREG(request_stat_info.st_mode)) {
+			std::ifstream file_stream(file_path.c_str());
+			std::string body;
+			if (file_stream.is_open()) {
 				response.setStatusCode(http_status_code::OK);
-				std::getline(default_file_stream, body, static_cast<char>(EOF));
+				std::getline(file_stream, body, static_cast<char>(EOF));
 				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 				response.setBody(body);
 				return (response);
 			}
+		} else if (S_ISDIR(request_stat_info.st_mode)) {
+			if (location_stat_info.st_ino == request_stat_info.st_ino) {
+				std::ifstream default_file_stream(
+					std::string(location_path + "/" + location_directive.getIndex()).c_str());
+				if (default_file_stream.is_open()) {
+					std::string body;
+					response.setStatusCode(http_status_code::OK);
+					std::getline(default_file_stream, body, static_cast<char>(EOF));
+					response.setHeaderValue("Content-Length", Utils::toString(body.size()));
+					response.setBody(body);
+					return (response);
+				}
+			}
+			if (location_directive.getAutoindex() == "on")
+				return (makeAutoIndex(request, location_directive));
 		}
-		if (location_directive.getAutoindex() == "on")
-			return (makeAutoIndex(request, location_directive));
-		else
-			return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
 	}
 	return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
 }
