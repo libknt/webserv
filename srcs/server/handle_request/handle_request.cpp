@@ -81,7 +81,6 @@ void executePost(const HttpRequest& request,
 		std::ofstream file_stream(file_path.c_str());
 		if (file_stream.is_open()) {
 			file_stream << request.getBody() << std::endl;
-			file_stream.close();
 			response.setStatusCode(http_status_code::CREATED);
 			response.setStatus(http_response_status::RESPONSE_SENDING);
 			return;
@@ -91,7 +90,6 @@ void executePost(const HttpRequest& request,
 		std::ofstream file_stream(std::string(file_path + Utils::toString(time_val)).c_str());
 		if (file_stream.is_open()) {
 			file_stream << request.getBody() << std::endl;
-			file_stream.close();
 			response.setStatusCode(http_status_code::CREATED);
 			response.setStatus(http_response_status::RESPONSE_SENDING);
 			return;
