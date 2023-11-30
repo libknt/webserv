@@ -16,11 +16,11 @@ namespace server {
 
 namespace handle_request {
 void handleRequest(ClientSession& client_session);
-HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive);
-HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive);
-HttpResponse executeDelete(const HttpRequest& request, const LocationDirective& location_directive);
-HttpResponse makeAutoIndex(HttpRequest const& request, const LocationDirective& location_directive);
-HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code,
+void executeGet(const HttpRequest& request, HttpResponse &response, const LocationDirective& location_directive);
+void executePost(const HttpRequest& request, HttpResponse &response, const LocationDirective& location_directive);
+void executeDelete(const HttpRequest& request, HttpResponse &response, const LocationDirective& location_directive);
+void makeAutoIndex(HttpRequest const& request, HttpResponse &response, const LocationDirective& location_directive);
+void createErrorResponse(HttpResponse &response, http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive);
 };
 
