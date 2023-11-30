@@ -4,7 +4,7 @@ namespace server {
 
 namespace handle_request {
 void handleRequest(ClientSession& client_session) {
-	HttpRequest& request = client_session.getRequest();
+	HttpRequest const& request = client_session.getRequest();
 	HttpResponse& response = client_session.getResponse();
 
 	ServerDirective server_directive = client_session.getServerDirective();
