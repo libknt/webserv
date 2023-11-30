@@ -318,8 +318,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	std::string buffer = client_session.getResponse().concatenateComponents();
-	std::memcpy(send_buffer, buffer.c_str(), buffer.length());
+	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE);
 	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
@@ -331,9 +330,9 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		closeClientSession(client_session);
 		return -1;
 	}
-	// if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
-	client_session.setStatus(SESSION_COMPLETE);
-	//}
+	if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
+		client_session.setStatus(SESSION_COMPLETE);
+	}
 	return 0;
 }
 

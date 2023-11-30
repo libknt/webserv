@@ -25,20 +25,17 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& other) {
 	return *this;
 }
 
-const std::string HttpResponse::concatenateComponents() {
-	std::string response;
-	std::stringstream stringstream;
-	stringstream << status_code_;
+void HttpResponse::concatenateComponents() {
 
-	response +=
-		"HTTP/1.1 " + stringstream.str() + " " + statusCodeToStatusText(status_code_) + "\r\n";
-	for (std::map<std::string, std::string>::iterator it = header_.begin(); it != header_.end();
+	stream_ << "HTTP/1.1 " + Utils::toString(status_code_) + " " +
+				   statusCodeToStatusText(status_code_) + "\r\n";
+	for (std::map<std::string, std::string>::const_iterator it = header_.begin();
+		 it != header_.end();
 		 ++it) {
-		response += it->first + ": " + it->second + "\r\n";
+		stream_ << it->first + ": " + it->second + "\r\n";
 	}
-	response += "\r\n";
-	response += body_;
-	return response;
+	stream_ << "\r\n";
+	stream_ << body_;
 }
 
 std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_CODE code) {
@@ -58,6 +55,10 @@ std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_
 		default:
 			return "UNKNOWN";
 	}
+}
+
+void HttpResponse::setStatus(const http_response_status::HTTP_RESPONSE_STATUS& status) {
+	status_ = status;
 }
 
 void HttpResponse::setStatusCode(const http_status_code::STATUS_CODE& status_code) {
@@ -98,4 +99,10 @@ http_response_status::HTTP_RESPONSE_STATUS const& HttpResponse::getStatus() cons
 	return status_;
 }
 
+void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
+	stream_.read(buffer, buffer_size);
+	if (stream_.eof()) {
+		setStatus(http_response_status::FINISHED);
+	}
+}
 } // namespace server

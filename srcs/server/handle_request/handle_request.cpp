@@ -7,23 +7,27 @@ void handleRequest(ClientSession& client_session) {
 	HttpRequest const& request = client_session.getRequest();
 	HttpResponse& response = client_session.getResponse();
 
-	const ServerDirective &server_directive = client_session.getServerDirective();
-	const LocationDirective &location_directive = server_directive.findLocation(request.getRequestPath());
+	const ServerDirective& server_directive = client_session.getServerDirective();
+	const LocationDirective& location_directive =
+		server_directive.findLocation(request.getRequestPath());
 	std::string const method = request.getMethod();
 
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
-		response = executeGet(request, location_directive);
+		executeGet(request, response, location_directive);
 	} else if (method == "POST" && location_directive.isAllowMethod(method)) {
-		response = executePost(request, location_directive);
+		executePost(request, response, location_directive);
 	} else if (method == "DELETE" && location_directive.isAllowMethod(method)) {
-		response = executeDelete(request, location_directive);
+		executeDelete(request, response, location_directive);
 	} else {
-		response = createErrorResponse(http_status_code::METHOD_NOT_ALLOWED, location_directive);
+		createErrorResponse(response, http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
+	response.concatenateComponents();
 }
 
-HttpResponse executeGet(const HttpRequest& request, const LocationDirective& location_directive) {
-	HttpResponse response;
+void executeGet(const HttpRequest& request,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {
+
 	struct stat location_stat_info;
 	struct stat request_stat_info;
 	std::string file_path = location_directive.getRoot() + request.getRequestPath();
@@ -32,8 +36,9 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 
 	if (stat(file_path.c_str(), &request_stat_info) != 0 ||
 		stat(location_path.c_str(), &location_stat_info) != 0) {
-		return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
-	} else if (S_ISREG(request_stat_info.st_mode)) {
+		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
+	}
+	if (S_ISREG(request_stat_info.st_mode)) {
 		std::ifstream file_stream(file_path.c_str());
 		std::string body;
 		if (file_stream.is_open()) {
@@ -41,13 +46,10 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 			std::getline(file_stream, body, static_cast<char>(EOF));
 			response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 			response.setBody(body);
-			return (response);
-		} else {
-			return (
-				createErrorResponse(http_status_code::INTERNAL_SERVER_ERROR, location_directive));
+			response.setStatus(http_response_status::RESPONSE_SENDING);
+			return;
 		}
 	} else if (S_ISDIR(request_stat_info.st_mode)) {
-
 		if (location_stat_info.st_ino == request_stat_info.st_ino) {
 			std::ifstream default_file_stream(
 				std::string(location_path + "/" + location_directive.getIndex()).c_str());
@@ -57,74 +59,74 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 				std::getline(default_file_stream, body, static_cast<char>(EOF));
 				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 				response.setBody(body);
-				return (response);
+				response.setStatus(http_response_status::RESPONSE_SENDING);
+				return;
 			}
 		}
 		if (location_directive.getAutoindex() == "on")
-			return (makeAutoIndex(request, location_directive));
-		else
-			return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
+			return (makeAutoIndex(request, response, location_directive));
 	}
-	return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
+	return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 }
 
-HttpResponse executePost(const HttpRequest& request, const LocationDirective& location_directive) {
-	HttpResponse response;
+void executePost(const HttpRequest& request,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {
 	struct stat file_info;
 	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
 	if (stat(file_path.c_str(), &file_info) != 0) {
-		return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
-	} else if (S_ISREG(file_info.st_mode)) {
+		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
+	}
+	if (S_ISREG(file_info.st_mode)) {
 		std::ofstream file_stream(file_path.c_str());
-		if (!file_stream.is_open()) {
-			return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
+		if (file_stream.is_open()) {
+			file_stream << request.getBody() << std::endl;
+			file_stream.close();
+			response.setStatusCode(http_status_code::CREATED);
+			response.setStatus(http_response_status::RESPONSE_SENDING);
+			return;
 		}
-		file_stream << request.getBody() << std::endl;
-		file_stream.close();
-		response.setStatusCode(http_status_code::CREATED);
-		return (response);
 	} else if (S_ISDIR(file_info.st_mode)) {
 		std::time_t time_val = std::time(NULL);
 		std::ofstream file_stream(std::string(file_path + Utils::toString(time_val)).c_str());
-		if (!file_stream.is_open()) {
-			return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
+		if (file_stream.is_open()) {
+			file_stream << request.getBody() << std::endl;
+			file_stream.close();
+			response.setStatusCode(http_status_code::CREATED);
+			response.setStatus(http_response_status::RESPONSE_SENDING);
+			return;
 		}
-		file_stream << request.getBody() << std::endl;
-		file_stream.close();
-		response.setStatusCode(http_status_code::CREATED);
-		return (response);
 	}
-	return (createErrorResponse(http_status_code::FORBIDDEN, location_directive));
+	return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 }
 
-HttpResponse executeDelete(const HttpRequest& request,
+void executeDelete(const HttpRequest& request,
+	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
 	std::string request_path = location_directive.getRoot() + request.getRequestPath();
 
 	if (stat(request_path.c_str(), &file_info) == -1) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
-		return createErrorResponse(http_status_code::NOT_FOUND, location_directive);
+		return createErrorResponse(response, http_status_code::NOT_FOUND, location_directive);
 	}
 
 	if (!(file_info.st_mode & S_IROTH) || !(file_info.st_mode & S_IWOTH)) {
 		std::cerr << "DELETE Error: Permission denied" << std::endl;
-		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
+		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
 
 	if (std::remove(request_path.c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
-		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
+		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
-
-	HttpResponse response;
 	response.setStatusCode(http_status_code::NO_CONTENT);
-	return response;
+	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code,
+void createErrorResponse(HttpResponse& response,
+	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
-	HttpResponse response;
 
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 
@@ -138,7 +140,6 @@ HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code
 		while (getline(file_stream, line)) {
 			body_content += line + "\n";
 		}
-		file_stream.close();
 	} else {
 		body_content =
 			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
@@ -147,16 +148,16 @@ HttpResponse createErrorResponse(const http_status_code::STATUS_CODE status_code
 	response.setHeaderValue("Content-Type", "text/html");
 	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
 	response.setBody(body_content);
-	return response;
+	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-HttpResponse makeAutoIndex(HttpRequest const& request,
+void makeAutoIndex(HttpRequest const& request,
+	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	HttpResponse response;
 	std::string const root = location_directive.getRoot() + request.getRequestPath();
 	DIR* dir = opendir(root.c_str());
 	if (!dir) {
-		return (createErrorResponse(http_status_code::NOT_FOUND, location_directive));
+		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 	} else {
 		std::string body;
 		struct dirent* ent;
@@ -182,7 +183,7 @@ HttpResponse makeAutoIndex(HttpRequest const& request,
 		response.setBody(body);
 	}
 	closedir(dir);
-	return (response);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 };
 };
