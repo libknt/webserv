@@ -333,7 +333,7 @@ const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
 }
 
-bool LocationDirective::isAllowMethod(const std::string& method) {
+bool LocationDirective::isAllowMethod(const std::string& method) const{
 	for (size_t i = 0; i < allow_methods_.size(); ++i) {
 		if (method == allow_methods_[i]) {
 			return true;
