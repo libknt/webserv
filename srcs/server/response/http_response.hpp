@@ -21,7 +21,7 @@ enum STATUS_CODE {
 	METHOD_NOT_ALLOWED = 405,
 	INTERNAL_SERVER_ERROR = 500,
 };
-}
+} // namespace http_status_code
 
 namespace http_response_status {
 enum HTTP_RESPONSE_STATUS {
@@ -30,7 +30,7 @@ enum HTTP_RESPONSE_STATUS {
 	ERROR,
 	UNDEFINED,
 };
-}
+} // namespace http_response_status
 
 class HttpResponse {
 private:
