@@ -7,8 +7,9 @@ void handleRequest(ClientSession& client_session) {
 	HttpRequest const& request = client_session.getRequest();
 	HttpResponse& response = client_session.getResponse();
 
-	const ServerDirective &server_directive = client_session.getServerDirective();
-	const LocationDirective &location_directive = server_directive.findLocation(request.getRequestPath());
+	const ServerDirective& server_directive = client_session.getServerDirective();
+	const LocationDirective& location_directive =
+		server_directive.findLocation(request.getRequestPath());
 	std::string const method = request.getMethod();
 
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
@@ -20,9 +21,12 @@ void handleRequest(ClientSession& client_session) {
 	} else {
 		createErrorResponse(response, http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
+	response.concatenateComponents();
 }
 
-void executeGet(const HttpRequest& request, HttpResponse &response, const LocationDirective& location_directive) {
+void executeGet(const HttpRequest& request,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {
 
 	struct stat location_stat_info;
 	struct stat request_stat_info;
@@ -41,7 +45,7 @@ void executeGet(const HttpRequest& request, HttpResponse &response, const Locati
 				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 				response.setBody(body);
 				response.setStatus(http_response_status::RESPONSE_SENDING);
-				return ;
+				return;
 			}
 		} else if (S_ISDIR(request_stat_info.st_mode)) {
 			if (location_stat_info.st_ino == request_stat_info.st_ino) {
@@ -54,7 +58,7 @@ void executeGet(const HttpRequest& request, HttpResponse &response, const Locati
 					response.setHeaderValue("Content-Length", Utils::toString(body.size()));
 					response.setBody(body);
 					response.setStatus(http_response_status::RESPONSE_SENDING);
-					return ;
+					return;
 				}
 			}
 			if (location_directive.getAutoindex() == "on")
@@ -64,7 +68,9 @@ void executeGet(const HttpRequest& request, HttpResponse &response, const Locati
 	return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 }
 
-void executePost(const HttpRequest& request, HttpResponse& response, const LocationDirective& location_directive) {
+void executePost(const HttpRequest& request,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {
 	struct stat file_info;
 	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
 	if (stat(file_path.c_str(), &file_info) == 0) {
@@ -75,7 +81,7 @@ void executePost(const HttpRequest& request, HttpResponse& response, const Locat
 				file_stream.close();
 				response.setStatusCode(http_status_code::CREATED);
 				response.setStatus(http_response_status::RESPONSE_SENDING);
-				return ;
+				return;
 			}
 		} else if (S_ISDIR(file_info.st_mode)) {
 			std::time_t time_val = std::time(NULL);
@@ -85,14 +91,15 @@ void executePost(const HttpRequest& request, HttpResponse& response, const Locat
 				file_stream.close();
 				response.setStatusCode(http_status_code::CREATED);
 				response.setStatus(http_response_status::RESPONSE_SENDING);
-				return ;
+				return;
 			}
 		}
 	}
 	return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 }
 
-void executeDelete(const HttpRequest& request, HttpResponse &response,
+void executeDelete(const HttpRequest& request,
+	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_status;
 	std::string request_path = location_directive.getRoot() + request.getRequestPath();
@@ -115,7 +122,8 @@ void executeDelete(const HttpRequest& request, HttpResponse &response,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-void createErrorResponse(HttpResponse &response, http_status_code::STATUS_CODE status_code,
+void createErrorResponse(HttpResponse& response,
+	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
 
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
@@ -141,7 +149,8 @@ void createErrorResponse(HttpResponse &response, http_status_code::STATUS_CODE s
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-void makeAutoIndex(HttpRequest const& request, HttpResponse &response,
+void makeAutoIndex(HttpRequest const& request,
+	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	std::string const root = location_directive.getRoot() + request.getRequestPath();
 	DIR* dir = opendir(root.c_str());
