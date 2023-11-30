@@ -54,12 +54,10 @@ HttpResponse executeGet(const HttpRequest& request, const LocationDirective& loc
 	} else if (S_ISDIR(request_stat_info.st_mode)) {
 
 		if (location_stat_info.st_ino == request_stat_info.st_ino) {
-			std::ifstream default_file_stream(std::string(location_directive.getRoot() + "/" +
-														  location_directive.getLocationPath() +
-														  "/" + location_directive.getIndex())
-												  .c_str());
-			std::string body;
+			std::ifstream default_file_stream(
+				std::string(location_path + "/" + location_directive.getIndex()).c_str());
 			if (default_file_stream.is_open()) {
+				std::string body;
 				response.setStatusCode(http_status_code::OK);
 				std::getline(default_file_stream, body, static_cast<char>(EOF));
 				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
