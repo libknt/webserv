@@ -112,7 +112,7 @@ HttpResponse executeDelete(const HttpRequest& request,
 		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
 
-	if (remove(request_path.c_str()) != 0) {
+	if (std::remove(request_path.c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
 		return createErrorResponse(http_status_code::BAD_REQUEST, location_directive);
 	}
