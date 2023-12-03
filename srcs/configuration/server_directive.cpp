@@ -2,7 +2,7 @@
 
 ServerDirective::ServerDirective()
 	: ip_address_("127.0.0.1")
-	, port_("80")
+	, port_("8080")
 	, server_name_("localhost") {}
 
 ServerDirective::~ServerDirective() {}
