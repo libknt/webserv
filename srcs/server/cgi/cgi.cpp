@@ -120,11 +120,6 @@ int Cgi::readCgiOutput() {
 	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
 	if (recv_result > 0) {
 		std::string recv_string(recv_buffer);
-		for (int i = 0; i < recv_result; i++) {
-			if (recv_string[i] == '\n' && recv_string[i - 1] != '\r') {
-				recv_string.insert(i - 1, "\r");
-			}
-		}
 		cgi_output_ += recv_string;
 	} else if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
