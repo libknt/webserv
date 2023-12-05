@@ -18,6 +18,7 @@ void createResponseFromCgiResponse(std::string const& cgi_output,
 	const LocationDirective& location_directive);
 void createStatusCode(std::string cgi_output, HttpResponse& response);
 void createHeaderFiled(std::string& headerFiled, HttpResponse& response);
+void removeSpace(std::string& str);
 void toLowerCaseForHeaders(std::string& str);
 int locationAnalysis(std::string location, HttpResponse& response);
 
