@@ -90,7 +90,7 @@ void createHeaderFiled(std::string& headerFiled, HttpResponse& response) {
 	position = headerFiled.find("status: ");
 	if (position != std::string::npos) {
 		end = headerFiled.find("\n", position);
-		createStatusCode(headerFiled.substr(position + 8, end), response);
+		createStatusCode(headerFiled.substr(position + 8, end - position - 8), response);
 	} else {
 		response.setStatusCode(http_status_code::OK);
 	}
@@ -98,7 +98,8 @@ void createHeaderFiled(std::string& headerFiled, HttpResponse& response) {
 	position = headerFiled.find("content-type: ");
 	if (position != std::string::npos) {
 		end = headerFiled.find("\n", position);
-		response.setHeaderValue("content-type", headerFiled.substr(position + 14, end));
+		response.setHeaderValue(
+			"content-type", headerFiled.substr(position + 14, end - position - 14));
 	} else {
 		response.setHeaderValue("content-type", "text/html");
 	}
