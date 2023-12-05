@@ -11,10 +11,17 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+// todo serverでなく namespace::Cgiにする
 namespace server {
 
-namespace cgi_status {
+enum CGI_RESPONSE_TYPE {
+	DOCUMENT_RESPONSE,
+	LOCAL_REDIRECTION_RESPONSE,
+	CLIENT_REDIRECTION_RESPONSE,
+	CLIENT_REDIRECTION_DOCUMENT_RESPONSE,
+};
 
+namespace cgi_status {
 enum CGI_STATUS {
 	BODY_SENDING,
 	CGI_RECEVICEING_COMPLETE,

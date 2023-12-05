@@ -14,6 +14,7 @@
 
 namespace server {
 
+// todo handle request
 namespace handle_request {
 void handleRequest(ClientSession& client_session);
 void executeGet(const HttpRequest& request,

@@ -15,6 +15,7 @@ enum STATUS_CODE {
 	OK = 200,
 	CREATED = 201,
 	NO_CONTENT = 204,
+	SEE_OTHER = 303,
 	PERMANENT_REDIRECT = 308,
 	BAD_REQUEST = 400,
 	FORBIDDEN = 403,
@@ -48,6 +49,7 @@ public:
 	HttpResponse& operator=(const HttpResponse& other);
 	void concatenateComponents();
 	std::string statusCodeToStatusText(const http_status_code::STATUS_CODE code);
+	static http_status_code::STATUS_CODE numberToStatusCode(const int code);
 	void setStatus(const http_response_status::HTTP_RESPONSE_STATUS& status);
 	void setStatusCode(const http_status_code::STATUS_CODE& status_code);
 	void setHeaderValue(const std::string& key, const std::string& value);
@@ -60,6 +62,8 @@ public:
 	http_response_status::HTTP_RESPONSE_STATUS const& getStatus() const;
 	void getStreamBuffer(char* buffer, size_t buffer_size);
 };
+
+std::ostream& operator<<(std::ostream& out, const HttpResponse& response);
 
 }
 

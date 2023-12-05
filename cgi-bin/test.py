@@ -4,11 +4,11 @@ import cgitb
 cgitb.enable()
 
 # HTTPステータスコードの追加
-print("HTTP/1.1 200 OK")
+print("Status: 200 OK")
 print("Date: Wed, 09 Nov 2023 12:00:00 GMT")
 print("Server: MyServer")
 print("Content-Type: text/html; charset=UTF-8")
-print("Content-Length: 1054")
+# print("Content-Length: 1054")
 print("")
 print("<html>")
 print("<head>")

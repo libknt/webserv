@@ -1,0 +1,28 @@
+#ifndef HANDLE_CGI_HPP
+#define HANDLE_CGI_HPP
+
+#include "cgi.hpp"
+#include "client_session.hpp"
+#include "handle_request.hpp"
+
+#include <cctype>
+#include <sstream>
+
+namespace server {
+
+namespace handle_request {
+void handleCgiResponse(ClientSession& client_session);
+void createResponseFromCgiResponse(std::string const& cgi_output,
+	HttpResponse& response,
+	const LocationDirective& location_directive);
+void createStatusCode(std::string cgi_output, HttpResponse& response);
+void createHeaderFiled(std::string& headerFiled, HttpResponse& response);
+void toLowerCaseForHeaders(std::string& str);
+int locationAnalysis(std::string location, HttpResponse& response);
+// http_status_code::STATUS_CODE IdentifyResponseType(Cgi const& cgi, HttpResponse& response) ;
+// CGI_RESPONSE_TYPE analysisLocation(const std::string& location);
+} // namespace handle_cgi
+
+} // namespace server
+
+#endif // HANDLE_CGI_HPP

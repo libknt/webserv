@@ -46,6 +46,8 @@ std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_
 			return "CREATED";
 		case http_status_code::NO_CONTENT:
 			return "NO_CONTENT";
+		case http_status_code::SEE_OTHER:
+			return "SEE_OTHER";
 		case http_status_code::PERMANENT_REDIRECT:
 			return "PERMANENT_REDIRECT";
 		case http_status_code::BAD_REQUEST:
@@ -54,6 +56,33 @@ std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_
 			return "NOT_FOUND";
 		default:
 			return "UNKNOWN";
+	}
+}
+
+http_status_code::STATUS_CODE HttpResponse::numberToStatusCode(const int code) {
+	switch (code) {
+		case 200:
+			return http_status_code::OK;
+		case 201:
+			return http_status_code::CREATED;
+		case 204:
+			return http_status_code::NO_CONTENT;
+		case 303:
+			return http_status_code::SEE_OTHER;
+		case 308:
+			return http_status_code::PERMANENT_REDIRECT;
+		case 400:
+			return http_status_code::BAD_REQUEST;
+		case 403:
+			return http_status_code::FORBIDDEN;
+		case 404:
+			return http_status_code::NOT_FOUND;
+		case 405:
+			return http_status_code::METHOD_NOT_ALLOWED;
+		case 500:
+			return http_status_code::INTERNAL_SERVER_ERROR;
+		default:
+			return http_status_code::INTERNAL_SERVER_ERROR;
 	}
 }
 
@@ -101,8 +130,23 @@ http_response_status::HTTP_RESPONSE_STATUS const& HttpResponse::getStatus() cons
 
 void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
 	stream_.read(buffer, buffer_size);
+	// std::cout << "buffer: " << std::endl << buffer << std::endl;
 	if (stream_.eof()) {
 		setStatus(http_response_status::FINISHED);
 	}
 }
+
+std::ostream& operator<<(std::ostream& out, const HttpResponse& response) {
+	out << "status_code: " << response.getStatusCode() << std::endl;
+	out << "header: " << std::endl;
+	for (std::map<std::string, std::string>::const_iterator it = response.getHeader().begin();
+		 it != response.getHeader().end();
+		 ++it) {
+		out << it->first << ": " << it->second << std::endl;
+	}
+	out << "body: " << std::endl;
+	out << response.getBody() << std::endl;
+	return out;
+}
+
 } // namespace server
