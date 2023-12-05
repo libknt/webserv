@@ -11,9 +11,7 @@ void handleCgiResponse(ClientSession& client_session) {
 	const ServerDirective& server_directive = client_session.getServerDirective();
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getRequestPath());
-	// std::cout << "\033[31m" << response << "\033[0m" << std::endl;
 	createResponseFromCgiResponse(cgi.getCgiOutput(), response, location_directive);
-	// std::cout << "\033[32m" << response << "\033[0m" << std::endl;
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 	response.concatenateComponents();
 }
@@ -46,13 +44,6 @@ void createResponseFromCgiResponse(std::string const& cgi_output,
 }
 
 int locationAnalysis(std::string location, HttpResponse& response) {
-	//     http：ハイパーテキスト転送プロトコル。
-	// https：安全なハイパーテキスト転送プロトコル。
-	// ftp：ファイル転送プロトコル。
-	// mailto：電子メールアドレス。
-	// file：ローカルまたはネットワークファイルシステム上のファイル。
-	// tel：電話番号。
-	// data
 	if (location.compare(0, 4, "http") == 0 || location.compare(0, 5, "https") == 0 ||
 		location.compare(0, 3, "ftp") == 0 || location.compare(0, 6, "mailto") == 0 ||
 		location.compare(0, 4, "file") == 0 || location.compare(0, 3, "tel") == 0 ||
