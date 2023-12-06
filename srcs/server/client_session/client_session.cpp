@@ -72,11 +72,11 @@ HttpRequest& ClientSession::getRequest() {
 	return request_;
 }
 
-Cgi const& ClientSession::getCgi() const {
+cgi::Cgi const& ClientSession::getCgi() const {
 	return *cgi_;
 }
 
-Cgi& ClientSession::getCgi() {
+cgi::Cgi& ClientSession::getCgi() {
 	return *cgi_;
 }
 
@@ -159,7 +159,7 @@ void ClientSession::sessionCleanup() {
 	std::cout << "  						Connection Cleanup" << std::endl;
 }
 
-void ClientSession::setCgi(Cgi* cgi) {
+void ClientSession::setCgi(cgi::Cgi* cgi) {
 	cgi_ = cgi;
 }
 

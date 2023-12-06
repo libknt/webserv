@@ -5,7 +5,7 @@ namespace server {
 namespace handle_cgi_response {
 
 void handleCgiResponse(ClientSession& client_session) {
-	Cgi const& cgi = client_session.getCgi();
+	cgi::Cgi const& cgi = client_session.getCgi();
 	HttpResponse& response = client_session.getResponse();
 	const HttpRequest& request = client_session.getRequest();
 	const ServerDirective& server_directive = client_session.getServerDirective();

@@ -33,7 +33,7 @@ private:
 	ServerDirective const& server_directive_;
 
 	HttpRequest request_;
-	Cgi* cgi_;
+	cgi::Cgi* cgi_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
 
@@ -53,8 +53,8 @@ public:
 	int getSd() const;
 	HttpRequest const& getRequest() const;
 	HttpRequest& getRequest();
-	Cgi const& getCgi() const;
-	Cgi& getCgi();
+	cgi::Cgi const& getCgi() const;
+	cgi::Cgi& getCgi();
 	HttpResponse& getResponse();
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
@@ -67,7 +67,7 @@ public:
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
-	void setCgi(Cgi* cgi);
+	void setCgi(cgi::Cgi* cgi);
 };
 
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session);

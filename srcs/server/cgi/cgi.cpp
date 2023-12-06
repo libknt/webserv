@@ -1,8 +1,8 @@
 #include "cgi.hpp"
 
-namespace server {
+namespace cgi {
 
-Cgi::Cgi(HttpRequest const& request,
+Cgi::Cgi(server::HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
 	: cgi_status_(cgi_status::UNDIFINED)
@@ -86,7 +86,7 @@ int Cgi::setup() {
 int Cgi::executeCgi() {
 	char** environ = cgi_request_context_.getCgiEnviron();
 	char** argv = cgi_request_context_.getExecveArgv();
-	http_method::HTTP_METHOD method = cgi_request_context_.getHttpRequest().getHttpMethod();
+	server::http_method::HTTP_METHOD method = cgi_request_context_.getHttpRequest().getHttpMethod();
 
 	pid_ = fork();
 	if (pid_ == -1) {
@@ -98,7 +98,7 @@ int Cgi::executeCgi() {
 		if (dup2(socket_vector_[1], STDOUT_FILENO) < 0) {
 			std::exit(EXIT_FAILURE);
 		}
-		if (method == http_method::POST) {
+		if (method == server::http_method::POST) {
 			if (dup2(socket_vector_[1], STDERR_FILENO) < 0) {
 				std::exit(EXIT_FAILURE);
 			}
@@ -106,7 +106,7 @@ int Cgi::executeCgi() {
 		execve(argv[0], argv, environ);
 		std::exit(EXIT_FAILURE);
 	}
-	if (method == http_method::GET) {
+	if (method == server::http_method::GET) {
 		close(socket_vector_[1]);
 	}
 	return 0;
@@ -143,7 +143,7 @@ int Cgi::getSocketFd() const {
 	return socket_vector_[0];
 }
 
-HttpRequest const& Cgi::getHttpRequest() const {
+server::HttpRequest const& Cgi::getHttpRequest() const {
 	return cgi_request_context_.getHttpRequest();
 }
 

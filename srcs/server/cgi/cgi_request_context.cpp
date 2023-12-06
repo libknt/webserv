@@ -1,6 +1,6 @@
 #include "cgi_request_context.hpp"
 
-namespace cgi{
+namespace cgi {
 
 CgiRequestContext::CgiRequestContext(server::HttpRequest const& request,
 	sockaddr_in const& client_address,

@@ -195,7 +195,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						// todo
 					}
 					if (client_session.getCgi().getStatus() ==
-						cgi_status::CGI_RECEVICEING_COMPLETE) {
+						cgi::cgi_status::CGI_RECEVICEING_COMPLETE) {
 						handle_cgi_response::handleCgiResponse(client_session);
 						// todo
 						cgi_socket_pairs_.erase(sd);
@@ -263,8 +263,8 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
-		Cgi* cgi =
-			new Cgi(session.getRequest(), session.getClientAddress(), session.getServerAddress());
+		cgi::Cgi* cgi = new cgi::Cgi(
+			session.getRequest(), session.getClientAddress(), session.getServerAddress());
 		session.setCgi(cgi);
 		session.setStatus(CGI_PREPARING);
 	} else {
@@ -413,7 +413,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		return -1;
 	}
 	if (client_session.getStatus() == SENDING_CGI_RESPONSE) {
-		if (client_session.getCgi().getStatus() == cgi_status::CGI_SENDING_COMPLETE) {
+		if (client_session.getCgi().getStatus() == cgi::cgi_status::CGI_SENDING_COMPLETE) {
 			client_session.setStatus(SESSION_COMPLETE);
 			std::cout << "\033[31m"
 					  << "  CGI SENDING: complete"

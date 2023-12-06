@@ -11,8 +11,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-// todo serverでなく namespace::Cgiにする
-namespace server {
+namespace cgi {
 
 enum CGI_RESPONSE_TYPE {
 	DOCUMENT_RESPONSE,
@@ -45,7 +44,7 @@ private:
 	int setupInterProcessCommunication();
 
 public:
-	Cgi(HttpRequest const& request,
+	Cgi(server::HttpRequest const& request,
 		sockaddr_in const& client_address,
 		sockaddr_in const& server_address);
 	Cgi(const Cgi& other);
@@ -55,7 +54,7 @@ public:
 	int executeCgi();
 	int readCgiOutput();
 	int getSocketFd() const;
-	HttpRequest const& getHttpRequest() const;
+	server::HttpRequest const& getHttpRequest() const;
 	std::string const& getCgiOutput() const;
 	void setStatus(cgi_status::CGI_STATUS const status);
 	cgi_status::CGI_STATUS getStatus() const;
@@ -64,6 +63,6 @@ public:
 
 std::ostream& operator<<(std::ostream& out, const Cgi& cgi);
 
-} // namespace server
+} // namespace
 
 #endif // CGI_HPP

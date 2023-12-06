@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-namespace  cgi{
+namespace cgi {
 
 class CgiRequestContext {
 private:
