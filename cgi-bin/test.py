@@ -41,4 +41,3 @@ print("</body>")
 
 print("</html>")
 print("")
-print("")

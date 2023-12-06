@@ -142,15 +142,15 @@ int ServerManager::cgiManagement(ClientSession& client_session) {
 	}
 	if (client_session.getCgi().getHttpRequest().getHttpMethod() == http_method::POST) {
 		client_session.setStatus(CGI_BODY_SENDING);
-		setWriteFd(client_session.getCgi().getSocketFd());
+		setWriteFd(client_session.getCgi().getSocketFd(0));
 		cgi_socket_pairs_.insert(
-			std::make_pair(client_session.getCgi().getSocketFd(), client_session.getSd()));
+			std::make_pair(client_session.getCgi().getSocketFd(0), client_session.getSd()));
 
 	} else {
 		client_session.setStatus(CGI_RECEIVEING);
-		setReadFd(client_session.getCgi().getSocketFd());
+		setReadFd(client_session.getCgi().getSocketFd(0));
 		cgi_socket_pairs_.insert(
-			std::make_pair(client_session.getCgi().getSocketFd(), client_session.getSd()));
+			std::make_pair(client_session.getCgi().getSocketFd(0), client_session.getSd()));
 	}
 	if (client_session.getStatus() == SENDING_RESPONSE) {
 		setWriteFd(client_session.getSd());
@@ -207,10 +207,10 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						handle_cgi_response::handleCgiResponse(client_session);
 						// todo
 						cgi_socket_pairs_.erase(sd);
-						int client_sd = client_session.getCgi().getSocketFd();
+						int client_sd = client_session.getCgi().getSocketFd(0);
 						clearFds(client_sd);
 
-						close(client_session.getCgi().getSocketFd());
+						close(client_session.getCgi().getSocketFd(0));
 						setWriteFd(client_session.getSd());
 						client_session.setStatus(SENDING_RESPONSE);
 					}
@@ -247,7 +247,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 }
 
 int ServerManager::sendCgiBody(ClientSession& client_session) {
-	int client_sd = client_session.getCgi().getSocketFd();
+	int client_sd = client_session.getCgi().getSocketFd(0);
 	std::string body = client_session.getRequest().getBody();
 	std::cout << "send: " << body << std::endl;
 	char buffer[BUFFER_SIZE];
@@ -257,25 +257,26 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		closeClientSession(client_session);
-		cgi_socket_pairs_.erase(client_session.getCgi().getSocketFd());
-		close(client_session.getCgi().getSocketFd());
-		clearFds(client_session.getCgi().getSocketFd());
+		cgi_socket_pairs_.erase(client_session.getCgi().getSocketFd(0));
+		close(client_session.getCgi().getSocketFd(0));
+		clearFds(client_session.getCgi().getSocketFd(0));
 		return -1;
 	}
 	if (send_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
 		closeClientSession(client_session);
-		cgi_socket_pairs_.erase(client_session.getCgi().getSocketFd());
-		close(client_session.getCgi().getSocketFd());
-		clearFds(client_session.getCgi().getSocketFd());
+		cgi_socket_pairs_.erase(client_session.getCgi().getSocketFd(0));
+		close(client_session.getCgi().getSocketFd(0));
+		clearFds(client_session.getCgi().getSocketFd(0));
 		return -1;
 	}
 	std::cout << "\033[31m"
 			  << "  CGI BODY SENDING: complete"
 			  << "\033[0m" << std::endl;
-	clearFds(client_session.getCgi().getSocketFd());
-	setReadFd(client_session.getCgi().getSocketFd());
+	clearFds(client_session.getCgi().getSocketFd(0));
+	setReadFd(client_session.getCgi().getSocketFd(0));
 	client_session.setStatus(CGI_RECEIVEING);
+	// close(client_session.getCgi().getSocketFd(1));
 	return 0;
 }
 

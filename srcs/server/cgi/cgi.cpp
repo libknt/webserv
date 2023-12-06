@@ -33,7 +33,13 @@ Cgi& Cgi::operator=(const Cgi& other) {
 	return *this;
 }
 
-Cgi::~Cgi() {}
+Cgi::~Cgi() {
+	if (pid_ != -1) {
+		kill(pid_, SIGKILL);
+	}
+	close(socket_vector_[0]);
+	close(socket_vector_[1]);
+}
 
 int Cgi::setNonBlocking(int sd) {
 	int flags = fcntl(sd, F_GETFL, 0);
@@ -109,9 +115,10 @@ int Cgi::executeCgi() {
 		std::cerr << "execve() failed: " << strerror(errno) << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	if (method != server::http_method::POST) {
-		close(socket_vector_[1]);
-	}
+	// if (method != server::http_method::POST) {
+	close(socket_vector_[1]);
+	// }
+	std::cout << "pid: " << pid_ << std::endl;
 	return 0;
 }
 
@@ -120,9 +127,11 @@ int Cgi::readCgiOutput() {
 	char recv_buffer[BUFFER_SIZE];
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
-	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+	int recv_result = recv(sd, recv_buffer, BUFFER_SIZE - 1, 0);
 	std::cout << "\033[30m"
 			  << "  CGI output: " << recv_buffer << "\033[0m" << std::endl;
+	std::cout << "\033[32m"
+			  << "  CGI output: end: " << recv_result << "\033[0m" << std::endl;
 	if (recv_result > 0) {
 		std::string recv_string(recv_buffer);
 		cgi_output_ += recv_string;
@@ -134,31 +143,27 @@ int Cgi::readCgiOutput() {
 		return -1;
 	} else if (recv_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
-		waitpid(pid_, &status_, 0);
-		if (WIFEXITED(status_)) {
-			std::cout << "CGI process exited with status " << WEXITSTATUS(status_) << std::endl;
-			setStatus(CGI_RECEVICEING_COMPLETE);
-		} else if (WIFSIGNALED(status_)) {
-			std::cout << "CGI process killed by signal " << WTERMSIG(status_) << std::endl;
+		if (waitpid(pid_, &status_, 0) > 0) {
+			if (WIFEXITED(status_)) {
+				std::cout << "\e[33m"
+						  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
+						  << std::endl;
+				setStatus(CGI_RECEVICEING_COMPLETE);
+			} else if (WIFSIGNALED(status_)) {
+				std::cout << "\e[33m"
+						  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m"
+						  << std::endl;
+			}
+		} else {
+			std::cerr << "waitpid failed" << std::endl;
 		}
 		return 0;
-	}
-	if (cgi_output_.find("\n\n") != std::string::npos &&
-		cgi_output_.find("\n\n", cgi_output_.find("\n\n") + 1) != std::string::npos) {
-		int signal;
-
-		signal = SIGKILL;
-
-		if (kill(pid_, signal) == -1) {
-			// todo error
-		}
-		setStatus(CGI_RECEVICEING_COMPLETE);
 	}
 	return 0;
 }
 
-int Cgi::getSocketFd() const {
-	return socket_vector_[0];
+int Cgi::getSocketFd(int index) const {
+	return socket_vector_[index];
 }
 
 server::HttpRequest const& Cgi::getHttpRequest() const {

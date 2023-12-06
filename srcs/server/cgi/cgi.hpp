@@ -50,7 +50,7 @@ public:
 	int setup();
 	int executeCgi();
 	int readCgiOutput();
-	int getSocketFd() const;
+	int getSocketFd(int index) const;
 	server::HttpRequest const& getHttpRequest() const;
 	std::string const& getCgiOutput() const;
 	void setStatus(CGI_STATUS const status);
