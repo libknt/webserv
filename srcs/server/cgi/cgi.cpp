@@ -5,7 +5,7 @@ namespace cgi {
 Cgi::Cgi(server::HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
-	: cgi_status_(cgi_status::UNDIFINED)
+	: cgi_status_(UNDIFINED)
 	, cgi_request_context_(cgi::CgiRequestContext(request, client_address, server_address))
 	, pid_(-1)
 	, status_(-1) {
@@ -130,7 +130,7 @@ int Cgi::readCgiOutput() {
 		waitpid(pid_, &status_, 0);
 		if (WIFEXITED(status_)) {
 			std::cout << "CGI process exited with status " << WEXITSTATUS(status_) << std::endl;
-			setStatus(cgi_status::CGI_RECEVICEING_COMPLETE);
+			setStatus(CGI_RECEVICEING_COMPLETE);
 		} else if (WIFSIGNALED(status_)) {
 			std::cout << "CGI process killed by signal " << WTERMSIG(status_) << std::endl;
 		}
@@ -151,11 +151,11 @@ std::string const& Cgi::getCgiOutput() const {
 	return cgi_output_;
 }
 
-void Cgi::setStatus(cgi_status::CGI_STATUS const status) {
+void Cgi::setStatus(CGI_STATUS const status) {
 	cgi_status_ = status;
 }
 
-cgi_status::CGI_STATUS Cgi::getStatus() const {
+CGI_STATUS Cgi::getStatus() const {
 	return cgi_status_;
 }
 
@@ -163,7 +163,7 @@ std::string const Cgi::sendResponse() {
 	std::string tmp = cgi_output_.substr(0, BUFFER_SIZE - 1);
 	cgi_output_ = cgi_output_.erase(0, BUFFER_SIZE - 1);
 	if (cgi_output_.empty()) {
-		setStatus(cgi_status::CGI_SENDING_COMPLETE);
+		setStatus(CGI_SENDING_COMPLETE);
 	}
 	return tmp;
 }

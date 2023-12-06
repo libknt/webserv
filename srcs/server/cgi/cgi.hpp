@@ -20,7 +20,6 @@ enum CGI_RESPONSE_TYPE {
 	CLIENT_REDIRECTION_DOCUMENT_RESPONSE,
 };
 
-namespace cgi_status {
 enum CGI_STATUS {
 	BODY_SENDING,
 	CGI_RECEVICEING_COMPLETE,
@@ -29,11 +28,9 @@ enum CGI_STATUS {
 	UNDIFINED,
 };
 
-} // namespace cgi_status
-
 class Cgi {
 private:
-	cgi_status::CGI_STATUS cgi_status_;
+	CGI_STATUS cgi_status_;
 	cgi::CgiRequestContext cgi_request_context_;
 	int socket_vector_[2];
 	int pid_;
@@ -56,8 +53,8 @@ public:
 	int getSocketFd() const;
 	server::HttpRequest const& getHttpRequest() const;
 	std::string const& getCgiOutput() const;
-	void setStatus(cgi_status::CGI_STATUS const status);
-	cgi_status::CGI_STATUS getStatus() const;
+	void setStatus(CGI_STATUS const status);
+	CGI_STATUS getStatus() const;
 	std::string const sendResponse();
 };
 
