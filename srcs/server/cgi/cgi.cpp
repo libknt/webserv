@@ -96,17 +96,20 @@ int Cgi::executeCgi() {
 	if (pid_ == 0) {
 		close(socket_vector_[0]);
 		if (dup2(socket_vector_[1], STDOUT_FILENO) < 0) {
+			std::cerr << "dup2() failed: " << strerror(errno) << std::endl;
 			std::exit(EXIT_FAILURE);
 		}
 		if (method == server::http_method::POST) {
-			if (dup2(socket_vector_[1], STDERR_FILENO) < 0) {
+			if (dup2(socket_vector_[1], STDIN_FILENO) < 0) {
+				std::cerr << "dup2() failed: " << strerror(errno) << std::endl;
 				std::exit(EXIT_FAILURE);
 			}
 		}
 		execve(argv[0], argv, environ);
+		std::cerr << "execve() failed: " << strerror(errno) << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	if (method == server::http_method::GET) {
+	if (method != server::http_method::POST) {
 		close(socket_vector_[1]);
 	}
 	return 0;
@@ -118,12 +121,16 @@ int Cgi::readCgiOutput() {
 	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
 
 	int recv_result = recv(sd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+	std::cout << "\033[30m"
+			  << "  CGI output: " << recv_buffer << "\033[0m" << std::endl;
 	if (recv_result > 0) {
 		std::string recv_string(recv_buffer);
 		cgi_output_ += recv_string;
 	} else if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
+
 		// Todo : server error
+		// ここでselectが∞るーぷするようになってしまう
 		return -1;
 	} else if (recv_result == 0) {
 		std::cout << "  Connection closed" << std::endl;
@@ -135,6 +142,17 @@ int Cgi::readCgiOutput() {
 			std::cout << "CGI process killed by signal " << WTERMSIG(status_) << std::endl;
 		}
 		return 0;
+	}
+	if (cgi_output_.find("\n\n") != std::string::npos &&
+		cgi_output_.find("\n\n", cgi_output_.find("\n\n") + 1) != std::string::npos) {
+		int signal;
+
+		signal = SIGKILL;
+
+		if (kill(pid_, signal) == -1) {
+			// todo error
+		}
+		setStatus(CGI_RECEVICEING_COMPLETE);
 	}
 	return 0;
 }

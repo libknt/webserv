@@ -49,6 +49,8 @@ private:
 	void closeClientSession(ClientSession& client_session);
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
+	int cgiManagement(ClientSession& client_session);
+	int sendCgiBody(ClientSession& client_session);
 
 public:
 	ServerManager(const Configuration& configuration);
