@@ -111,6 +111,7 @@ int Cgi::executeCgi() {
 				std::exit(EXIT_FAILURE);
 			}
 		}
+		// todo fcntl FD_CLOEXEC
 		execve(argv[0], argv, environ);
 		std::cerr << "execve() failed: " << strerror(errno) << std::endl;
 		std::exit(EXIT_FAILURE);
