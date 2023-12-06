@@ -115,9 +115,7 @@ int Cgi::executeCgi() {
 		std::cerr << "execve() failed: " << strerror(errno) << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	// if (method != server::http_method::POST) {
 	close(socket_vector_[1]);
-	// }
 	std::cout << "pid: " << pid_ << std::endl;
 	return 0;
 }
@@ -138,7 +136,7 @@ int Cgi::readCgiOutput() {
 	} else if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 
-		// Todo : server error
+		// Todo : server error create response
 		// ここでselectが∞るーぷするようになってしまう
 		return -1;
 	} else if (recv_result == 0) {

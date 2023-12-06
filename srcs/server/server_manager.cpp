@@ -227,8 +227,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				sendCgiBody(client_session);
 			}
 			if (client_session.getStatus() == SENDING_RESPONSE) {
-				// if (client_session.getStatus() == SENDING_RESPONSE ||
-				// 	client_session.getStatus() == SENDING_CGI_RESPONSE) {
 				sendResponse(client_session);
 			}
 			if (client_session.getStatus() == CLOSED) {
