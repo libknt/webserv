@@ -6,7 +6,7 @@ Cgi::Cgi(HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
 	: cgi_status_(cgi_status::UNDIFINED)
-	, cgi_request_context_(CgiRequestContext(request, client_address, server_address))
+	, cgi_request_context_(cgi::CgiRequestContext(request, client_address, server_address))
 	, pid_(-1)
 	, status_(-1) {
 	socket_vector_[0] = -1;

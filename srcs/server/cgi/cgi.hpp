@@ -35,7 +35,7 @@ enum CGI_STATUS {
 class Cgi {
 private:
 	cgi_status::CGI_STATUS cgi_status_;
-	CgiRequestContext cgi_request_context_;
+	cgi::CgiRequestContext cgi_request_context_;
 	int socket_vector_[2];
 	int pid_;
 	int status_;

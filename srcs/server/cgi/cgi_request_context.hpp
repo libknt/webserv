@@ -6,11 +6,11 @@
 #include <map>
 #include <string>
 
-namespace server {
+namespace  cgi{
 
 class CgiRequestContext {
 private:
-	HttpRequest const& request_;
+	server::HttpRequest const& request_;
 	std::map<std::string, std::string> meta_variables_;
 	sockaddr_in const& client_address_;
 	sockaddr_in const& server_address_;
@@ -45,7 +45,7 @@ private:
 	int setupExecveArgv();
 
 public:
-	CgiRequestContext(HttpRequest const& request,
+	CgiRequestContext(server::HttpRequest const& request,
 		sockaddr_in const& client_address,
 		sockaddr_in const& server_address);
 	CgiRequestContext(CgiRequestContext const& other);
@@ -55,7 +55,7 @@ public:
 	int createEnviron();
 	char** getExecveArgv() const;
 	char** getCgiEnviron() const;
-	HttpRequest const& getHttpRequest() const;
+	server::HttpRequest const& getHttpRequest() const;
 	std::string const getMetaVariable(std::string const& key) const;
 };
 
@@ -63,6 +63,6 @@ std::ostream& operator<<(std::ostream& out, const CgiRequestContext& cgi_meta_va
 
 char** DeepCopyCharPointerArray(char** source);
 
-} // namespace server
+} // namespace cgi
 
 #endif

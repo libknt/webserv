@@ -1,8 +1,8 @@
 #include "cgi_request_context.hpp"
 
-namespace server {
+namespace cgi{
 
-CgiRequestContext::CgiRequestContext(HttpRequest const& request,
+CgiRequestContext::CgiRequestContext(server::HttpRequest const& request,
 	sockaddr_in const& client_address,
 	sockaddr_in const& server_address)
 	: request_(request)
@@ -388,7 +388,7 @@ char** CgiRequestContext::getCgiEnviron() const {
 	return environ_;
 }
 
-HttpRequest const& CgiRequestContext::getHttpRequest() const {
+server::HttpRequest const& CgiRequestContext::getHttpRequest() const {
 	return request_;
 }
 
@@ -410,4 +410,4 @@ std::ostream& operator<<(std::ostream& out, const CgiRequestContext& cgi_meta_va
 	return out;
 }
 
-} // namespace server
+} // namespace cgi
