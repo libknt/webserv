@@ -2,7 +2,7 @@
 
 namespace server {
 
-namespace handle_request {
+namespace handle_cgi_response {
 
 void handleCgiResponse(ClientSession& client_session) {
 	Cgi const& cgi = client_session.getCgi();

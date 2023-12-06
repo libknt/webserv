@@ -10,7 +10,7 @@
 
 namespace server {
 
-namespace handle_request {
+namespace handle_cgi_response {
 
 void handleCgiResponse(ClientSession& client_session);
 void createResponseFromCgiResponse(std::string const& cgi_output,
@@ -22,7 +22,7 @@ void removeSpace(std::string& str);
 void toLowerCaseForHeaders(std::string& str);
 int locationAnalysis(std::string location, HttpResponse& response);
 
-} // namespace handle_cgi
+} // namespace handle_cgi_response
 
 } // namespace server
 

@@ -122,33 +122,6 @@ void executeDelete(const HttpRequest& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-void createErrorResponse(HttpResponse& response,
-	http_status_code::STATUS_CODE status_code,
-	const LocationDirective& location_directive) {
-
-	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
-
-	std::stringstream stringstream;
-	stringstream << status_code;
-	std::string error_page_path = error_pages[stringstream.str()];
-
-	std::ifstream file_stream(error_page_path.c_str());
-	std::string line, body_content;
-	if (file_stream.is_open()) {
-		while (getline(file_stream, line)) {
-			body_content += line + "\n";
-		}
-	} else {
-		body_content =
-			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
-	}
-	response.setStatusCode(status_code);
-	response.setHeaderValue("Content-Type", "text/html");
-	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
-	response.setBody(body_content);
-	response.setStatus(http_response_status::RESPONSE_SENDING);
-}
-
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
@@ -184,4 +157,31 @@ void makeAutoIndex(HttpRequest const& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 };
+
+void createErrorResponse(HttpResponse& response,
+	http_status_code::STATUS_CODE status_code,
+	const LocationDirective& location_directive) {
+
+	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
+
+	std::stringstream stringstream;
+	stringstream << status_code;
+	std::string error_page_path = error_pages[stringstream.str()];
+
+	std::ifstream file_stream(error_page_path.c_str());
+	std::string line, body_content;
+	if (file_stream.is_open()) {
+		while (getline(file_stream, line)) {
+			body_content += line + "\n";
+		}
+	} else {
+		body_content =
+			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+	}
+	response.setStatusCode(status_code);
+	response.setHeaderValue("Content-Type", "text/html");
+	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
+	response.setBody(body_content);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
+}
 };

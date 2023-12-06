@@ -196,7 +196,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					}
 					if (client_session.getCgi().getStatus() ==
 						cgi_status::CGI_RECEVICEING_COMPLETE) {
-						handle_request::handleCgiResponse(client_session);
+						handle_cgi_response::handleCgiResponse(client_session);
 						// todo
 						cgi_socket_pairs_.erase(sd);
 						int client_sd = client_session.getCgi().getSocketFd();
@@ -206,7 +206,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						setWriteFd(client_session.getSd());
 						client_session.setStatus(SENDING_RESPONSE);
 					}
-					// std::cout << client_session.getCgi() << std::endl;
 				}
 			}
 			--ready_sds;
@@ -218,6 +217,8 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			ClientSession& client_session = getClientSession(client_sd);
 			if (client_session.getStatus() == CGI_BODY_SENDING) {
 				std::string body = client_session.getRequest().getBody();
+				std::cout << "\033[31m"
+						  << "  CGI BODY SENDING: " << body << "\033[0m" << std::endl;
 				int send_result = send(sd, body.c_str(), body.length(), 0);
 				if (send_result < 0) {
 					std::cerr << "send() failed: " << strerror(errno) << std::endl;
