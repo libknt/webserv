@@ -448,8 +448,9 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE);
-	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
+	std::cout << "sizeof: " << sizeof(send_buffer) << std::endl;
+	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE - 1);
+	int send_result = send(client_sd, send_buffer, sizeof(send_buffer), 0);
 	std::cout << "send_buffer: " << send_buffer << std::endl;
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;

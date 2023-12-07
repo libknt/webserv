@@ -132,6 +132,7 @@ void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
 	stream_.read(buffer, buffer_size);
 	// std::cout << "buffer: " << std::endl << buffer << std::endl;
 	if (stream_.eof()) {
+		stream_.clear();
 		setStatus(http_response_status::FINISHED);
 	}
 }
