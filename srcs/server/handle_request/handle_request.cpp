@@ -139,7 +139,8 @@ void createErrorResponse(HttpResponse& response,
 			body_content += line + "\n";
 		}
 	} else {
-		body_content =
+		std::ifstream file
+		body_content = 
 			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
 	}
 	response.setStatusCode(status_code);
