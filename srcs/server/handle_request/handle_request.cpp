@@ -122,6 +122,7 @@ void executeDelete(const HttpRequest& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
+// TODO: refactor
 void createErrorResponse(HttpResponse& response,
 	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
@@ -139,14 +140,15 @@ void createErrorResponse(HttpResponse& response,
 			body_content += line + "\n";
 		}
 	} else {
-		std::ifstream default_error_page(location_directive.getDefaultErrorPage().c_str());
+		std::ifstream default_error_page(location_directive.getDefaultErrorPage());
 		if (default_error_page.is_open()) {
-			while (getline(error_page, line)) {
+			while (getline(default_error_page, line)) {
 				body_content += line + "\n";
 			}
+		} else {
+			body_content =
+				"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
 		}
-		body_content =
-			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
