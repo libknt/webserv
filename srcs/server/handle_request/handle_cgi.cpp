@@ -23,7 +23,6 @@ void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 		return;
 	} else {
 		createHeaderFiled(cgi_response, response);
-		response.setStatusCode(http_status_code::OK);
 	}
 	if (!cgi_response.getHeaderValue("location").empty()) {
 		if (locationAnalysis(cgi_response.getHeaderValue("location"), response) < 0) {
@@ -58,11 +57,12 @@ int locationAnalysis(std::string location, HttpResponse& response) {
 
 void createHeaderFiled(cgi::CgiResponse const& cgi_response, HttpResponse& response) {
 	std::string status = cgi_response.getHeaderValue("status");
+	http_status_code::STATUS_CODE status_code = http_status_code::OK;
 	if (!status.empty()) {
-		int status_code = createStatusCode(status);
-		response.setStatusCode(HttpResponse::numberToStatusCode(status_code));
+		status_code = HttpResponse::numberToStatusCode(createStatusCode(status));
+		response.setStatusCode(status_code);
 	} else {
-		response.setStatusCode(http_status_code::OK);
+		response.setStatusCode(status_code);
 	}
 
 	std::string content_type = cgi_response.getHeaderValue("content-type");
