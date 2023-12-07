@@ -172,7 +172,6 @@ int Cgi::execute() {
 		std::exit(EXIT_FAILURE);
 	}
 	close(socket_vector_[1]);
-	std::cout << "pid: " << pid_ << std::endl;
 	cgi_status_ = EXECUTED;
 	return 0;
 }

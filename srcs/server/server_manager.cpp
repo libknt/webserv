@@ -150,6 +150,7 @@ void ServerManager::cgiManagement(ClientSession& client_session) {
 		client_session.setStatus(CGI_BODY_SENDING);
 		setWriteFd(cgi.getSocketFd(0));
 		cgi_socket_pairs_.insert(std::make_pair(cgi.getSocketFd(0), client_session.getSd()));
+		client_session.getCgiResponse().setStage(cgi::HEADERS_SENT);
 	} else {
 		client_session.setStatus(CGI_RECEIVEING);
 		setReadFd(cgi.getSocketFd(0));
@@ -176,6 +177,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				if (client_session.getStatus() != CGI_RECEIVEING) {
 					if (receiveAndParseHttpRequest(client_session) < 0) {
 						is_running = false;
+						std::cout << "receiveAndParseHttpRequest() failed" << std::endl;
 						return -1;
 					}
 					if (client_session.getStatus() == CLOSED) {
@@ -199,6 +201,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				} else {
 					if (client_session.getCgiResponse().readCgiReponse() < 0) {
 						// createErrorResponse(client_session.getResponse(),
+						std::cout << "createErrorResponse" << std::endl;
 					}
 					if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
 						client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
@@ -245,7 +248,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 int ServerManager::sendCgiBody(ClientSession& client_session) {
 	int client_sd = client_session.getCgi().getSocketFd(0);
 	std::string body = client_session.getRequest().getBody();
-	std::cout << "send: " << body << std::endl;
 	char buffer[BUFFER_SIZE];
 	std::memset(buffer, '\0', sizeof(buffer));
 	std::memcpy(buffer, body.c_str(), body.length());
