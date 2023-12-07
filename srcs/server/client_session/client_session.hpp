@@ -27,7 +27,7 @@ enum CLIENT_SESSION_STATUS {
 };
 
 class ClientSession {
-//todo requestの数と時間によってcloseする
+	// todo requestの数と時間によってcloseする
 private:
 	const int sd_;
 	const sockaddr_in client_address_;

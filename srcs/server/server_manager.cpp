@@ -293,9 +293,13 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	if (pos != std::string::npos) {
 		std::string path_info = file_extension.substr(pos);
 		file_extension = file_extension.erase(pos, file_extension.size());
-
+		file_path = location_directive.getRoot() + path_info + request.getUriPath();
 		file_path = file_path.erase(file_path.size() - path_info.size(), file_path.size());
 	}
+	std::cout << "+++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	std::cout << "file_extension: " << file_extension << std::endl;
+	std::cout << "file_path: " << file_path << std::endl;
+	std::cout << "+++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
 		std::map<std::string, std::string> meta_variables;
@@ -318,7 +322,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	} else {
 		session.setStatus(RESPONSE_PREPARING);
 	}
-
+	std::cout << "session.getStatus(): " << session.getStatus() << std::endl;
 	return;
 }
 

@@ -127,8 +127,7 @@ char** Cgi::createExecveArgv() {
 	}
 	std::strcpy(argv[0], path.c_str());
 
-	std::string script = findMetaVariable("SCRIPT_NAME");
-	script = "/home/ubuntu2204/Documents/prg/42tokyo/webserv" + script;
+	std::string script = findMetaVariable("PATH_TRANSLATED") + findMetaVariable("SCRIPT_NAME");
 	argv[1] = new (std::nothrow) char[script.size() + 1];
 	if (!argv[1]) {
 		delete[] argv[0];
@@ -160,6 +159,13 @@ int Cgi::execute() {
 	char** argv = execve_argv_;
 	char** environ = environ_;
 	std::string const method = findMetaVariable("REQUEST_METHOD");
+
+	for (int i = 0; argv[i]; ++i) {
+		std::cout << "argv[" << i << "]: " << argv[i] << std::endl;
+	}
+	for (int i = 0; environ[i]; ++i) {
+		std::cout << "environ[" << i << "]: " << environ[i] << std::endl;
+	}
 
 	pid_ = fork();
 	if (pid_ == -1) {
