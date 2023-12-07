@@ -200,13 +200,19 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 				} else {
 					if (client_session.getCgiResponse().readCgiReponse() < 0) {
-						// createErrorResponse(client_session.getResponse(),
-						std::cout << "createErrorResponse" << std::endl;
-					}
-					if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
-						client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
+						createErrorResponse(client_session.getResponse(),
+							http_status_code::INTERNAL_SERVER_ERROR,
+							client_session.findLocation());
+						cgi_socket_pairs_.erase(sd);
+						int client_sd = client_session.getCgi().getSocketFd(0);
+						clearFds(client_sd);
+						close(client_session.getCgi().getSocketFd(0));
+						setWriteFd(client_session.getSd());
+						client_session.getResponse().concatenateComponents();
+						client_session.setStatus(SENDING_RESPONSE);
+					} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
+							   client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
 						handle_cgi_response::handleCgiResponse(client_session);
-						// 	// todo
 						cgi_socket_pairs_.erase(sd);
 						int client_sd = client_session.getCgi().getSocketFd(0);
 						clearFds(client_sd);
@@ -439,6 +445,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
 	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE);
 	int send_result = ::send(client_sd, send_buffer, sizeof(send_buffer), 0);
+	std::cout << "send_buffer: " << send_buffer << std::endl;
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		closeClientSession(client_session);

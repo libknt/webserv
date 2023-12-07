@@ -158,6 +158,9 @@ int CgiResponse::readCgiReponse() {
 				std::cout << "\e[33m"
 						  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
 						  << std::endl;
+				if (WEXITSTATUS(status_) != 0) {
+					return -1;
+				}
 			} else if (WIFSIGNALED(status_)) {
 				std::cout << "\e[33m"
 						  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m"

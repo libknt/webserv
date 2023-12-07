@@ -38,6 +38,18 @@ Cgi::~Cgi() {
 	if (pid_ != -1) {
 		kill(pid_, SIGKILL);
 	}
+	if (execve_argv_) {
+		for (int i = 0; execve_argv_[i]; ++i) {
+			delete[] execve_argv_[i];
+		}
+		delete[] execve_argv_;
+	}
+	if (environ_) {
+		for (int i = 0; environ_[i]; ++i) {
+			delete[] environ_[i];
+		}
+		delete[] environ_;
+	}
 	close(socket_vector_[0]);
 	close(socket_vector_[1]);
 }
