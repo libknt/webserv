@@ -34,13 +34,14 @@ private:
 	int parseCgiDirective(std::vector<std::string>& tokens);
 	int parseCgiExtensionsDirective(std::vector<std::string>& tokens);
 	bool isStatusCode(const std::string& status_code);
-	LocationDirective(const LocationDirective& other);
-	LocationDirective& operator=(const LocationDirective& other);
+
 
 public:
 	LocationDirective();
 	LocationDirective(const std::string& location_path);
 	~LocationDirective();
+	LocationDirective(const LocationDirective& other);
+	LocationDirective& operator=(const LocationDirective& other);
 
 	int parseLocationDirective(std::vector<std::string>& tokens);
 	std::string getLocationPath() const;
