@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 
 namespace cgi {
 enum CGI_STATUS {
