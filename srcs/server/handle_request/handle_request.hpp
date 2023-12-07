@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <sys/stat.h>
 
 namespace server {

@@ -40,25 +40,27 @@ void executeGet(const HttpRequest& request,
 	}
 	if (S_ISREG(request_stat_info.st_mode)) {
 		std::ifstream file_stream(file_path.c_str());
-		std::string body;
+		std::stringstream body_stream;
 		if (file_stream.is_open()) {
 			response.setStatusCode(http_status_code::OK);
-			std::getline(file_stream, body, static_cast<char>(EOF));
-			response.setHeaderValue("Content-Length", Utils::toString(body.size()));
-			response.setBody(body);
+			body_stream << file_stream.rdbuf();
+			response.setBody(body_stream.str());
+			response.setHeaderValue("Content-Length", Utils::toString(response.getBodyLength()));
+			response.setHeaderValue("Content-Type", response.getFileContentType(file_path));
 			response.setStatus(http_response_status::RESPONSE_SENDING);
 			return;
 		}
 	} else if (S_ISDIR(request_stat_info.st_mode)) {
 		if (location_stat_info.st_ino == request_stat_info.st_ino) {
-			std::ifstream default_file_stream(
-				std::string(location_path + "/" + location_directive.getIndex()).c_str());
+			std::string default_file_path = location_path + "/" + location_directive.getIndex();
+			std::ifstream default_file_stream(default_file_path.c_str());
 			if (default_file_stream.is_open()) {
-				std::string body;
+				std::stringstream body_stream;
 				response.setStatusCode(http_status_code::OK);
-				std::getline(default_file_stream, body, static_cast<char>(EOF));
-				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
-				response.setBody(body);
+				body_stream << default_file_stream.rdbuf();
+				response.setBody(body_stream.str());
+				response.setHeaderValue("Content-Length", Utils::toString(response.getBodyLength()));
+				response.setHeaderValue("Content-Type", response.getFileContentType(default_file_path));
 				response.setStatus(http_response_status::RESPONSE_SENDING);
 				return;
 			}
@@ -178,6 +180,7 @@ void makeAutoIndex(HttpRequest const& request,
 		body += ("</pre>\n</hr>\n</body>\n</html>\n");
 		response.setStatusCode(http_status_code::OK);
 		response.setHeaderValue("Content-Length", Utils::toString(body.size()));
+		response.setHeaderValue("Content-Type", "text/html");
 		response.setBody(body);
 	}
 	closedir(dir);
