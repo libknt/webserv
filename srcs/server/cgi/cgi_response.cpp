@@ -138,6 +138,7 @@ void CgiResponse::moveStage(std::string const& value) {
 
 int CgiResponse::readCgiReponse() {
 	if (stage_ == NOT_STARTED) {
+		std::cout << "cgi_response: NOT_STARTED" << std::endl;
 		return -1;
 	}
 	int sd = socket_vector_[0];
