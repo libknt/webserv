@@ -87,11 +87,25 @@ void CgiResponse::parseHeaders() {
 	headers_.clear();
 
 	while (std::getline(stream, line, '\n')) {
-		std::size_t pos = line.find(':');
+		std::string::size_type pos = line.find("\r\n");
+		if (pos != std::string::npos) {
+			line.erase(pos);
+		}
+		pos = line.find('\n');
+		if (pos != std::string::npos) {
+			line.erase(pos);
+		}
+		if (line.empty()) {
+			break;
+		}
+
+		pos = line.find(':');
 		if (pos != std::string::npos) {
 			std::string key = toLower(trim(line.substr(0, pos)));
 			std::string value = trim(line.substr(pos + 1));
-			headers_.insert(std::pair<std::string, std::string>(key, value));
+			if (!value.empty()) {
+				headers_.insert(std::pair<std::string, std::string>(key, value));
+			}
 		}
 	}
 	headers_stream_.clear();
