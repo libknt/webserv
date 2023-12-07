@@ -165,6 +165,8 @@ void ClientSession::sessionCleanup() {
 		delete cgi_;
 		cgi_ = NULL;
 	}
+	cgi_response_ = cgi::CgiResponse();
+	status_ = AWAITING_REQUEST;
 	std::cout << "  						Connection Cleanup" << std::endl;
 }
 
