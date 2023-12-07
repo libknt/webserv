@@ -247,6 +247,10 @@ int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::st
 	return 0;
 }
 
+std::string LocationDirective::getDefaultErrorPage() const {
+	return default_error_page_;
+}
+
 std::map<std::string, std::string> LocationDirective::getErrorPages() const {
 	return error_pages_;
 }

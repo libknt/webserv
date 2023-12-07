@@ -139,8 +139,13 @@ void createErrorResponse(HttpResponse& response,
 			body_content += line + "\n";
 		}
 	} else {
-		std::ifstream file
-		body_content = 
+		std::ifstream default_error_page(location_directive.getDefaultErrorPage().c_str());
+		if (default_error_page.is_open()) {
+			while (getline(error_page, line)) {
+				body_content += line + "\n";
+			}
+		}
+		body_content =
 			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
 	}
 	response.setStatusCode(status_code);
