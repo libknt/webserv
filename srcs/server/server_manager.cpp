@@ -129,7 +129,7 @@ int ServerManager::monitorSocketEvents() {
 	return 0;
 }
 
-void ServerManager::cgiManagement(ClientSession& client_session) {
+void ServerManager::handleCgiProcess(ClientSession& client_session) {
 	cgi::Cgi& cgi = client_session.getCgi();
 	const HttpRequest& request = client_session.getRequest();
 
@@ -141,21 +141,20 @@ void ServerManager::cgiManagement(ClientSession& client_session) {
 		client_session.setStatus(SENDING_RESPONSE);
 		return;
 	}
-
-	client_session.getCgiResponse().setSocketFd(0, cgi.getSocketFd(0));
-	client_session.getCgiResponse().setSocketFd(1, cgi.getSocketFd(1));
-	client_session.getCgiResponse().setPid(cgi.getPid());
+	cgi::CgiResponse& cgi_response = client_session.getCgiResponse();
+	cgi_response.setSocketFd(0, cgi.getSocketFd(0));
+	cgi_response.setSocketFd(1, cgi.getSocketFd(1));
+	cgi_response.setPid(cgi.getPid());
+	cgi_response.setStage(cgi::HEADERS_SENT);
 
 	if (request.getHttpMethod() == http_method::POST) {
 		client_session.setStatus(CGI_BODY_SENDING);
 		setWriteFd(cgi.getSocketFd(0));
 		cgi_socket_pairs_.insert(std::make_pair(cgi.getSocketFd(0), client_session.getSd()));
-		client_session.getCgiResponse().setStage(cgi::HEADERS_SENT);
 	} else {
 		client_session.setStatus(CGI_RECEIVEING);
 		setReadFd(cgi.getSocketFd(0));
 		cgi_socket_pairs_.insert(std::make_pair(cgi.getSocketFd(0), client_session.getSd()));
-		client_session.getCgiResponse().setStage(cgi::HEADERS_SENT);
 	}
 }
 
@@ -189,10 +188,9 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						setClientResponseStage(client_session);
 					}
 					if (client_session.getStatus() == RESPONSE_PREPARING) {
-						// レスポンスの準備
 						handle_request::handleRequest(client_session);
 					} else if (client_session.getStatus() == CGI_PREPARING) {
-						cgiManagement(client_session);
+						handleCgiProcess(client_session);
 					}
 					if (client_session.getStatus() == SENDING_RESPONSE) {
 						setWriteFd(sd);
@@ -203,12 +201,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						createErrorResponse(client_session.getResponse(),
 							http_status_code::INTERNAL_SERVER_ERROR,
 							client_session.findLocation());
+						client_session.getResponse().concatenateComponents();
 						cgi_socket_pairs_.erase(sd);
 						int client_sd = client_session.getCgi().getSocketFd(0);
 						clearFds(client_sd);
 						close(client_session.getCgi().getSocketFd(0));
 						setWriteFd(client_session.getSd());
-						client_session.getResponse().concatenateComponents();
 						client_session.setStatus(SENDING_RESPONSE);
 					} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
 							   client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
@@ -243,7 +241,6 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			} else if (client_session.getStatus() == SESSION_COMPLETE) {
 				clearFds(client_session.getSd());
 				client_session.sessionCleanup();
-				// FD_CLR(client_session.getSd(), &master_write_fds_);
 			}
 			--ready_sds;
 		}
@@ -290,15 +287,23 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getUriPath());
 	std::string file_extension = Utils::extructUriExtension(request.getUriPath());
-	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
+	std::string file_path = location_directive.getRoot() + request.getUriPath();
 
+	std::string::size_type pos = file_extension.find('/');
+	if (pos != std::string::npos) {
+		std::string path_info = file_extension.substr(pos);
+		file_extension = file_extension.erase(pos, file_extension.size());
+
+		file_path = file_path.erase(file_path.size() - path_info.size(), file_path.size());
+	}
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
 		std::map<std::string, std::string> meta_variables;
 		server_cgi_utils::createCgiMetaVariables(meta_variables,
 			session.getRequest(),
 			session.getClientAddress(),
-			session.getServerAddress());
+			session.getServerAddress(),
+			location_directive.getRoot());
 		cgi::Cgi* cgi = new (std::nothrow) cgi::Cgi(meta_variables);
 		if (!cgi) {
 			std::cerr << "new (std::nothrow) Cgi() failed" << std::endl;

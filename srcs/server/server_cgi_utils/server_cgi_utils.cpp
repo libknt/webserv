@@ -24,17 +24,8 @@ static std::string pathInfo(const std::string& value) {
 	return std::string("");
 }
 
-static std::string pathTranslated(std::string const& path_info) {
-	// TODO serverのドキュメントルートに合わせる.
-	// サーバー上の実際のファイルパス
-	// PATH_INFO
-	// のパスがサーバーのドキュメントルートを基準とした物理的なファイルパスに変換されたもの.
-	std::string path_translated("");
-	if (!path_info.empty()) {
-		// root_path + path_info
-		//  一旦
-		path_translated = "/var/www/html/additional" + path_info;
-	}
+static std::string pathTranslated(std::string const& root, std::string const& path_info) {
+	std::string path_translated = root + path_info;
 	return path_translated;
 }
 
@@ -116,15 +107,10 @@ static std::string remoteUser(std::string const& value) {
 }
 
 static std::string scriptName(const std::string& value, const std::string& path_info) {
-	std::string uri(value);
-	std::string script_name(uri);
+	std::string script_name(value);
 	if (!path_info.empty()) {
-		uri.erase(path_info.size());
+		script_name = script_name.erase(script_name.size() - path_info.size(), path_info.size());
 	}
-	// std::string::size_type position = uri.rfind("/");
-	// if (position != std::string::npos) {
-	// 	script_name.erase(0, position);
-	// }
 	return script_name;
 }
 
@@ -149,10 +135,10 @@ static std::string serverPort(sockaddr_in const& server_address) {
 void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	server::HttpRequest const& request,
 	sockaddr_in const& client_address,
-	sockaddr_in const& server_address) {
+	sockaddr_in const& server_address,
+	std::string const& root_path) {
 
 	meta_variables.clear();
-
 	meta_variables.insert(
 		std::make_pair("AUTH_TYPE", authTye(request.getHeaderValue("authorization"))));
 	meta_variables.insert(
@@ -161,7 +147,7 @@ void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	meta_variables.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	meta_variables.insert(std::make_pair("PATH_INFO", pathInfo(request.getUriPath())));
 	meta_variables.insert(std::make_pair(
-		"PATH_TRANSLATED", pathTranslated(meta_variables.find("PATH_INFO")->second)));
+		"PATH_TRANSLATED", pathTranslated(root_path, meta_variables.find("PATH_INFO")->second)));
 	meta_variables.insert(std::make_pair("QUERY_STRING", request.getUriQuery()));
 	meta_variables.insert(std::make_pair("REMOTE_ADDR", remoteAddr(client_address)));
 	meta_variables.insert(std::make_pair("REMOTE_HOST", remoteHost()));

@@ -36,7 +36,7 @@ public:
 	CgiResponse& operator=(const CgiResponse& other);
 	~CgiResponse();
 
-	void moveStage(std::string const& value);
+	void advanceResponseProcessing(std::string const& value);
 	void setStage(CGI_RESPONSE_STAGE const stage);
 	int readCgiReponse();
 	void setSocketFd(int index, int fd);

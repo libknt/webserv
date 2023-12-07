@@ -12,7 +12,8 @@ namespace server_cgi_utils {
 void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	server::HttpRequest const& request,
 	sockaddr_in const& client_address,
-	sockaddr_in const& server_address);
+	sockaddr_in const& server_address,
+	std::string const& root_path);
 
 } // namespace server_cgi_utils
 

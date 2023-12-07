@@ -50,7 +50,7 @@ private:
 	void closeClientSession(ClientSession& client_session);
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
-	void cgiManagement(ClientSession& client_session);
+	void handleCgiProcess(ClientSession& client_session);
 	int sendCgiBody(ClientSession& client_session);
 
 public:

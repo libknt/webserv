@@ -97,7 +97,7 @@ void CgiResponse::parseHeaders() {
 	headers_stream_.clear();
 }
 
-void CgiResponse::moveStage(std::string const& value) {
+void CgiResponse::advanceResponseProcessing(std::string const& value) {
 	std::string output(value);
 
 	if (stage_ == NOT_STARTED) {
@@ -147,7 +147,7 @@ int CgiResponse::readCgiReponse() {
 
 	int recv_result = recv(sd, buffer, BUFFER_SIZE - 1, 0);
 	if (recv_result > 0) {
-		moveStage(std::string(buffer));
+		advanceResponseProcessing(std::string(buffer));
 	} else if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		return -1;
