@@ -132,10 +132,10 @@ void createErrorResponse(HttpResponse& response,
 	stringstream << status_code;
 	std::string error_page_path = error_pages[stringstream.str()];
 
-	std::ifstream file_stream(error_page_path.c_str());
+	std::ifstream error_page(error_page_path.c_str());
 	std::string line, body_content;
-	if (file_stream.is_open()) {
-		while (getline(file_stream, line)) {
+	if (error_page.is_open()) {
+		while (getline(error_page, line)) {
 			body_content += line + "\n";
 		}
 	} else {
