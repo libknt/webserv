@@ -30,6 +30,7 @@ LocationDirective::~LocationDirective() {}
 
 LocationDirective::LocationDirective(const LocationDirective& other)
 	: location_path_(other.location_path_)
+	, default_error_page_(other.default_error_page_)
 	, error_pages_(other.error_pages_)
 	, allow_methods_(other.allow_methods_)
 	, client_max_body_size_(other.client_max_body_size_)
@@ -43,6 +44,7 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 
 LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
+		default_error_page_ = other.default_error_page_;
 		error_pages_ = other.error_pages_;
 		allow_methods_ = other.allow_methods_;
 		client_max_body_size_ = other.client_max_body_size_;
@@ -369,6 +371,7 @@ bool LocationDirective::isStatusCode(const std::string& status_code) {
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
 	out << "LocationPath: " << location_directive.getLocationPath() << std::endl;
+	out << "DefaultErrorPage: " << location_directive.getDefaultErrorPage() << std::endl;
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 	out << "ErrorPages: " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = error_pages.begin();
