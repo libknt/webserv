@@ -1,6 +1,7 @@
 #ifndef SERVER_CGI_UTILS_HPP
 #define SERVER_CGI_UTILS_HPP
 
+#include "client_session.hpp"
 #include "http_request.hpp"
 #include <arpa/inet.h>
 #include <map>
