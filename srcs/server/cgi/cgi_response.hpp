@@ -29,6 +29,7 @@ private:
 	std::size_t content_length_;
 
 	void parseHeaders();
+	void addCarriageReturn(std::string& str);
 
 public:
 	CgiResponse();

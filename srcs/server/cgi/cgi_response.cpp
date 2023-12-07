@@ -111,6 +111,15 @@ void CgiResponse::parseHeaders() {
 	headers_stream_.clear();
 }
 
+void CgiResponse::addCarriageReturn(std::string& str) {
+	for (std::string::size_type i = 0; i < str.size(); ++i) {
+		if (str[i] == '\n') {
+			str.insert(i, "\r");
+			++i;
+		}
+	}
+}
+
 void CgiResponse::advanceResponseProcessing(std::string const& value) {
 	std::string output(value);
 
@@ -135,6 +144,7 @@ void CgiResponse::advanceResponseProcessing(std::string const& value) {
 	}
 	if (stage_ == BODY_SENT) {
 		if (!body_.empty() && body_[body_.size() - 1] == '\n' && output[0] == '\n') {
+			addCarriageReturn(output);
 			body_ += output;
 			stage_ = COMPLETE;
 			return;
@@ -142,9 +152,12 @@ void CgiResponse::advanceResponseProcessing(std::string const& value) {
 			std::string::size_type pos = output.find("\n\n");
 			if (pos != std::string::npos) {
 				stage_ = COMPLETE;
+				addCarriageReturn(output);
 				body_ += output;
 				content_length_ = body_.size();
+				return;
 			}
+			addCarriageReturn(output);
 			body_ += output;
 		}
 	}
