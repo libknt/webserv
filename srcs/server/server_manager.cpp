@@ -296,10 +296,6 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 		file_path = location_directive.getRoot() + path_info + request.getUriPath();
 		file_path = file_path.erase(file_path.size() - path_info.size(), file_path.size());
 	}
-	std::cout << "+++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-	std::cout << "file_extension: " << file_extension << std::endl;
-	std::cout << "file_path: " << file_path << std::endl;
-	std::cout << "+++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
 		std::map<std::string, std::string> meta_variables;
