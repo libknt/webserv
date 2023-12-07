@@ -5,42 +5,37 @@ namespace server {
 namespace handle_cgi_response {
 
 void handleCgiResponse(ClientSession& client_session) {
-	cgi::Cgi const& cgi = client_session.getCgi();
+	cgi::CgiResponse const& cgi_response = client_session.getCgiResponse();
 	HttpResponse& response = client_session.getResponse();
-	const HttpRequest& request = client_session.getRequest();
-	const ServerDirective& server_directive = client_session.getServerDirective();
-	const LocationDirective& location_directive =
-		server_directive.findLocation(request.getRequestPath());
-	createResponseFromCgiResponse(cgi.getCgiOutput(), response, location_directive);
+	const LocationDirective& location_directive = client_session.findLocation();
+	createResponseFromCgiResponse(cgi_response, response, location_directive);
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 	response.concatenateComponents();
 }
 
-void createResponseFromCgiResponse(std::string const& cgi_output,
+void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	if (cgi_output.find("Location") != std::string::npos &&
-		cgi_output.find("Status") == std::string::npos) {
+
+	if (!cgi_response.getHeaderValue("location").empty() &&
+		cgi_response.getHeaderValue("status").empty()) {
 		createErrorResponse(response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
+		return;
 	} else {
-		std::string output(cgi_output);
-		std::string header = output.substr(0, output.find("\n\n"));
-		std::string body = output.substr(output.find("\n\n") + 2);
-		toLowerCaseForHeaders(header);
-		removeSpace(header);
-		createHeaderFiled(header, response);
-		if (header.find("location:") != std::string::npos) {
-			if (locationAnalysis(header.substr(header.find("location:") + 9,
-									 header.find("\n", header.find("location:") + 9) -
-										 header.find("location:") - 9),
-					response) < 0) {
-				createErrorResponse(
-					response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
-				return;
-			}
+		createHeaderFiled(cgi_response, response);
+		response.setStatusCode(http_status_code::OK);
+	}
+	if (!cgi_response.getHeaderValue("location").empty()) {
+		if (locationAnalysis(cgi_response.getHeaderValue("location"), response) < 0) {
+			createErrorResponse(
+				response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
+			return;
 		}
-		response.setHeaderValue("content-length", Utils::toString(body.size()));
-		response.setBody(body);
+	}
+
+	if (cgi_response.getContentLength() > 0) {
+		response.setHeaderValue("content-length", Utils::toString(cgi_response.getContentLength()));
+		response.setBody(cgi_response.getBody());
 	}
 }
 
@@ -61,63 +56,27 @@ int locationAnalysis(std::string location, HttpResponse& response) {
 	return -1;
 }
 
-void removeSpace(std::string& str) {
-	for (size_t i = 0; i < str.length(); ++i) {
-		if (str[i] == ':') {
-			if (i > 0 && str[i - 1] == ' ') {
-				str.erase(i - 1, 1);
-				--i;
-			}
-			if (i < str.length() - 1 && str[i + 1] == ' ') {
-				str.erase(i + 1, 1);
-			}
-		}
-	}
-}
-
-void toLowerCaseForHeaders(std::string& str) {
-	bool isKey = true;
-	for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
-		if (*it == ':') {
-			isKey = false;
-		}
-
-		if (isKey && std::isalpha(*it)) {
-			*it = std::tolower(*it);
-		}
-
-		if (*it == '\n') {
-			isKey = true;
-		}
-	}
-}
-
-void createHeaderFiled(std::string& headerFiled, HttpResponse& response) {
-	std::string::size_type position;
-	std::string::size_type end;
-
-	position = headerFiled.find("status:");
-	if (position != std::string::npos) {
-		end = headerFiled.find("\n", position);
-		createStatusCode(headerFiled.substr(position + 7, end - position - 7), response);
+void createHeaderFiled(cgi::CgiResponse const& cgi_response, HttpResponse& response) {
+	std::string status = cgi_response.getHeaderValue("status");
+	if (!status.empty()) {
+		int status_code = createStatusCode(status);
+		response.setStatusCode(HttpResponse::numberToStatusCode(status_code));
 	} else {
 		response.setStatusCode(http_status_code::OK);
 	}
 
-	position = headerFiled.find("content-type:");
-	if (position != std::string::npos) {
-		end = headerFiled.find("\n", position);
-		response.setHeaderValue(
-			"content-type", headerFiled.substr(position + 13, end - position - 13));
+	std::string content_type = cgi_response.getHeaderValue("content-type");
+	if (!content_type.empty()) {
+		response.setHeaderValue("content-type", content_type);
 	} else {
-		response.setHeaderValue("content-type", "text/html");
+		response.setHeaderValue("content-type", "text/plain");
 	}
 }
 
-void createStatusCode(std::string line, HttpResponse& response) {
+int createStatusCode(std::string const& status) {
 	std::string status_code;
 	int number = 200;
-	std::istringstream iss(line);
+	std::istringstream iss(status);
 	std::string tmp;
 	while (iss >> tmp) {
 		std::istringstream iss2(tmp);
@@ -125,7 +84,7 @@ void createStatusCode(std::string line, HttpResponse& response) {
 			break;
 		}
 	}
-	response.setStatusCode(HttpResponse::numberToStatusCode(number));
+	return number;
 }
 
 } // namespace handle_cgi

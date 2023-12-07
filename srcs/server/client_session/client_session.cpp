@@ -12,6 +12,7 @@ ClientSession::ClientSession(int const sd,
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
 	, cgi_(NULL)
+	, cgi_response_(cgi::CgiResponse())
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
 
@@ -26,6 +27,7 @@ ClientSession::ClientSession(int const sd,
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
 	, cgi_(NULL)
+	, cgi_response_(cgi::CgiResponse())
 	, response_(HttpResponse())
 	, status_(status) {}
 
@@ -43,13 +45,16 @@ ClientSession::ClientSession(const ClientSession& other)
 	, server_directive_(other.server_directive_)
 	, request_(other.request_)
 	, cgi_(other.cgi_)
+	, cgi_response_(other.cgi_response_)
 	, response_(other.response_)
 	, status_(other.status_) {}
 
 ClientSession& ClientSession::operator=(const ClientSession& other) {
 	if (this != &other) {
 		request_ = other.request_;
+		// tofo deep copy
 		cgi_ = other.cgi_;
+		cgi_response_ = other.cgi_response_;
 		response_ = other.response_;
 		status_ = other.status_;
 	}
@@ -167,6 +172,10 @@ void ClientSession::setCgi(cgi::Cgi* cgi) {
 	cgi_ = cgi;
 }
 
+cgi::CgiResponse& ClientSession::getCgiResponse() {
+	return cgi_response_;
+}
+
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session) {
 	out << "ClientSession: " << std::endl;
 	out << "  sd: " << client_session.getSd() << std::endl;
@@ -178,8 +187,6 @@ std::ostream& operator<<(std::ostream& out, const ClientSession& client_session)
 	std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	out << "  request: " << std::endl;
 	out << &client_session.getRequest() << std::endl;
-	out << "  cgi: request: " << std::endl;
-	out << &client_session.getCgi().getHttpRequest() << std::endl;
 	std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	return out;
 }

@@ -2,12 +2,12 @@
 
 namespace cgi {
 
-Cgi::Cgi(server::HttpRequest const& request,
-	sockaddr_in const& client_address,
-	sockaddr_in const& server_address)
+Cgi::Cgi(const std::map<std::string, std::string> meta_variables)
 	: cgi_status_(UNDIFINED)
-	, cgi_request_context_(cgi::CgiRequestContext(request, client_address, server_address))
+	, meta_variables_(meta_variables)
 	, pid_(-1)
+	, execve_argv_(NULL)
+	, environ_(NULL)
 	, status_(-1) {
 	socket_vector_[0] = -1;
 	socket_vector_[1] = -1;
@@ -15,7 +15,7 @@ Cgi::Cgi(server::HttpRequest const& request,
 
 Cgi::Cgi(const Cgi& other)
 	: cgi_status_(other.cgi_status_)
-	, cgi_request_context_(other.cgi_request_context_)
+	, meta_variables_(other.meta_variables_)
 	, pid_(other.pid_)
 	, status_(other.status_) {
 	socket_vector_[0] = other.socket_vector_[0];
@@ -24,7 +24,8 @@ Cgi::Cgi(const Cgi& other)
 
 Cgi& Cgi::operator=(const Cgi& other) {
 	if (this != &other) {
-		cgi_request_context_ = other.cgi_request_context_;
+		cgi_status_ = other.cgi_status_;
+		meta_variables_ = other.meta_variables_;
 		socket_vector_[0] = other.socket_vector_[0];
 		socket_vector_[1] = other.socket_vector_[1];
 		pid_ = other.pid_;
@@ -72,27 +73,81 @@ int Cgi::setupInterProcessCommunication() {
 	return 0;
 }
 
-int Cgi::setupCgiRequestContext() {
-	if (cgi_request_context_.setup() == -1) {
-		return -1;
+char** Cgi::mapToCharStarStar(const std::map<std::string, std::string>& map) {
+	typedef std::map<std::string, std::string>::const_iterator MapIterator;
+	char** char_star_star = new (std::nothrow) char*[map.size() + 1];
+	if (!char_star_star) {
+		std::cerr << "Memory allocation failed" << std::endl;
+		return NULL;
 	}
-	return 0;
+
+	int i = 0;
+	for (MapIterator it = map.begin(); it != map.end(); ++it) {
+		std::string temp = it->first + "=" + it->second;
+		char_star_star[i] = new (std::nothrow) char[temp.size() + 1];
+		if (!char_star_star[i]) {
+			std::cerr << "Memory allocation failed" << std::endl;
+			for (int j = 0; j < i; ++j) {
+				delete[] char_star_star[j];
+			}
+			delete[] char_star_star;
+			return NULL;
+		}
+		std::strcpy(char_star_star[i], temp.c_str());
+		++i;
+	}
+	char_star_star[i] = NULL;
+	return char_star_star;
+}
+
+char** Cgi::createExecveArgv() {
+	char** argv = new (std::nothrow) char*[3];
+	if (!argv) {
+		return NULL;
+	}
+
+	std::string path = "/usr/bin/python3";
+
+	argv[0] = new (std::nothrow) char[path.size() + 1];
+	if (!argv[0]) {
+		delete[] argv;
+		return NULL;
+	}
+	std::strcpy(argv[0], path.c_str());
+
+	std::string script = findMetaVariable("SCRIPT_NAME");
+	script = "/home/ubuntu2204/Documents/prg/42tokyo/webserv" + script;
+	argv[1] = new (std::nothrow) char[script.size() + 1];
+	if (!argv[1]) {
+		delete[] argv[0];
+		delete[] argv;
+		return NULL;
+	}
+	std::strcpy(argv[1], script.c_str());
+
+	argv[2] = NULL;
+	return argv;
 }
 
 int Cgi::setup() {
 	if (setupInterProcessCommunication() == -1) {
 		return -1;
 	}
-	if (setupCgiRequestContext() == -1) {
+	execve_argv_ = createExecveArgv();
+	if (!execve_argv_) {
+		return -1;
+	}
+	environ_ = mapToCharStarStar(meta_variables_);
+	if (!environ_) {
 		return -1;
 	}
 	return 0;
 }
 
-int Cgi::executeCgi() {
-	char** environ = cgi_request_context_.getCgiEnviron();
-	char** argv = cgi_request_context_.getExecveArgv();
-	server::http_method::HTTP_METHOD method = cgi_request_context_.getHttpRequest().getHttpMethod();
+int Cgi::execute() {
+	char** argv = execve_argv_;
+	char** environ = environ_;
+	std::string const method = findMetaVariable("REQUEST_METHOD");
 
 	pid_ = fork();
 	if (pid_ == -1) {
@@ -105,7 +160,7 @@ int Cgi::executeCgi() {
 			std::cerr << "dup2() failed: " << strerror(errno) << std::endl;
 			std::exit(EXIT_FAILURE);
 		}
-		if (method == server::http_method::POST) {
+		if (method == "POST") {
 			if (dup2(socket_vector_[1], STDIN_FILENO) < 0) {
 				std::cerr << "dup2() failed: " << strerror(errno) << std::endl;
 				std::exit(EXIT_FAILURE);
@@ -118,82 +173,34 @@ int Cgi::executeCgi() {
 	}
 	close(socket_vector_[1]);
 	std::cout << "pid: " << pid_ << std::endl;
+	cgi_status_ = EXECUTED;
 	return 0;
 }
 
-int Cgi::readCgiOutput() {
-	int sd = socket_vector_[0];
-	char recv_buffer[BUFFER_SIZE];
-	std::memset(recv_buffer, '\0', sizeof(recv_buffer));
-
-	int recv_result = recv(sd, recv_buffer, BUFFER_SIZE - 1, 0);
-	std::cout << "\033[30m"
-			  << "  CGI output: " << recv_buffer << "\033[0m" << std::endl;
-	std::cout << "\033[32m"
-			  << "  CGI output: end: " << recv_result << "\033[0m" << std::endl;
-	if (recv_result > 0) {
-		std::string recv_string(recv_buffer);
-		cgi_output_ += recv_string;
-	} else if (recv_result < 0) {
-		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-
-		// Todo : server error create response
-		// ここでselectが∞るーぷするようになってしまう
-		return -1;
-	} else if (recv_result == 0) {
-		std::cout << "  Connection closed" << std::endl;
-		if (waitpid(pid_, &status_, 0) > 0) {
-			if (WIFEXITED(status_)) {
-				std::cout << "\e[33m"
-						  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
-						  << std::endl;
-				setStatus(CGI_RECEVICEING_COMPLETE);
-			} else if (WIFSIGNALED(status_)) {
-				std::cout << "\e[33m"
-						  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m"
-						  << std::endl;
-			}
-		} else {
-			std::cerr << "waitpid failed" << std::endl;
-		}
-		return 0;
+std::string Cgi::findMetaVariable(std::string const& key) const {
+	std::map<std::string, std::string>::const_iterator it = meta_variables_.find(key);
+	if (it == meta_variables_.end()) {
+		return "";
 	}
-	return 0;
+	return it->second;
 }
 
-int Cgi::getSocketFd(int index) const {
+int Cgi::getSocketFd(int const index) const {
 	return socket_vector_[index];
-}
-
-server::HttpRequest const& Cgi::getHttpRequest() const {
-	return cgi_request_context_.getHttpRequest();
-}
-
-std::string const& Cgi::getCgiOutput() const {
-	return cgi_output_;
-}
-
-void Cgi::setStatus(CGI_STATUS const status) {
-	cgi_status_ = status;
 }
 
 CGI_STATUS Cgi::getStatus() const {
 	return cgi_status_;
 }
 
-std::string const Cgi::sendResponse() {
-	std::string tmp = cgi_output_.substr(0, BUFFER_SIZE - 1);
-	cgi_output_ = cgi_output_.erase(0, BUFFER_SIZE - 1);
-	if (cgi_output_.empty()) {
-		setStatus(CGI_SENDING_COMPLETE);
-	}
-	return tmp;
+pid_t Cgi::getPid() const {
+	return pid_;
 }
 
 std::ostream& operator<<(std::ostream& out, const Cgi& cgi) {
 
 	out << "Cgi: " << std::endl;
-	out << cgi.getCgiOutput() << std::endl;
+	out << cgi.getStatus() << std::endl;
 	return out;
 }
 

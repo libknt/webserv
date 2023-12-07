@@ -1,6 +1,7 @@
 #ifndef CLIENT_SESSION_HPP
 #define CLIENT_SESSION_HPP
 
+#include "cgi_response.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "server_directive.hpp"
@@ -34,6 +35,7 @@ private:
 
 	HttpRequest request_;
 	cgi::Cgi* cgi_;
+	cgi::CgiResponse cgi_response_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
 
@@ -69,6 +71,7 @@ public:
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
 	void setCgi(cgi::Cgi* cgi);
+	cgi::CgiResponse& getCgiResponse();
 };
 
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session);

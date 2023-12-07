@@ -6,6 +6,7 @@
 #include "handle_cgi.hpp"
 #include "handle_request.hpp"
 #include "http_request_parser.hpp"
+#include "server_cgi_utils.hpp"
 #include "tcp_socket.hpp"
 #include "utils.hpp"
 #include "webserv.hpp"
@@ -49,7 +50,7 @@ private:
 	void closeClientSession(ClientSession& client_session);
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
-	int cgiManagement(ClientSession& client_session);
+	void cgiManagement(ClientSession& client_session);
 	int sendCgiBody(ClientSession& client_session);
 
 public:

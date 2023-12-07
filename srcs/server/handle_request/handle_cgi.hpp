@@ -2,6 +2,7 @@
 #define HANDLE_CGI_HPP
 
 #include "cgi.hpp"
+#include "cgi_response.hpp"
 #include "client_session.hpp"
 #include "handle_request.hpp"
 
@@ -13,13 +14,11 @@ namespace server {
 namespace handle_cgi_response {
 
 void handleCgiResponse(ClientSession& client_session);
-void createResponseFromCgiResponse(std::string const& cgi_output,
+void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 	HttpResponse& response,
 	const LocationDirective& location_directive);
-void createStatusCode(std::string cgi_output, HttpResponse& response);
-void createHeaderFiled(std::string& headerFiled, HttpResponse& response);
-void removeSpace(std::string& str);
-void toLowerCaseForHeaders(std::string& str);
+int createStatusCode(std::string const& status);
+void createHeaderFiled(cgi::CgiResponse const& cgi_response, HttpResponse& response);
 int locationAnalysis(std::string location, HttpResponse& response);
 
 } // namespace handle_cgi_response

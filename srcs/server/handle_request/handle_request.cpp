@@ -22,6 +22,7 @@ void handleRequest(ClientSession& client_session) {
 		createErrorResponse(response, http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
 	response.concatenateComponents();
+	client_session.setStatus(SENDING_RESPONSE);
 }
 
 void executeGet(const HttpRequest& request,
