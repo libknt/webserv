@@ -318,7 +318,6 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	} else {
 		session.setStatus(RESPONSE_PREPARING);
 	}
-	std::cout << "session.getStatus(): " << session.getStatus() << std::endl;
 	return;
 }
 
