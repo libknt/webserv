@@ -5,12 +5,15 @@
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <signal.h>
+#include <sstream>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vector>
 
 namespace cgi {
 enum CGI_STATUS {
@@ -31,6 +34,7 @@ private:
 	int setNonBlocking(int sd);
 	int setupInterProcessCommunication();
 	char** mapToCharStarStar(std::map<std::string, std::string> const& map);
+	int shebang(std::string file, std::string& path);
 	char** createExecveArgv();
 
 public:

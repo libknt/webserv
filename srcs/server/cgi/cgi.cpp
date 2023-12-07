@@ -112,31 +112,68 @@ char** Cgi::mapToCharStarStar(const std::map<std::string, std::string>& map) {
 	return char_star_star;
 }
 
+// シバン（shebang）
+// #!/usr/local/bin/python3
+int Cgi::shebang(std::string file, std::string& path) {
+	std::ifstream infile(file.c_str());
+	if (!infile) {
+		std::cout << "file open error: " << file << std::endl;
+		return -1;
+	}
+	std::string line;
+	std::getline(infile, line);
+	path.clear();
+	if (line.empty()) {
+		return -1;
+	} else if (line.size() > 2 && line[0] == '#' && line[1] == '!') {
+		line = line.substr(2);
+		// int access_flag = access(line.c_str(), X_OK);
+		// if (access_flag == 0) {
+		// 	std::cout << "access() success: " << line << std::endl;
+		path = line;
+		// } else {
+		// 	std::cout << "access() failed: " << line << std::endl;
+		// }
+	}
+	return 0;
+}
+
 char** Cgi::createExecveArgv() {
-	char** argv = new (std::nothrow) char*[3];
+	std::vector<std::string> argv_vector;
+	std::string path;
+	std::string script = findMetaVariable("PATH_TRANSLATED") + findMetaVariable("SCRIPT_NAME");
+	shebang(script, path);
+	if (!path.empty()) {
+		std::istringstream iss(path);
+		std::string token;
+		while (std::getline(iss, token, ' ')) {
+			if (!token.empty()) {
+				argv_vector.push_back(token);
+			}
+		}
+	} else {
+		argv_vector.push_back("/usr/bin/python3");
+	}
+	argv_vector.push_back(script);
+
+	char** argv = new (std::nothrow) char*[argv_vector.size() + 1];
 	if (!argv) {
 		return NULL;
 	}
 
-	std::string path = "/usr/bin/python3";
-
-	argv[0] = new (std::nothrow) char[path.size() + 1];
-	if (!argv[0]) {
-		delete[] argv;
-		return NULL;
+	for (size_t i = 0; i < argv_vector.size(); ++i) {
+		argv[i] = new (std::nothrow) char[argv_vector[i].size() + 1];
+		if (!argv[i]) {
+			for (size_t j = 0; j < i; ++j) {
+				delete[] argv[j];
+			}
+			delete[] argv;
+			return NULL;
+		}
+		std::strcpy(argv[i], argv_vector[i].c_str());
 	}
-	std::strcpy(argv[0], path.c_str());
-
-	std::string script = findMetaVariable("PATH_TRANSLATED") + findMetaVariable("SCRIPT_NAME");
-	argv[1] = new (std::nothrow) char[script.size() + 1];
-	if (!argv[1]) {
-		delete[] argv[0];
-		delete[] argv;
-		return NULL;
-	}
-	std::strcpy(argv[1], script.c_str());
-
-	argv[2] = NULL;
+	argv[argv_vector.size()] = NULL;
+	argv_vector.clear();
 	return argv;
 }
 
@@ -159,13 +196,6 @@ int Cgi::execute() {
 	char** argv = execve_argv_;
 	char** environ = environ_;
 	std::string const method = findMetaVariable("REQUEST_METHOD");
-
-	for (int i = 0; argv[i]; ++i) {
-		std::cout << "argv[" << i << "]: " << argv[i] << std::endl;
-	}
-	for (int i = 0; environ[i]; ++i) {
-		std::cout << "environ[" << i << "]: " << environ[i] << std::endl;
-	}
 
 	pid_ = fork();
 	if (pid_ == -1) {
