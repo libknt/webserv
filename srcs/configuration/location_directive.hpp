@@ -2,6 +2,7 @@
 #define LOCATION_DIRECTIVE_HPP
 
 #include "parser_utils.hpp"
+#include "webserv.hpp"
 #include <iostream>
 #include <map>
 #include <string>
@@ -49,7 +50,7 @@ public:
 	std::string getLocationPath() const;
 	std::string getDefaultErrorPage() const;
 	std::map<std::string, std::string> getErrorPages() const;
-	std::ifstream const& findErrorPage(std::string status_code);
+	std::string const findErrorPagePath(http_status_code::STATUS_CODE status_code) const;
 	std::vector<std::string> getAllowMethods() const;
 	std::string getClientMaxBodySize() const;
 	std::string getRoot() const;

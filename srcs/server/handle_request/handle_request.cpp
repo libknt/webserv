@@ -122,34 +122,26 @@ void executeDelete(const HttpRequest& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-// TODO: refactor
 void createErrorResponse(HttpResponse& response,
 	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
-
-	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
-
-	std::stringstream stringstream;
-	stringstream << status_code;
-	std::string error_page_path = error_pages[stringstream.str()];
-
+	const std::string& error_page_path = location_directive.findErrorPagePath(status_code);
 	std::ifstream error_page(error_page_path.c_str());
+	std::ifstream default_error_page(location_directive.getDefaultErrorPage().c_str());
+
 	std::string line, body_content;
 	if (error_page.is_open()) {
 		while (getline(error_page, line)) {
 			body_content += line + "\n";
 		}
-	} else {
-		std::ifstream default_error_page(location_directive.getDefaultErrorPage());
-		if (default_error_page.is_open()) {
-			while (getline(default_error_page, line)) {
-				body_content += line + "\n";
-			}
-		} else {
-			body_content =
-				"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+	} else if (default_error_page.is_open()) {
+		while (getline(default_error_page, line)) {
+			body_content += line + "\n";
 		}
+	} else {
+		body_content = "<html><body><h1> setErrorResponse() </h1></body></html>";
 	}
+
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
 	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
