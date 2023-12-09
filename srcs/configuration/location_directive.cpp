@@ -257,6 +257,14 @@ std::map<std::string, std::string> LocationDirective::getErrorPages() const {
 	return error_pages_;
 }
 
+std::ifstream const& LocationDirective::findErrorPage(std::string status_code) {
+	std::stringstream stringstream;
+	stringstream << status_code;
+	std::string error_page_path = error_pages_[stringstream.str()];
+	std::ifstream error_page(error_page_path);
+	return error_page;
+}
+
 int LocationDirective::parseCgiDirective(std::vector<std::string>& tokens) {
 	if (tokens.size() != 1) {
 		std::cerr << "Parse Error: parseCgiDirective" << std::endl;

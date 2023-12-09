@@ -6,6 +6,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <fstream>
 
 class LocationDirective {
 private:
@@ -47,6 +49,7 @@ public:
 	std::string getLocationPath() const;
 	std::string getDefaultErrorPage() const;
 	std::map<std::string, std::string> getErrorPages() const;
+	std::ifstream const& findErrorPage(std::string status_code);
 	std::vector<std::string> getAllowMethods() const;
 	std::string getClientMaxBodySize() const;
 	std::string getRoot() const;
