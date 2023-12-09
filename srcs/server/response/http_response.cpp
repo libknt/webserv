@@ -35,7 +35,7 @@ void HttpResponse::concatenateComponents() {
 		stream_ << it->first + ": " + it->second + "\r\n";
 	}
 	stream_ << "\r\n";
-	stream_ << body_;
+	stream_ << body_ << "";
 }
 
 std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_CODE code) {

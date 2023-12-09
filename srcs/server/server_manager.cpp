@@ -166,6 +166,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
 			ClientSession& client_session = getClientSession(sd);
+			std::cout << "Location: " << client_session.getResponse().getHeader().at("Location") << std::endl;
 			sendResponse(client_session);
 			if (client_session.getStatus() == CLOSED) {
 				unregisterClientSession(client_session);
