@@ -35,7 +35,7 @@ private:
 	ServerDirective const& server_directive_;
 
 	HttpRequest request_;
-	cgi::Cgi* cgi_;
+	cgi::CgiRequest* cgi_;
 	cgi::CgiResponse cgi_response_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
@@ -56,8 +56,8 @@ public:
 	int getSd() const;
 	HttpRequest const& getRequest() const;
 	HttpRequest& getRequest();
-	cgi::Cgi const& getCgi() const;
-	cgi::Cgi& getCgi();
+	cgi::CgiRequest const& getCgi() const;
+	cgi::CgiRequest& getCgi();
 	HttpResponse& getResponse();
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
@@ -71,7 +71,7 @@ public:
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
-	void setCgi(cgi::Cgi* cgi);
+	void setCgi(cgi::CgiRequest* cgi);
 	cgi::CgiResponse& getCgiResponse();
 };
 

@@ -21,7 +21,7 @@ enum CGI_STATUS {
 	EXECUTED,
 };
 
-class Cgi {
+class CgiRequest {
 private:
 	CGI_STATUS cgi_status_;
 	std::map<std::string, std::string> meta_variables_;
@@ -38,10 +38,10 @@ private:
 	char** createExecveArgv();
 
 public:
-	Cgi(const std::map<std::string, std::string> meta_variables);
-	Cgi(const Cgi& other);
-	Cgi& operator=(const Cgi& other);
-	~Cgi();
+	CgiRequest(const std::map<std::string, std::string> meta_variables);
+	CgiRequest(const CgiRequest& other);
+	CgiRequest& operator=(const CgiRequest& other);
+	~CgiRequest();
 	int setup();
 	int execute();
 	int getSocketFd(int const index) const;
@@ -50,7 +50,7 @@ public:
 	pid_t getPid() const;
 };
 
-std::ostream& operator<<(std::ostream& out, const Cgi& cgi);
+std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi);
 
 } // namespace
 

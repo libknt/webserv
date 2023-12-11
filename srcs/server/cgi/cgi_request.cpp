@@ -2,7 +2,7 @@
 
 namespace cgi {
 
-Cgi::Cgi(const std::map<std::string, std::string> meta_variables)
+CgiRequest::CgiRequest(const std::map<std::string, std::string> meta_variables)
 	: cgi_status_(UNDIFINED)
 	, meta_variables_(meta_variables)
 	, pid_(-1)
@@ -13,7 +13,7 @@ Cgi::Cgi(const std::map<std::string, std::string> meta_variables)
 	socket_vector_[1] = -1;
 }
 
-Cgi::Cgi(const Cgi& other)
+CgiRequest::CgiRequest(const CgiRequest& other)
 	: cgi_status_(other.cgi_status_)
 	, meta_variables_(other.meta_variables_)
 	, pid_(other.pid_)
@@ -22,7 +22,7 @@ Cgi::Cgi(const Cgi& other)
 	socket_vector_[1] = other.socket_vector_[1];
 }
 
-Cgi& Cgi::operator=(const Cgi& other) {
+CgiRequest& CgiRequest::operator=(const CgiRequest& other) {
 	if (this != &other) {
 		cgi_status_ = other.cgi_status_;
 		meta_variables_ = other.meta_variables_;
@@ -34,7 +34,7 @@ Cgi& Cgi::operator=(const Cgi& other) {
 	return *this;
 }
 
-Cgi::~Cgi() {
+CgiRequest::~CgiRequest() {
 	if (pid_ != -1) {
 		kill(pid_, SIGKILL);
 	}
@@ -54,7 +54,7 @@ Cgi::~Cgi() {
 	close(socket_vector_[1]);
 }
 
-int Cgi::setNonBlocking(int sd) {
+int CgiRequest::setNonBlocking(int sd) {
 	int flags = fcntl(sd, F_GETFL, 0);
 	if (flags < 0) {
 		std::cerr << "fcntl() get flags failed: " << strerror(errno) << std::endl;
@@ -71,7 +71,7 @@ int Cgi::setNonBlocking(int sd) {
 	return 0;
 }
 
-int Cgi::setupInterProcessCommunication() {
+int CgiRequest::setupInterProcessCommunication() {
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, socket_vector_) == -1) {
 		std::cerr << "socketpair() failed(): " << strerror(errno) << std::endl;
 		return -1;
@@ -85,7 +85,7 @@ int Cgi::setupInterProcessCommunication() {
 	return 0;
 }
 
-char** Cgi::mapToCharStarStar(const std::map<std::string, std::string>& map) {
+char** CgiRequest::mapToCharStarStar(const std::map<std::string, std::string>& map) {
 	typedef std::map<std::string, std::string>::const_iterator MapIterator;
 	char** char_star_star = new (std::nothrow) char*[map.size() + 1];
 	if (!char_star_star) {
@@ -114,7 +114,7 @@ char** Cgi::mapToCharStarStar(const std::map<std::string, std::string>& map) {
 
 // シバン（shebang）
 // #!/usr/local/bin/python3
-int Cgi::shebang(std::string file, std::string& path) {
+int CgiRequest::shebang(std::string file, std::string& path) {
 	std::ifstream infile(file.c_str());
 	if (!infile) {
 		std::cout << "file open error: " << file << std::endl;
@@ -138,7 +138,7 @@ int Cgi::shebang(std::string file, std::string& path) {
 	return 0;
 }
 
-char** Cgi::createExecveArgv() {
+char** CgiRequest::createExecveArgv() {
 	std::vector<std::string> argv_vector;
 	std::string path;
 	std::string script = findMetaVariable("PATH_TRANSLATED") + findMetaVariable("SCRIPT_NAME");
@@ -177,7 +177,7 @@ char** Cgi::createExecveArgv() {
 	return argv;
 }
 
-int Cgi::setup() {
+int CgiRequest::setup() {
 	if (setupInterProcessCommunication() == -1) {
 		return -1;
 	}
@@ -192,7 +192,7 @@ int Cgi::setup() {
 	return 0;
 }
 
-int Cgi::execute() {
+int CgiRequest::execute() {
 	char** argv = execve_argv_;
 	char** environ = environ_;
 	std::string const method = findMetaVariable("REQUEST_METHOD");
@@ -224,7 +224,7 @@ int Cgi::execute() {
 	return 0;
 }
 
-std::string Cgi::findMetaVariable(std::string const& key) const {
+std::string CgiRequest::findMetaVariable(std::string const& key) const {
 	std::map<std::string, std::string>::const_iterator it = meta_variables_.find(key);
 	if (it == meta_variables_.end()) {
 		return "";
@@ -232,21 +232,21 @@ std::string Cgi::findMetaVariable(std::string const& key) const {
 	return it->second;
 }
 
-int Cgi::getSocketFd(int const index) const {
+int CgiRequest::getSocketFd(int const index) const {
 	return socket_vector_[index];
 }
 
-CGI_STATUS Cgi::getStatus() const {
+CGI_STATUS CgiRequest::getStatus() const {
 	return cgi_status_;
 }
 
-pid_t Cgi::getPid() const {
+pid_t CgiRequest::getPid() const {
 	return pid_;
 }
 
-std::ostream& operator<<(std::ostream& out, const Cgi& cgi) {
+std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi) {
 
-	out << "Cgi: " << std::endl;
+	out << "CgiRequest: " << std::endl;
 	out << cgi.getStatus() << std::endl;
 	return out;
 }

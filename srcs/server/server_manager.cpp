@@ -130,7 +130,7 @@ int ServerManager::monitorSocketEvents() {
 }
 
 void ServerManager::handleCgiProcess(ClientSession& client_session) {
-	cgi::Cgi& cgi = client_session.getCgi();
+	cgi::CgiRequest& cgi = client_session.getCgi();
 	const HttpRequest& request = client_session.getRequest();
 
 	if (cgi.setup() < 0 || cgi.execute() < 0) {
@@ -304,9 +304,9 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 			session.getClientAddress(),
 			session.getServerAddress(),
 			location_directive.getRoot());
-		cgi::Cgi* cgi = new (std::nothrow) cgi::Cgi(meta_variables);
+		cgi::CgiRequest* cgi = new (std::nothrow) cgi::CgiRequest(meta_variables);
 		if (!cgi) {
-			std::cerr << "new (std::nothrow) Cgi() failed" << std::endl;
+			std::cerr << "new (std::nothrow) CgiRequest() failed" << std::endl;
 			createErrorResponse(session.getResponse(),
 				http_status_code::INTERNAL_SERVER_ERROR,
 				session.findLocation());
