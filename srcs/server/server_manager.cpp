@@ -304,16 +304,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 			session.getClientAddress(),
 			session.getServerAddress(),
 			location_directive.getRoot());
-		cgi::CgiRequest* cgi = new (std::nothrow) cgi::CgiRequest(meta_variables);
-		if (!cgi) {
-			std::cerr << "new (std::nothrow) CgiRequest() failed" << std::endl;
-			createErrorResponse(session.getResponse(),
-				http_status_code::INTERNAL_SERVER_ERROR,
-				session.findLocation());
-			session.setStatus(SENDING_RESPONSE);
-			return;
-		}
-		session.setCgi(cgi);
+		session.getCgi().setMetaVariable(meta_variables);
 		session.setStatus(CGI_PREPARING);
 	} else {
 		session.setStatus(RESPONSE_PREPARING);

@@ -35,7 +35,7 @@ private:
 	ServerDirective const& server_directive_;
 
 	HttpRequest request_;
-	cgi::CgiRequest* cgi_;
+	cgi::CgiRequest cgi_;
 	cgi::CgiResponse cgi_response_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
@@ -71,7 +71,6 @@ public:
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
-	void setCgi(cgi::CgiRequest* cgi);
 	cgi::CgiResponse& getCgiResponse();
 };
 

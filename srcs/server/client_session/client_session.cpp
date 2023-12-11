@@ -11,7 +11,7 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
-	, cgi_(NULL)
+	, cgi_(cgi::CgiRequest())
 	, cgi_response_(cgi::CgiResponse())
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
@@ -26,16 +26,13 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
-	, cgi_(NULL)
+	, cgi_(cgi::CgiRequest())
 	, cgi_response_(cgi::CgiResponse())
 	, response_(HttpResponse())
 	, status_(status) {}
 
 ClientSession::~ClientSession() {
 	std::cout << "ClientSession destructor called" << std::endl;
-	if (cgi_ != NULL) {
-		delete cgi_;
-	}
 }
 
 ClientSession::ClientSession(const ClientSession& other)
@@ -52,7 +49,6 @@ ClientSession::ClientSession(const ClientSession& other)
 ClientSession& ClientSession::operator=(const ClientSession& other) {
 	if (this != &other) {
 		request_ = other.request_;
-		// tofo deep copy
 		cgi_ = other.cgi_;
 		cgi_response_ = other.cgi_response_;
 		response_ = other.response_;
@@ -82,11 +78,11 @@ HttpRequest& ClientSession::getRequest() {
 }
 
 cgi::CgiRequest const& ClientSession::getCgi() const {
-	return *cgi_;
+	return cgi_;
 }
 
 cgi::CgiRequest& ClientSession::getCgi() {
-	return *cgi_;
+	return cgi_;
 }
 
 HttpResponse& ClientSession::getResponse() {
@@ -161,17 +157,10 @@ std::string ClientSession::getServerPort() const {
 void ClientSession::sessionCleanup() {
 	request_ = HttpRequest();
 	response_ = HttpResponse();
-	if (cgi_ != NULL) {
-		delete cgi_;
-		cgi_ = NULL;
-	}
+	cgi_ = cgi::CgiRequest();
 	cgi_response_ = cgi::CgiResponse();
 	status_ = AWAITING_REQUEST;
 	std::cout << "  						Connection Cleanup" << std::endl;
-}
-
-void ClientSession::setCgi(cgi::CgiRequest* cgi) {
-	cgi_ = cgi;
 }
 
 cgi::CgiResponse& ClientSession::getCgiResponse() {

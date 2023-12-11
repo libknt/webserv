@@ -19,6 +19,7 @@ namespace cgi {
 enum CGI_STATUS {
 	UNDIFINED,
 	EXECUTED,
+	ERROR,
 };
 
 class CgiRequest {
@@ -38,7 +39,7 @@ private:
 	char** createExecveArgv();
 
 public:
-	CgiRequest(const std::map<std::string, std::string> meta_variables);
+	CgiRequest();
 	CgiRequest(const CgiRequest& other);
 	CgiRequest& operator=(const CgiRequest& other);
 	~CgiRequest();
@@ -48,6 +49,7 @@ public:
 	std::string findMetaVariable(std::string const& key) const;
 	CGI_STATUS getStatus() const;
 	pid_t getPid() const;
+	void setMetaVariable(std::map<std::string, std::string> const& meta_variables);
 };
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi);

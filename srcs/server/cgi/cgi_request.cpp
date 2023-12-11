@@ -2,9 +2,11 @@
 
 namespace cgi {
 
-CgiRequest::CgiRequest(const std::map<std::string, std::string> meta_variables)
+char** DeepCopy(char** src);
+
+CgiRequest::CgiRequest()
 	: cgi_status_(UNDIFINED)
-	, meta_variables_(meta_variables)
+	, meta_variables_()
 	, pid_(-1)
 	, execve_argv_(NULL)
 	, environ_(NULL)
@@ -17,6 +19,8 @@ CgiRequest::CgiRequest(const CgiRequest& other)
 	: cgi_status_(other.cgi_status_)
 	, meta_variables_(other.meta_variables_)
 	, pid_(other.pid_)
+	, execve_argv_(other.execve_argv_)
+	, environ_(other.environ_)
 	, status_(other.status_) {
 	socket_vector_[0] = other.socket_vector_[0];
 	socket_vector_[1] = other.socket_vector_[1];
@@ -26,12 +30,36 @@ CgiRequest& CgiRequest::operator=(const CgiRequest& other) {
 	if (this != &other) {
 		cgi_status_ = other.cgi_status_;
 		meta_variables_ = other.meta_variables_;
+		pid_ = other.pid_;
 		socket_vector_[0] = other.socket_vector_[0];
 		socket_vector_[1] = other.socket_vector_[1];
-		pid_ = other.pid_;
+		execve_argv_ = DeepCopy(other.execve_argv_);
+		environ_ = DeepCopy(other.environ_);
 		status_ = other.status_;
 	}
 	return *this;
+}
+
+char** DeepCopy(char** src) {
+	if (!src) {
+		return NULL;
+	}
+	char** dst = new (std::nothrow) char*[sizeof(src)];
+	if (!dst) {
+		return NULL;
+	}
+	for (int i = 0; src[i]; ++i) {
+		dst[i] = new (std::nothrow) char[sizeof(src[i])];
+		if (!dst[i]) {
+			for (int j = 0; j < i; ++j) {
+				delete[] dst[j];
+			}
+			delete[] dst;
+			return NULL;
+		}
+		std::strcpy(dst[i], src[i]);
+	}
+	return dst;
 }
 
 CgiRequest::~CgiRequest() {
@@ -242,6 +270,10 @@ CGI_STATUS CgiRequest::getStatus() const {
 
 pid_t CgiRequest::getPid() const {
 	return pid_;
+}
+
+void CgiRequest::setMetaVariable(std::map<std::string, std::string> const& meta_variables) {
+	meta_variables_ = meta_variables;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi) {
