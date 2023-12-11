@@ -1,9 +1,9 @@
 #ifndef SERVER_MANAGER_HPP
 #define SERVER_MANAGER_HPP
 
+#include "cgi_handler.hpp"
 #include "client_session.hpp"
 #include "configuration.hpp"
-#include "cgi_handler.hpp"
 #include "handle_request.hpp"
 #include "http_request_parser.hpp"
 #include "server_cgi_utils.hpp"
