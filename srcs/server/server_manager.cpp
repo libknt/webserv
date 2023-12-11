@@ -210,7 +210,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						client_session.setStatus(SENDING_RESPONSE);
 					} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
 							   client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
-						handle_cgi_response::handleCgiResponse(client_session);
+						cgi_handler::handleCgiResponse(client_session);
 						cgi_socket_pairs_.erase(sd);
 						int client_sd = client_session.getCgi().getSocketFd(0);
 						clearFds(client_sd);

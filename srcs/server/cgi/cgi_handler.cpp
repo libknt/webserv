@@ -1,8 +1,8 @@
-#include "handle_cgi.hpp"
+#include "cgi_handler.hpp"
 
 namespace server {
 
-namespace handle_cgi_response {
+namespace cgi_handler {
 
 void handleCgiResponse(ClientSession& client_session) {
 	cgi::CgiResponse const& cgi_response = client_session.getCgiResponse();

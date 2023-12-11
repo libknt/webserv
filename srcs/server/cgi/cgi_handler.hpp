@@ -1,5 +1,5 @@
-#ifndef HANDLE_CGI_HPP
-#define HANDLE_CGI_HPP
+#ifndef CGI_HANDLER_HPP
+#define CGI_HANDLER_HPP
 
 #include "cgi_request.hpp"
 #include "cgi_response.hpp"
@@ -11,7 +11,7 @@
 
 namespace server {
 
-namespace handle_cgi_response {
+namespace cgi_handler {
 
 void handleCgiResponse(ClientSession& client_session);
 void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
@@ -21,7 +21,7 @@ int createStatusCode(std::string const& status);
 void createHeaderFiled(cgi::CgiResponse const& cgi_response, HttpResponse& response);
 int locationAnalysis(std::string location, HttpResponse& response);
 
-} // namespace handle_cgi_response
+} // namespace cgi_handler
 
 } // namespace server
 

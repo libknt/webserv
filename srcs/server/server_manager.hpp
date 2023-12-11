@@ -3,7 +3,7 @@
 
 #include "client_session.hpp"
 #include "configuration.hpp"
-#include "handle_cgi.hpp"
+#include "cgi_handler.hpp"
 #include "handle_request.hpp"
 #include "http_request_parser.hpp"
 #include "server_cgi_utils.hpp"
