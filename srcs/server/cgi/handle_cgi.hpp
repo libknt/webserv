@@ -1,7 +1,7 @@
 #ifndef HANDLE_CGI_HPP
 #define HANDLE_CGI_HPP
 
-#include "cgi.hpp"
+#include "cgi_request.hpp"
 #include "cgi_response.hpp"
 #include "client_session.hpp"
 #include "handle_request.hpp"

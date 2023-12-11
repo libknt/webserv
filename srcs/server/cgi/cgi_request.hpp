@@ -1,5 +1,5 @@
-#ifndef CGI_HPP
-#define CGI_HPP
+#ifndef CGI_REQUEST_HPP
+#define CGI_REQUEST_HPP
 #include "webserv.hpp"
 #include <cstdlib>
 #include <cstring>

@@ -1,4 +1,4 @@
-#include "cgi.hpp"
+#include "cgi_request.hpp"
 
 namespace cgi {
 
