@@ -11,6 +11,7 @@ void handleRequest(ClientSession& client_session) {
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getRequestPath());
 
+	// TODO: redirectURLのみの指定でもいいかも
 	const std::vector<std::string> return_directive = location_directive.getReturn();
 	if (!return_directive.empty()) {
 		response.setStatusCode(http_status_code::FOUND);
