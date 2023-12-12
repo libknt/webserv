@@ -54,7 +54,7 @@ public:
 	void setBody(const std::string& body);
 	void appendBody(const std::string& body);
 	http_status_code::STATUS_CODE getStatusCode() const;
-	const std::string getFileContentType(std::string const &file_name) const;
+	const std::string getFileContentType(std::string const& file_name) const;
 	const std::string getHeaderValue(const std::string& key) const;
 	const std::map<std::string, std::string>& getHeader() const;
 	const std::string& getBody() const;

@@ -80,8 +80,8 @@ http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 	return status_code_;
 }
 
-const std::string HttpResponse::getFileContentType(std::string const &file_name) const {
-	std::string const &file_extention = file_name.substr(file_name.rfind("."));
+const std::string HttpResponse::getFileContentType(std::string const& file_name) const {
+	std::string const& file_extention = file_name.substr(file_name.rfind("."));
 
 	if (file_extention == ".html")
 		return ("text/html");

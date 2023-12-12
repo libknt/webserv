@@ -59,8 +59,10 @@ void executeGet(const HttpRequest& request,
 				response.setStatusCode(http_status_code::OK);
 				body_stream << default_file_stream.rdbuf();
 				response.setBody(body_stream.str());
-				response.setHeaderValue("Content-Length", Utils::toString(response.getBodyLength()));
-				response.setHeaderValue("Content-Type", response.getFileContentType(default_file_path));
+				response.setHeaderValue(
+					"Content-Length", Utils::toString(response.getBodyLength()));
+				response.setHeaderValue(
+					"Content-Type", response.getFileContentType(default_file_path));
 				response.setStatus(http_response_status::RESPONSE_SENDING);
 				return;
 			}
