@@ -129,7 +129,7 @@ int ServerManager::monitorSocketEvents() {
 	return 0;
 }
 
-int ServerManager::ResolveClientSocket(const int sd) {
+int ServerManager::resolveClientSocket(const int sd) {
 	if (cgi_socket_pairs_.find(sd) != cgi_socket_pairs_.end()) {
 		return cgi_socket_pairs_.find(sd)->second;
 	}
@@ -146,7 +146,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					return -1;
 				}
 			} else {
-				int client_sd = ResolveClientSocket(sd);
+				int client_sd = resolveClientSocket(sd);
 				ClientSession& client_session = getClientSession(client_sd);
 				if (client_session.getStatus() != CGI_RECEIVEING) {
 					if (receiveAndParseHttpRequest(client_session) < 0) {
@@ -198,7 +198,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			}
 			--ready_sds;
 		} else if (FD_ISSET(sd, &write_fds_)) {
-			int client_sd = ResolveClientSocket(sd);
+			int client_sd = resolveClientSocket(sd);
 			ClientSession& client_session = getClientSession(client_sd);
 			if (client_session.getStatus() == CGI_BODY_SENDING) {
 				if (sendCgiBody(client_session) < 0) {
