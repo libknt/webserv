@@ -4,6 +4,31 @@ namespace server {
 
 namespace cgi_handler {
 
+void handleCgiProcess(ClientSession& client_session) {
+	cgi::CgiRequest& cgi = client_session.getCgi();
+	const HttpRequest& request = client_session.getRequest();
+
+	if (cgi.setup() < 0 || cgi.execute() < 0) {
+		createErrorResponse(client_session.getResponse(),
+			http_status_code::INTERNAL_SERVER_ERROR,
+			client_session.findLocation());
+		client_session.getResponse().concatenateComponents();
+		client_session.setStatus(SENDING_RESPONSE);
+		return;
+	}
+	cgi::CgiResponse& cgi_response = client_session.getCgiResponse();
+	cgi_response.setSocketFd(0, cgi.getSocketFd(0));
+	cgi_response.setSocketFd(1, cgi.getSocketFd(1));
+	cgi_response.setPid(cgi.getPid());
+	cgi_response.setStage(cgi::HEADERS_SENT);
+
+	if (request.getHttpMethod() == http_method::POST) {
+		client_session.setStatus(CGI_BODY_SENDING);
+	} else {
+		client_session.setStatus(CGI_RECEIVEING);
+	}
+}
+
 void handleCgiResponse(ClientSession& client_session) {
 	cgi::CgiResponse const& cgi_response = client_session.getCgiResponse();
 	HttpResponse& response = client_session.getResponse();

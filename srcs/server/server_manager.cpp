@@ -129,35 +129,6 @@ int ServerManager::monitorSocketEvents() {
 	return 0;
 }
 
-void ServerManager::handleCgiProcess(ClientSession& client_session) {
-	cgi::CgiRequest& cgi = client_session.getCgi();
-	const HttpRequest& request = client_session.getRequest();
-
-	if (cgi.setup() < 0 || cgi.execute() < 0) {
-		createErrorResponse(client_session.getResponse(),
-			http_status_code::INTERNAL_SERVER_ERROR,
-			client_session.findLocation());
-		client_session.getResponse().concatenateComponents();
-		client_session.setStatus(SENDING_RESPONSE);
-		return;
-	}
-	cgi::CgiResponse& cgi_response = client_session.getCgiResponse();
-	cgi_response.setSocketFd(0, cgi.getSocketFd(0));
-	cgi_response.setSocketFd(1, cgi.getSocketFd(1));
-	cgi_response.setPid(cgi.getPid());
-	cgi_response.setStage(cgi::HEADERS_SENT);
-
-	if (request.getHttpMethod() == http_method::POST) {
-		client_session.setStatus(CGI_BODY_SENDING);
-		setWriteFd(cgi.getSocketFd(0));
-		cgi_socket_pairs_.insert(std::make_pair(cgi.getSocketFd(0), client_session.getSd()));
-	} else {
-		client_session.setStatus(CGI_RECEIVEING);
-		setReadFd(cgi.getSocketFd(0));
-		cgi_socket_pairs_.insert(std::make_pair(cgi.getSocketFd(0), client_session.getSd()));
-	}
-}
-
 int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 	for (int sd = 0; sd <= highest_sd_ && ready_sds > 0; ++sd) {
@@ -190,7 +161,17 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 					if (client_session.getStatus() == RESPONSE_PREPARING) {
 						handle_request::handleRequest(client_session);
 					} else if (client_session.getStatus() == CGI_PREPARING) {
-						handleCgiProcess(client_session);
+						cgi_handler::handleCgiProcess(client_session);
+
+						if (client_session.getRequest().getHttpMethod() == http_method::POST) {
+							setWriteFd(client_session.getCgi().getSocketFd(0));
+							cgi_socket_pairs_.insert(std::make_pair(
+								client_session.getCgi().getSocketFd(0), client_session.getSd()));
+						} else {
+							setReadFd(client_session.getCgi().getSocketFd(0));
+							cgi_socket_pairs_.insert(std::make_pair(
+								client_session.getCgi().getSocketFd(0), client_session.getSd()));
+						}
 					}
 					if (client_session.getStatus() == SENDING_RESPONSE) {
 						setWriteFd(sd);

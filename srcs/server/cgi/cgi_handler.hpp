@@ -14,6 +14,7 @@ namespace server {
 namespace cgi_handler {
 
 void handleCgiResponse(ClientSession& client_session);
+void handleCgiProcess(ClientSession& client_session);
 void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 	HttpResponse& response,
 	const LocationDirective& location_directive);
