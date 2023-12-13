@@ -5,10 +5,10 @@
 #define COLOR_SWITCH "ON"
 #define LOG(level, message) Logger::getInstance().log(level, message, __FILE__, __LINE__)
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include <fstream>
 
 enum LogLevel { DEBUG, INFO, WARNING, ERROR };
 
@@ -18,7 +18,7 @@ private:
 	static Logger* instance;
 	std::ofstream log_file_;
 
-	Logger(LogLevel level, std::string const& filename=LOGFILE);
+	Logger(LogLevel level, std::string const& filename = LOGFILE);
 
 	Logger(const Logger&);
 	Logger& operator=(const Logger&);
