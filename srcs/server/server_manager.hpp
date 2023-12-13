@@ -54,6 +54,9 @@ private:
 	int resolveClientSocket(const int sd);
 	void cleaning(ClientSession& client_sesion);
 
+	void readEvent(int client_sd);
+	void writeEvent(int client_sd);
+
 public:
 	ServerManager(const Configuration& configuration);
 	virtual ~ServerManager();
