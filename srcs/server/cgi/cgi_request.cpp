@@ -171,16 +171,15 @@ char** CgiRequest::createExecveArgv() {
 	std::string path;
 	std::string script = findMetaVariable("PATH_TRANSLATED") + findMetaVariable("SCRIPT_NAME");
 	shebang(script, path);
-	if (!path.empty()) {
-		std::istringstream iss(path);
-		std::string token;
-		while (std::getline(iss, token, ' ')) {
-			if (!token.empty()) {
-				argv_vector.push_back(token);
-			}
+	if (path.empty()) {
+		return NULL;
+	}
+	std::istringstream iss(path);
+	std::string token;
+	while (std::getline(iss, token, ' ')) {
+		if (!token.empty()) {
+			argv_vector.push_back(token);
 		}
-	} else {
-		argv_vector.push_back("/usr/bin/python3");
 	}
 	argv_vector.push_back(script);
 
