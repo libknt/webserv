@@ -51,6 +51,8 @@ private:
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
 	int sendCgiBody(ClientSession& client_session);
+	int ResolveClientSocket(const int sd);
+	void cleaning(ClientSession &client_sesion);
 
 public:
 	ServerManager(const Configuration& configuration);
