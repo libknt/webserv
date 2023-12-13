@@ -173,7 +173,6 @@ int CgiResponse::readCgiReponse() {
 	std::memset(buffer, '\0', sizeof(buffer));
 
 	int recv_result = recv(sd, buffer, BUFFER_SIZE - 1, 0);
-	std::cout << "++++++++++++++++++++++++++++++++cgi_response: recv_result: " << buffer << std::endl;
 	if (recv_result > 0) {
 		advanceResponseProcessing(std::string(buffer));
 	} else if (recv_result < 0) {

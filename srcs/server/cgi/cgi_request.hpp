@@ -31,6 +31,7 @@ private:
 	char** execve_argv_;
 	char** environ_;
 	int status_;
+	std::string body_;
 
 	int setNonBlocking(int sd);
 	int setupInterProcessCommunication();
@@ -50,6 +51,9 @@ public:
 	CGI_STATUS getStatus() const;
 	pid_t getPid() const;
 	void setMetaVariable(std::map<std::string, std::string> const& meta_variables);
+	void setBody(std::string const& body);
+	int getBody(char* buffer, std::size_t max_size);
+	std::string getBody(std::size_t max_size);
 };
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi);

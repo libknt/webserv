@@ -207,7 +207,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 						http_status_code::INTERNAL_SERVER_ERROR,
 						client_session.findLocation());
 					client_session.getResponse().concatenateComponents();
-					
+
 					setWriteFd(client_session.getSd());
 					client_session.setStatus(SENDING_RESPONSE);
 				}
@@ -230,10 +230,21 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 int ServerManager::sendCgiBody(ClientSession& client_session) {
 	int client_sd = client_session.getCgi().getSocketFd(0);
-	std::string body = client_session.getRequest().getBody();
+	cgi::CgiRequest& cgi_request = client_session.getCgi();
 	char buffer[BUFFER_SIZE];
 	std::memset(buffer, '\0', sizeof(buffer));
+	std::string body = cgi_request.getBody(BUFFER_SIZE - 1);
+	if (body.empty()) {
+		std::cout << "\033[31m"
+				  << "  CGI BODY SENDING: complete"
+				  << "\033[0m" << std::endl;
+		clearFds(client_session.getCgi().getSocketFd(0));
+		setReadFd(client_session.getCgi().getSocketFd(0));
+		client_session.setStatus(CGI_RECEIVEING);
+		return 0;
+	}
 	std::memcpy(buffer, body.c_str(), body.length());
+	std::cout << "cgi body: " << buffer << std::endl;
 	int send_result = ::send(client_sd, buffer, sizeof(buffer), 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
@@ -243,12 +254,6 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 		std::cout << "  Connection closed" << std::endl;
 		return -1;
 	}
-	std::cout << "\033[31m"
-			  << "  CGI BODY SENDING: complete"
-			  << "\033[0m" << std::endl;
-	clearFds(client_session.getCgi().getSocketFd(0));
-	setReadFd(client_session.getCgi().getSocketFd(0));
-	client_session.setStatus(CGI_RECEIVEING);
 	return 0;
 }
 
@@ -276,6 +281,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 			session.getServerAddress(),
 			location_directive.getRoot());
 		session.getCgi().setMetaVariable(meta_variables);
+		session.getCgi().setBody(session.getRequest().getBody());
 		session.setStatus(CGI_PREPARING);
 	} else {
 		session.setStatus(RESPONSE_PREPARING);
@@ -428,7 +434,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	return 0;
 }
 
-void ServerManager::cleaning(ClientSession &client_session){
+void ServerManager::cleaning(ClientSession& client_session) {
 	cgi::CgiRequest& cgi_request = client_session.getCgi();
 
 	int socket_vector = cgi_request.getSocketFd(0);

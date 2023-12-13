@@ -275,6 +275,19 @@ void CgiRequest::setMetaVariable(std::map<std::string, std::string> const& meta_
 	meta_variables_ = meta_variables;
 }
 
+void CgiRequest::setBody(std::string const& body) {
+	body_ = body;
+}
+
+std::string CgiRequest::getBody(std::size_t max_size) {
+	if (body_.empty()) {
+		return "";
+	}
+	std::string temp = body_.substr(0, max_size);
+	body_ = body_.erase(0, max_size);
+	return temp;
+}
+
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi) {
 
 	out << "CgiRequest: " << std::endl;

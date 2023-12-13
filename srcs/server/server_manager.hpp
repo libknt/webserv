@@ -52,7 +52,7 @@ private:
 	ClientSession& getClientSession(int const sd);
 	int sendCgiBody(ClientSession& client_session);
 	int resolveClientSocket(const int sd);
-	void cleaning(ClientSession &client_sesion);
+	void cleaning(ClientSession& client_sesion);
 
 public:
 	ServerManager(const Configuration& configuration);
