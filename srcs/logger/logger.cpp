@@ -2,8 +2,6 @@
 
 Logger::Logger(LogLevel level, std::string const& filename)
 	: currentLevel(level) {
-	std::cout << "Logger constructor" << std::endl;
-	std::cout << "filename: " << filename << std::endl;
 	log_file_.open(filename.c_str(), std::ios::out | std::ios::app);
 }
 
