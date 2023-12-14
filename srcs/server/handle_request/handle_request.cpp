@@ -8,7 +8,7 @@ void handleRequest(ClientSession& client_session) {
 	HttpResponse& response = client_session.getResponse();
 
 	const ServerDirective& server_directive = client_session.getServerDirective();
-	const LocationDirective& location_directive = server_directive.findLocation(request.getUri());
+	const LocationDirective& location_directive = server_directive.findLocation(request.getUriPath());
 	std::string const method = request.getMethod();
 
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
@@ -72,7 +72,7 @@ void executePost(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
-	std::string file_path = location_directive.getRoot() + "/" + request.getUri();
+	std::string file_path = location_directive.getRoot() + "/" + request.getUriPath();
 	if (stat(file_path.c_str(), &file_info) != 0) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 	}
@@ -101,7 +101,7 @@ void executeDelete(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
-	std::string uri = location_directive.getRoot() + request.getUri();
+	std::string uri = location_directive.getRoot() + request.getUriPath();
 
 	if (stat(uri.c_str(), &file_info) != 0) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
@@ -151,7 +151,7 @@ void createErrorResponse(HttpResponse& response,
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	std::string const root = location_directive.getRoot() + request.getUri();
+	std::string const root = location_directive.getRoot() + request.getUriPath();
 	DIR* dir = opendir(root.c_str());
 	if (!dir) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));

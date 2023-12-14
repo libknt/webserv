@@ -126,20 +126,58 @@ size_t HttpRequest::getBodySize() const {
 	return (body_.size());
 }
 
-std::string HttpRequest::getUriPath() const {
-	std::string::size_type query_index = uri_.find("?");
-	if (query_index != std::string::npos) {
-		return (uri_.substr(0, query_index));
-	}
-	return (uri_);
+std::string	HttpRequest::getUriScheme() const
+{
+	std::string::size_type end_index = uri_.find("://");
+	if (end_index == std::string::npos)
+		return (std::string(""));
+	return (uri_.substr(0, end_index));
 }
 
-std::string HttpRequest::getUriQuery() const {
-	std::string::size_type query_index = uri_.find("?");
-	if (query_index != std::string::npos && query_index + 1 <= uri_.size()) {
-		return (uri_.substr(query_index + 1));
-	}
-	return (std::string(""));
+std::string	HttpRequest::getUriAuthority() const
+{
+	std::string::size_type front_index = uri_.find("://");
+	if (front_index == std::string::npos)
+		return (std::string(""));
+	front_index += std::string("://").size();
+	std::string::size_type end_index = uri_.find("/", front_index);
+	if (end_index != std::string::npos)
+		return (uri_.substr(front_index, end_index - front_index));
+	end_index = uri_.find("?", front_index);
+	if (end_index != std::string::npos)
+		return (uri_.substr(front_index, end_index - front_index));
+	end_index = uri_.find("#", front_index);
+	if (end_index != std::string::npos)
+		return (uri_.substr(front_index, end_index - front_index));
+	return (uri_.substr(front_index));
+}
+
+std::string	HttpRequest::getUriPath() const
+{
+	std::string::size_type front_index = 0;
+	std::string::size_type authority_index = uri_.find("://");
+	if (authority_index != std::string::npos)
+		front_index = uri_.find("/", authority_index + std::string("://").size());
+	if (front_index == std::string::npos)
+		return (std::string(""));
+	std::string::size_type end_index = uri_.find("?", front_index);
+	if (end_index != std::string::npos)
+		return (uri_.substr(front_index, end_index - front_index));
+	end_index = uri_.find("#", front_index);
+	if (end_index != std::string::npos)
+		return (uri_.substr(front_index, end_index - front_index));
+	return (uri_.substr(front_index));
+}
+
+std::string	HttpRequest::getUriQuery() const
+{
+	std::string::size_type	front_index = uri_.find("?");
+	if (front_index == std::string::npos)
+		return (std::string(""));
+	std::string::size_type	end_index = uri_.find("#");
+	if (end_index == std::string::npos)
+		return (uri_.substr(front_index));
+	return (uri_.substr(front_index, end_index - front_index));
 }
 
 void HttpRequest::appendStreamLine(std::string const& stream_line) {

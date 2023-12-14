@@ -107,6 +107,10 @@ public:
 	std::string const getMethod() const;
 	std::string const getVersion() const;
 	std::string const& getUri() const;
+	std::string	getUriScheme() const;
+	std::string	getUriAuthority() const;
+	std::string	getUriPath() const;
+	std::string	getUriQuery() const;
 	std::string const getHeaderValue(std::string const& key) const;
 	std::map<std::string, std::string> const& getHeader() const;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType() const;
@@ -115,8 +119,6 @@ public:
 	size_t getChunkedSize() const;
 	std::string const& getBody() const;
 	size_t getBodySize() const;
-	std::string getUriPath() const;
-	std::string getUriQuery() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);
