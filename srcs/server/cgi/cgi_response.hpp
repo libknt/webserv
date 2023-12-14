@@ -28,13 +28,13 @@ private:
 	std::string body_;
 	std::size_t content_length_;
 
-	void parseHeaders();
-	void addCarriageReturn(std::string& str);
 	void advanceResponseProcessing(std::string const& value);
-
+	void processHeaders(std::string& output);
+	void parseHeaders();
+	void parseHeaderLine(const std::string& line);
+	void processBody(std::string& output);
 	int handleRecvError(int recv_result);
 	bool processChildExit();
-	void parseHeaderLine(const std::string& line);
 
 public:
 	CgiResponse();

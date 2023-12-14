@@ -63,44 +63,6 @@ int CgiResponse::readCgiResponse() {
 	return 0;
 }
 
-int CgiResponse::handleRecvError(int recv_result) {
-	if (recv_result < 0) {
-		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-		return -1;
-	}
-
-	// recv_result == 0
-	std::cout << "  Connection closed" << std::endl;
-	if (processChildExit()) {
-		stage_ = COMPLETE;
-	} else {
-		return -1;
-	}
-
-	return 0;
-}
-
-bool CgiResponse::processChildExit() {
-	if (waitpid(pid_, &status_, 0) <= 0) {
-		std::cerr << "waitpid failed" << std::endl;
-		return false;
-	}
-
-	if (WIFEXITED(status_)) {
-		std::cout << "\e[33m"
-				  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
-				  << std::endl;
-		return WEXITSTATUS(status_) == 0;
-	}
-
-	if (WIFSIGNALED(status_)) {
-		std::cout << "\e[33m"
-				  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m" << std::endl;
-	}
-
-	return true;
-}
-
 CGI_RESPONSE_STAGE CgiResponse::getStage() const {
 	return stage_;
 }
@@ -149,6 +111,57 @@ std::size_t CgiResponse::getContentLength() const {
 	return content_length_;
 }
 
+// todo これcgi側がすべきことではない
+void CgiResponse::advanceResponseProcessing(std::string const& value) {
+	std::string output(value);
+
+	if (stage_ == NOT_STARTED) {
+		return;
+	}
+	if (stage_ == HEADERS_SENT) {
+		processHeaders(output);
+	}
+	if (stage_ == BODY_SENT) {
+		processBody(output);
+	}
+}
+
+void CgiResponse::processHeaders(std::string& output) {
+	if (!headers_stream_.empty() && headers_stream_[headers_stream_.size() - 1] == '\n' &&
+		output[0] == '\n') {
+		stage_ = BODY_SENT;
+		output = output.erase(0, 1);
+		return;
+	}
+
+	const std::string headerDelimiter = "\n\n";
+	std::string::size_type pos = output.find(headerDelimiter);
+	if (pos != std::string::npos) {
+		stage_ = BODY_SENT;
+		headers_stream_ += output.substr(0, pos + 1);
+		output.erase(0, pos + headerDelimiter.length());
+		parseHeaders();
+	} else {
+		headers_stream_ += output;
+	}
+}
+
+void CgiResponse::parseHeaders() {
+	std::istringstream stream(headers_stream_);
+	headers_.clear();
+	std::string line;
+	while (std::getline(stream, line, '\n')) {
+		if (line.empty()) {
+			break;
+		}
+		if (line[line.size() - 1] == '\n') {
+			line.erase(line.size() - 1);
+		}
+		parseHeaderLine(line);
+	}
+	headers_stream_.clear();
+}
+
 static std::string ltrim(const std::string& s) {
 	size_t start = s.find_first_not_of(" \t");
 	return (start == std::string::npos) ? "" : s.substr(start);
@@ -182,72 +195,58 @@ void CgiResponse::parseHeaderLine(const std::string& line) {
 	}
 }
 
-void CgiResponse::parseHeaders() {
-	std::istringstream stream(headers_stream_);
-	headers_.clear();
-	std::string line;
-	while (std::getline(stream, line, '\n')) {
-		if (line.empty()) {
-			break;
-		}
-		if (line[line.size() - 1] == '\n') {
-			line.erase(line.size() - 1);
-		}
-		parseHeaderLine(line);
-	}
-	headers_stream_.clear();
-}
-
-void CgiResponse::addCarriageReturn(std::string& str) {
-	for (std::string::size_type i = 0; i < str.size(); ++i) {
-		if (str[i] == '\n') {
-			str.insert(i, "\r");
-			++i;
-		}
-	}
-}
-
-void CgiResponse::advanceResponseProcessing(std::string const& value) {
-	std::string output(value);
-
-	if (stage_ == NOT_STARTED) {
+void CgiResponse::processBody(std::string& output) {
+	if (!body_.empty() && body_[body_.size() - 1] == '\n' && output[0] == '\n') {
+		body_ += output;
+		stage_ = COMPLETE;
 		return;
 	}
-	if (stage_ == HEADERS_SENT) {
-		if (!headers_stream_.empty() && headers_stream_[headers_stream_.size() - 1] == '\n' &&
-			output[0] == '\n') {
-			stage_ = BODY_SENT;
-		} else {
-			std::string::size_type pos = output.find("\n\n");
-			if (pos != std::string::npos) {
-				stage_ = BODY_SENT;
-				headers_stream_ += output.substr(0, pos + 1);
-				output.erase(0, pos + 2);
-				parseHeaders();
-			} else {
-				headers_stream_ += output;
-			}
-		}
+	const std::string bodyDelimiter = "\n\n";
+	std::string::size_type pos = output.find(bodyDelimiter);
+	if (pos != std::string::npos) {
+		stage_ = COMPLETE;
+		body_ += output;
+		content_length_ = body_.size();
+	} else {
+		body_ += output;
 	}
-	if (stage_ == BODY_SENT) {
-		if (!body_.empty() && body_[body_.size() - 1] == '\n' && output[0] == '\n') {
-			addCarriageReturn(output);
-			body_ += output;
-			stage_ = COMPLETE;
-			return;
-		} else {
-			std::string::size_type pos = output.find("\n\n");
-			if (pos != std::string::npos) {
-				stage_ = COMPLETE;
-				addCarriageReturn(output);
-				body_ += output;
-				content_length_ = body_.size();
-				return;
-			}
-			addCarriageReturn(output);
-			body_ += output;
-		}
+}
+
+int CgiResponse::handleRecvError(int recv_result) {
+	if (recv_result < 0) {
+		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
+		return -1;
 	}
+
+	std::cout << "  Connection closed" << std::endl;
+	if (processChildExit()) {
+		stage_ = COMPLETE;
+	} else {
+		return -1;
+	}
+
+	return 0;
+}
+
+bool CgiResponse::processChildExit() {
+	if (waitpid(pid_, &status_, 0) <= 0) {
+		std::cerr << "waitpid failed" << std::endl;
+		return false;
+	}
+
+	if (WIFEXITED(status_)) {
+		std::cout << "\e[33m"
+				  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
+				  << std::endl;
+		return WEXITSTATUS(status_) == 0;
+	}
+
+	if (WIFSIGNALED(status_)) {
+		std::cout << "\e[33m"
+				  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m" << std::endl;
+	}
+
+	return true;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiResponse& cgi_response) {
