@@ -54,6 +54,9 @@ private:
 
 	void recvEvent(int client_sd);
 	void handleCgiResponseReading(ClientSession& client_session);
+	void processEvaluatingResponseType(ClientSession& client_session);
+	void processCgiPreparing(ClientSession& client_session);
+
 	void writeEvent(int client_sd);
 	void handleCgiBodySending(ClientSession& client_session);
 	int sendCgiBody(ClientSession& client_session);

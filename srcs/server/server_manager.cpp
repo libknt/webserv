@@ -172,17 +172,20 @@ int ServerManager::handleReadEvent(int sd, int client_sd) {
 void ServerManager::recvEvent(int client_sd) {
 
 	ClientSession& client_session = getClientSession(client_sd);
-	if (client_session.getStatus() != CGI_RECEIVEING) {
+
+	if (client_session.getStatus() == AWAITING_REQUEST ||
+		client_session.getStatus() == REQUEST_RECEIVING) {
 		if (receiveAndParseHttpRequest(client_session) < 0) {
 			unregisterClientSession(client_session);
 			return;
 		}
-		if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
-			setClientResponseStage(client_session);
-		}
+	}
+	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
+		setClientResponseStage(client_session);
 		if (client_session.getStatus() == RESPONSE_PREPARING) {
 			handle_request::handleRequest(client_session);
-		} else if (client_session.getStatus() == CGI_PREPARING) {
+		}
+		if (client_session.getStatus() == CGI_PREPARING) {
 			cgi_handler::handleCgiProcess(client_session);
 
 			if (client_session.getRequest().getHttpMethod() == http_method::POST) {
@@ -199,13 +202,12 @@ void ServerManager::recvEvent(int client_sd) {
 			setWriteFd(client_sd);
 		}
 	}
-	handleCgiResponseReading(client_session);
+	if (client_session.getStatus() == CGI_RECEIVEING) {
+		handleCgiResponseReading(client_session);
+	}
 }
 
 void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
-	if (client_session.getStatus() != CGI_RECEIVEING) {
-		return;
-	}
 	if (client_session.getCgiResponse().readCgiReponse() < 0) {
 		cleaning(client_session);
 		createErrorResponse(client_session.getResponse(),
