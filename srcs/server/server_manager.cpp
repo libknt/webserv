@@ -263,7 +263,7 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 	cgi::CgiRequest& cgi_request = client_session.getCgi();
 	char buffer[BUFFER_SIZE];
 	std::memset(buffer, '\0', sizeof(buffer));
-	std::string body = cgi_request.getBody(BUFFER_SIZE - 1);
+	std::string body = cgi_request.extractBodySegment(BUFFER_SIZE - 1);
 	if (body.empty()) {
 		std::cout << "\033[31m"
 				  << "  CGI BODY SENDING: complete"

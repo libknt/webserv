@@ -33,11 +33,11 @@ private:
 	int status_;
 	std::string body_;
 
-	int setNonBlocking(int sd);
 	int setupInterProcessCommunication();
-	char** mapToCharStarStar(std::map<std::string, std::string> const& map);
-	int shebang(std::string file, std::string& path);
+	int setNonBlocking(int sd);
 	char** createExecveArgv();
+	int shebang(std::string file, std::string& path);
+	char** mapToCharPtrPtr(std::map<std::string, std::string> const& map);
 
 public:
 	CgiRequest();
@@ -46,14 +46,15 @@ public:
 	~CgiRequest();
 	int setup();
 	int execute();
-	int getSocketFd(int const index) const;
-	std::string findMetaVariable(std::string const& key) const;
+	std::string extractBodySegment(std::size_t max_size);
 	CGI_STATUS getStatus() const;
-	pid_t getPid() const;
+	std::map<std::string, std::string> getMetaVariables() const;
 	void setMetaVariable(std::map<std::string, std::string> const& meta_variables);
+	std::string findMetaVariable(std::string const& key) const;
+	pid_t getPid() const;
+	int getSocketFd(int const index) const;
+	const std::string& getBody() const;
 	void setBody(std::string const& body);
-	int getBody(char* buffer, std::size_t max_size);
-	std::string getBody(std::size_t max_size);
 };
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi);
