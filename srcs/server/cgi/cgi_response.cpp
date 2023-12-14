@@ -43,19 +43,91 @@ CgiResponse& CgiResponse::operator=(const CgiResponse& other) {
 
 CgiResponse::~CgiResponse() {}
 
+int CgiResponse::readCgiReponse() {
+	if (stage_ == NOT_STARTED) {
+		std::cout << "cgi_response: NOT_STARTED" << std::endl;
+		return -1;
+	}
+	int sd = socket_vector_[0];
+	char buffer[BUFFER_SIZE];
+	std::memset(buffer, '\0', sizeof(buffer));
+
+	int recv_result = recv(sd, buffer, BUFFER_SIZE - 1, 0);
+	if (recv_result > 0) {
+		advanceResponseProcessing(std::string(buffer));
+	} else if (recv_result < 0) {
+		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
+		return -1;
+	} else if (recv_result == 0) {
+		std::cout << "  Connection closed" << std::endl;
+		if (waitpid(pid_, &status_, 0) > 0) {
+			if (WIFEXITED(status_)) {
+				std::cout << "\e[33m"
+						  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
+						  << std::endl;
+				if (WEXITSTATUS(status_) != 0) {
+					return -1;
+				}
+			} else if (WIFSIGNALED(status_)) {
+				std::cout << "\e[33m"
+						  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m"
+						  << std::endl;
+			}
+			stage_ = COMPLETE;
+		} else {
+			std::cerr << "waitpid failed" << std::endl;
+			return -1;
+		}
+	}
+	return 0;
+}
+
+CGI_RESPONSE_STAGE CgiResponse::getStage() const {
+	return stage_;
+}
+
 void CgiResponse::setStage(CGI_RESPONSE_STAGE const stage) {
 	stage_ = stage;
+}
+
+int CgiResponse::getSocketFd(int index) const {
+	return socket_vector_[index];
+}
+
+void CgiResponse::setSocketFd(int index, int fd) {
+	socket_vector_[index] = fd;
+}
+
+pid_t CgiResponse::getPid() const {
+	return pid_;
 }
 
 void CgiResponse::setPid(pid_t pid) {
 	pid_ = pid;
 }
-void CgiResponse::setSocketFd(int index, int fd) {
-	socket_vector_[index] = fd;
+
+int CgiResponse::getStatus() const {
+	return status_;
 }
 
-CGI_RESPONSE_STAGE CgiResponse::getStage() const {
-	return stage_;
+const std::map<std::string, std::string>& CgiResponse::getHeaders() const {
+	return headers_;
+}
+
+std::string const CgiResponse::getHeaderValue(std::string const& key) const {
+	std::map<std::string, std::string>::const_iterator it = headers_.find(key);
+	if (it == headers_.end()) {
+		return "";
+	}
+	return it->second;
+}
+
+const std::string& CgiResponse::getBody() const {
+	return body_;
+}
+
+std::size_t CgiResponse::getContentLength() const {
+	return content_length_;
 }
 
 static std::string ltrim(const std::string& s) {
@@ -161,77 +233,6 @@ void CgiResponse::advanceResponseProcessing(std::string const& value) {
 			body_ += output;
 		}
 	}
-}
-
-int CgiResponse::readCgiReponse() {
-	if (stage_ == NOT_STARTED) {
-		std::cout << "cgi_response: NOT_STARTED" << std::endl;
-		return -1;
-	}
-	int sd = socket_vector_[0];
-	char buffer[BUFFER_SIZE];
-	std::memset(buffer, '\0', sizeof(buffer));
-
-	int recv_result = recv(sd, buffer, BUFFER_SIZE - 1, 0);
-	if (recv_result > 0) {
-		advanceResponseProcessing(std::string(buffer));
-	} else if (recv_result < 0) {
-		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
-		return -1;
-	} else if (recv_result == 0) {
-		std::cout << "  Connection closed" << std::endl;
-		if (waitpid(pid_, &status_, 0) > 0) {
-			if (WIFEXITED(status_)) {
-				std::cout << "\e[33m"
-						  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
-						  << std::endl;
-				if (WEXITSTATUS(status_) != 0) {
-					return -1;
-				}
-			} else if (WIFSIGNALED(status_)) {
-				std::cout << "\e[33m"
-						  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m"
-						  << std::endl;
-			}
-			stage_ = COMPLETE;
-		} else {
-			std::cerr << "waitpid failed" << std::endl;
-			return -1;
-		}
-	}
-	return 0;
-}
-
-int CgiResponse::getSocketFd(int index) const {
-	return socket_vector_[index];
-}
-
-pid_t CgiResponse::getPid() const {
-	return pid_;
-}
-
-int CgiResponse::getStatus() const {
-	return status_;
-}
-
-const std::map<std::string, std::string>& CgiResponse::getHeaders() const {
-	return headers_;
-}
-
-const std::string& CgiResponse::getBody() const {
-	return body_;
-}
-
-std::string const CgiResponse::getHeaderValue(std::string const& key) const {
-	std::map<std::string, std::string>::const_iterator it = headers_.find(key);
-	if (it == headers_.end()) {
-		return "";
-	}
-	return it->second;
-}
-
-std::size_t CgiResponse::getContentLength() const {
-	return content_length_;
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiResponse& cgi_response) {

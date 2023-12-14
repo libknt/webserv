@@ -30,6 +30,7 @@ private:
 
 	void parseHeaders();
 	void addCarriageReturn(std::string& str);
+	void advanceResponseProcessing(std::string const& value);
 
 public:
 	CgiResponse();
@@ -37,18 +38,18 @@ public:
 	CgiResponse& operator=(const CgiResponse& other);
 	~CgiResponse();
 
-	void advanceResponseProcessing(std::string const& value);
-	void setStage(CGI_RESPONSE_STAGE const stage);
 	int readCgiReponse();
-	void setSocketFd(int index, int fd);
-	void setPid(pid_t pid);
+
 	CGI_RESPONSE_STAGE getStage() const;
+	void setStage(CGI_RESPONSE_STAGE const stage);
 	int getSocketFd(int index) const;
+	void setSocketFd(int index, int fd);
 	pid_t getPid() const;
+	void setPid(pid_t pid);
 	int getStatus() const;
 	const std::map<std::string, std::string>& getHeaders() const;
-	const std::string& getBody() const;
 	std::string const getHeaderValue(std::string const& key) const;
+	const std::string& getBody() const;
 	std::size_t getContentLength() const;
 };
 
