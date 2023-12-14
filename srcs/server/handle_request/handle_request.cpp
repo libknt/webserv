@@ -8,7 +8,8 @@ void handleRequest(ClientSession& client_session) {
 	HttpResponse& response = client_session.getResponse();
 
 	const ServerDirective& server_directive = client_session.getServerDirective();
-	const LocationDirective& location_directive = server_directive.findLocation(request.getUriPath());
+	const LocationDirective& location_directive =
+		server_directive.findLocation(request.getUriPath());
 	std::string const method = request.getMethod();
 
 	if (method == "GET" && location_directive.isAllowMethod(method)) {

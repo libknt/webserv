@@ -126,16 +126,14 @@ size_t HttpRequest::getBodySize() const {
 	return (body_.size());
 }
 
-std::string	HttpRequest::getUriScheme() const
-{
+std::string HttpRequest::getUriScheme() const {
 	std::string::size_type end_index = uri_.find("://");
 	if (end_index == std::string::npos)
 		return (std::string(""));
 	return (uri_.substr(0, end_index));
 }
 
-std::string	HttpRequest::getUriAuthority() const
-{
+std::string HttpRequest::getUriAuthority() const {
 	std::string::size_type front_index = uri_.find("://");
 	if (front_index == std::string::npos)
 		return (std::string(""));
@@ -152,8 +150,7 @@ std::string	HttpRequest::getUriAuthority() const
 	return (uri_.substr(front_index));
 }
 
-std::string	HttpRequest::getUriPath() const
-{
+std::string HttpRequest::getUriPath() const {
 	std::string::size_type front_index = 0;
 	std::string::size_type authority_index = uri_.find("://");
 	if (authority_index != std::string::npos)
@@ -169,12 +166,11 @@ std::string	HttpRequest::getUriPath() const
 	return (uri_.substr(front_index));
 }
 
-std::string	HttpRequest::getUriQuery() const
-{
-	std::string::size_type	front_index = uri_.find("?");
+std::string HttpRequest::getUriQuery() const {
+	std::string::size_type front_index = uri_.find("?");
 	if (front_index == std::string::npos)
 		return (std::string(""));
-	std::string::size_type	end_index = uri_.find("#");
+	std::string::size_type end_index = uri_.find("#");
 	if (end_index == std::string::npos)
 		return (uri_.substr(front_index));
 	return (uri_.substr(front_index, end_index - front_index));
