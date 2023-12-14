@@ -282,6 +282,14 @@ int CgiRequest::getSocketFd(int const index) const {
 	return socket_vector_[index];
 }
 
+char const* const* CgiRequest::getExecveArgv() const {
+	return execve_argv_;
+}
+
+char const* const* CgiRequest::getEnviron() const {
+	return environ_;
+}
+
 const std::string& CgiRequest::getBody() const {
 	return body_;
 }
@@ -291,9 +299,24 @@ void CgiRequest::setBody(std::string const& body) {
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi) {
-
+	// out << "\e[1;32m";
 	out << "CgiRequest: " << std::endl;
-	out << cgi.getStatus() << std::endl;
+	out << "cgi_status_: " << cgi.getStatus() << std::endl;
+	out << "pid_: " << cgi.getPid() << std::endl;
+	out << "socket_vector_[0]: " << cgi.getSocketFd(0) << std::endl;
+	out << "socket_vector_[1]: " << cgi.getSocketFd(1) << std::endl;
+	out << "execve_argv_: " << std::endl;
+	char const* const* execve_argv = cgi.getExecveArgv();
+	for (int i = 0; execve_argv[i]; ++i) {
+		out << "  " << execve_argv[i] << std::endl;
+	}
+	out << "environ_: " << std::endl;
+	char const* const* environ = cgi.getEnviron();
+	for (int i = 0; environ[i]; ++i) {
+		out << "  " << environ[i] << std::endl;
+	}
+	out << "body_: " << cgi.getBody() << std::endl;
+	// out << "\e[m";
 	return out;
 }
 

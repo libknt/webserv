@@ -53,6 +53,8 @@ public:
 	std::string findMetaVariable(std::string const& key) const;
 	pid_t getPid() const;
 	int getSocketFd(int const index) const;
+	char const* const* getExecveArgv() const;
+	char const* const* getEnviron() const;
 	const std::string& getBody() const;
 	void setBody(std::string const& body);
 };
