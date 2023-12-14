@@ -137,29 +137,39 @@ int ServerManager::resolveClientSocket(const int sd) {
 }
 
 int ServerManager::dispatchSocketEvents(int ready_sds) {
-
 	for (int sd = 0; sd <= highest_sd_ && ready_sds > 0; ++sd) {
-		if (FD_ISSET(sd, &read_fds_)) {
-			if (isListeningSocket(sd)) {
-				if (acceptIncomingConnection(sd) < 0) {
-					is_running = false;
-					return -1;
-				}
-			} else {
-				int client_sd = resolveClientSocket(sd);
-				readEvent(client_sd);
-			}
-			--ready_sds;
-		} else if (FD_ISSET(sd, &write_fds_)) {
-			int client_sd = resolveClientSocket(sd);
-			writeEvent(client_sd);
-			--ready_sds;
+		if (!FD_ISSET(sd, &read_fds_) && !FD_ISSET(sd, &write_fds_)) {
+			continue;
 		}
+
+		int client_sd = isListeningSocket(sd) ? sd : resolveClientSocket(sd);
+
+		if (FD_ISSET(sd, &read_fds_)) {
+			if (handleReadEvent(sd, client_sd) < 0) {
+				return -1;
+			}
+		} else if (FD_ISSET(sd, &write_fds_)) {
+			writeEvent(client_sd);
+		}
+
+		--ready_sds;
 	}
 	return 0;
 }
 
-void ServerManager::readEvent(int client_sd) {
+int ServerManager::handleReadEvent(int sd, int client_sd) {
+	if (isListeningSocket(sd)) {
+		if (acceptIncomingConnection(sd) < 0) {
+			is_running = false;
+			return -1;
+		}
+	} else {
+		recvEvent(client_sd);
+	}
+	return 0;
+}
+
+void ServerManager::recvEvent(int client_sd) {
 
 	ClientSession& client_session = getClientSession(client_sd);
 	if (client_session.getStatus() != CGI_RECEIVEING) {
@@ -188,24 +198,30 @@ void ServerManager::readEvent(int client_sd) {
 		if (client_session.getStatus() == SENDING_RESPONSE) {
 			setWriteFd(client_sd);
 		}
-	} else {
-		if (client_session.getCgiResponse().readCgiReponse() < 0) {
-			cleaning(client_session);
-			createErrorResponse(client_session.getResponse(),
-				http_status_code::INTERNAL_SERVER_ERROR,
-				client_session.findLocation());
-			client_session.getResponse().concatenateComponents();
-			client_session.setStatus(SENDING_RESPONSE);
-		} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
-				   client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
-			cgi_handler::handleCgiResponse(client_session);
-			cleaning(client_session);
+	}
+	handleCgiResponseReading(client_session);
+}
 
-			client_session.setStatus(SENDING_RESPONSE);
-		}
-		if (client_session.getStatus() == SENDING_RESPONSE) {
-			setWriteFd(client_session.getSd());
-		}
+void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
+	if (client_session.getStatus() != CGI_RECEIVEING) {
+		return;
+	}
+	if (client_session.getCgiResponse().readCgiReponse() < 0) {
+		cleaning(client_session);
+		createErrorResponse(client_session.getResponse(),
+			http_status_code::INTERNAL_SERVER_ERROR,
+			client_session.findLocation());
+		client_session.getResponse().concatenateComponents();
+		client_session.setStatus(SENDING_RESPONSE);
+	} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
+			   client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
+		cgi_handler::handleCgiResponse(client_session);
+		cleaning(client_session);
+
+		client_session.setStatus(SENDING_RESPONSE);
+	}
+	if (client_session.getStatus() == SENDING_RESPONSE) {
+		setWriteFd(client_session.getSd());
 	}
 }
 

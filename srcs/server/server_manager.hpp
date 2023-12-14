@@ -52,12 +52,14 @@ private:
 	int resolveClientSocket(const int sd);
 	void cleaning(ClientSession& client_sesion);
 
-	void readEvent(int client_sd);
+	void recvEvent(int client_sd);
+	void handleCgiResponseReading(ClientSession& client_session);
 	void writeEvent(int client_sd);
 	void handleCgiBodySending(ClientSession& client_session);
 	int sendCgiBody(ClientSession& client_session);
 	void handleSendingResponse(ClientSession& client_session);
 	void finalizeSession(ClientSession& client_session);
+	int handleReadEvent(int sd, int client_sd);
 
 public:
 	ServerManager(const Configuration& configuration);
