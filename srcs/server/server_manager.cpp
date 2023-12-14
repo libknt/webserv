@@ -182,8 +182,7 @@ void ServerManager::recvEvent(int client_sd) {
 	}
 	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
 		processEvaluatingResponseType(client_session, client_sd);
-	}
-	if (client_session.getStatus() == CGI_RECEIVEING) {
+	} else if (client_session.getStatus() == CGI_RECEIVEING) {
 		handleCgiResponseReading(client_session);
 	}
 }
@@ -460,8 +459,10 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
 	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE - 1);
+	std::cout << "\033[32m"
+			  << "[" << send_buffer << "]"
+			  << "\033[0m" << std::endl;
 	int send_result = send(client_sd, send_buffer, sizeof(send_buffer), 0);
-	std::cout << "send_buffer: " << send_buffer << std::endl;
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		return -1;
