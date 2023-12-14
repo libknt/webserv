@@ -55,7 +55,7 @@ int CgiResponse::readCgiResponse() {
 
 	int recv_result = recv(sd, buffer, BUFFER_SIZE - 1, 0);
 	if (recv_result > 0) {
-		advanceResponseProcessing(std::string(buffer));
+		return advanceResponseProcessing(std::string(buffer));
 	} else {
 		return handleRecvError(recv_result);
 	}
@@ -112,26 +112,29 @@ std::size_t CgiResponse::getContentLength() const {
 }
 
 // todo これcgi側がすべきことではない
-void CgiResponse::advanceResponseProcessing(std::string const& value) {
+int CgiResponse::advanceResponseProcessing(std::string const& value) {
 	std::string output(value);
 
 	if (stage_ == NOT_STARTED) {
-		return;
+		return -1;
 	}
 	if (stage_ == HEADERS_SENT) {
-		processHeaders(output);
+		if (processHeaders(output) < 0) {
+			return -1;
+		}
 	}
 	if (stage_ == BODY_SENT) {
 		processBody(output);
 	}
+	return 0;
 }
 
-void CgiResponse::processHeaders(std::string& output) {
+int CgiResponse::processHeaders(std::string& output) {
 	if (!headers_stream_.empty() && headers_stream_[headers_stream_.size() - 1] == '\n' &&
 		output[0] == '\n') {
 		stage_ = BODY_SENT;
 		output = output.erase(0, 1);
-		return;
+		return 0;
 	}
 
 	const std::string headerDelimiter = "\n\n";
@@ -140,13 +143,16 @@ void CgiResponse::processHeaders(std::string& output) {
 		stage_ = BODY_SENT;
 		headers_stream_ += output.substr(0, pos + 1);
 		output.erase(0, pos + headerDelimiter.length());
-		parseHeaders();
+		if (parseHeaders() < 0) {
+			return -1;
+		}
 	} else {
 		headers_stream_ += output;
 	}
+	return 0;
 }
 
-void CgiResponse::parseHeaders() {
+int CgiResponse::parseHeaders() {
 	std::istringstream stream(headers_stream_);
 	headers_.clear();
 	std::string line;
@@ -157,9 +163,12 @@ void CgiResponse::parseHeaders() {
 		if (line[line.size() - 1] == '\n') {
 			line.erase(line.size() - 1);
 		}
-		parseHeaderLine(line);
+		if (parseHeaderLine(line) < 0) {
+			return -1;
+		}
 	}
 	headers_stream_.clear();
+	return 0;
 }
 
 static std::string ltrim(const std::string& s) {
@@ -184,15 +193,19 @@ static std::string toLower(const std::string& s) {
 	return result;
 }
 
-void CgiResponse::parseHeaderLine(const std::string& line) {
+int CgiResponse::parseHeaderLine(const std::string& line) {
 	size_t pos = line.find(':');
 	if (pos != std::string::npos) {
 		std::string key = toLower(trim(line.substr(0, pos)));
 		std::string value = trim(line.substr(pos + 1));
 		if (!value.empty()) {
+			if (headers_.find(key) != headers_.end()) {
+				return -1;
+			}
 			headers_.insert(std::make_pair(key, value));
 		}
 	}
+	return 0;
 }
 
 void CgiResponse::processBody(std::string& output) {

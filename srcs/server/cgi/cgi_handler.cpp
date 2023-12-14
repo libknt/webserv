@@ -61,7 +61,6 @@ void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 		response.setHeaderValue("content-length", Utils::toString(cgi_response.getContentLength()));
 		std::string body = cgi_response.getBody();
 		std::string new_body;
-		// add carriage return
 		for (std::size_t i = 0; i < body.size(); i++) {
 			if (body[i] == '\n') {
 				new_body += "\r\n";
