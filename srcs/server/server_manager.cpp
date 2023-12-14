@@ -181,29 +181,38 @@ void ServerManager::recvEvent(int client_sd) {
 		}
 	}
 	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
-		setClientResponseStage(client_session);
-		if (client_session.getStatus() == RESPONSE_PREPARING) {
-			handle_request::handleRequest(client_session);
-		}
-		if (client_session.getStatus() == CGI_PREPARING) {
-			cgi_handler::handleCgiProcess(client_session);
-
-			if (client_session.getRequest().getHttpMethod() == http_method::POST) {
-				setWriteFd(client_session.getCgi().getSocketFd(0));
-				cgi_socket_pairs_.insert(
-					std::make_pair(client_session.getCgi().getSocketFd(0), client_session.getSd()));
-			} else {
-				setReadFd(client_session.getCgi().getSocketFd(0));
-				cgi_socket_pairs_.insert(
-					std::make_pair(client_session.getCgi().getSocketFd(0), client_session.getSd()));
-			}
-		}
-		if (client_session.getStatus() == SENDING_RESPONSE) {
-			setWriteFd(client_sd);
-		}
+		processEvaluatingResponseType(client_session, client_sd);
 	}
 	if (client_session.getStatus() == CGI_RECEIVEING) {
 		handleCgiResponseReading(client_session);
+	}
+}
+
+void ServerManager::processEvaluatingResponseType(ClientSession& client_session,
+	const int client_sd) {
+	setClientResponseStage(client_session);
+	if (client_session.getStatus() == RESPONSE_PREPARING) {
+		handle_request::handleRequest(client_session);
+	}
+	if (client_session.getStatus() == CGI_PREPARING) {
+		processCgiPreparing(client_session);
+	}
+	if (client_session.getStatus() == SENDING_RESPONSE) {
+		setWriteFd(client_sd);
+	}
+}
+
+void ServerManager::processCgiPreparing(ClientSession& client_session) {
+	cgi_handler::handleCgiProcess(client_session);
+
+	if (client_session.getRequest().getHttpMethod() == http_method::POST) {
+		setWriteFd(client_session.getCgi().getSocketFd(0));
+		cgi_socket_pairs_.insert(
+			std::make_pair(client_session.getCgi().getSocketFd(0), client_session.getSd()));
+	} else {
+		setReadFd(client_session.getCgi().getSocketFd(0));
+		cgi_socket_pairs_.insert(
+			std::make_pair(client_session.getCgi().getSocketFd(0), client_session.getSd()));
 	}
 }
 
