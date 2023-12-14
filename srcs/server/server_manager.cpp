@@ -274,7 +274,6 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 		return 0;
 	}
 	std::memcpy(buffer, body.c_str(), body.length());
-	std::cout << "cgi body: " << buffer << std::endl;
 	int send_result = ::send(client_sd, buffer, sizeof(buffer), 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
