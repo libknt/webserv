@@ -211,26 +211,23 @@ void ServerManager::readEvent(int client_sd) {
 
 void ServerManager::writeEvent(int client_sd) {
 	ClientSession& client_session = getClientSession(client_sd);
-	if (client_session.getStatus() == CGI_BODY_SENDING) {
-		if (sendCgiBody(client_session) < 0) {
-			cleaning(client_session);
-			createErrorResponse(client_session.getResponse(),
-				http_status_code::INTERNAL_SERVER_ERROR,
-				client_session.findLocation());
-			client_session.getResponse().concatenateComponents();
+	handleCgiBodySending(client_session);
+	handleSendingResponse(client_session);
+}
 
-			setWriteFd(client_session.getSd());
-			client_session.setStatus(SENDING_RESPONSE);
-		}
+void ServerManager::handleCgiBodySending(ClientSession& client_session) {
+	if (client_session.getStatus() != CGI_BODY_SENDING) {
+		return;
 	}
-	if (client_session.getStatus() == SENDING_RESPONSE) {
-		if (sendResponse(client_session) < 0) {
-			unregisterClientSession(client_session);
-			return;
-		} else if (client_session.getStatus() == SESSION_COMPLETE) {
-			clearFds(client_session.getSd());
-			client_session.sessionCleanup();
-		}
+	if (sendCgiBody(client_session) < 0) {
+		cleaning(client_session);
+		createErrorResponse(client_session.getResponse(),
+			http_status_code::INTERNAL_SERVER_ERROR,
+			client_session.findLocation());
+		client_session.getResponse().concatenateComponents();
+
+		setWriteFd(client_session.getSd());
+		client_session.setStatus(SENDING_RESPONSE);
 	}
 }
 
@@ -261,6 +258,24 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 		return -1;
 	}
 	return 0;
+}
+
+void ServerManager::handleSendingResponse(ClientSession& client_session) {
+	if (client_session.getStatus() != SENDING_RESPONSE) {
+		return;
+	}
+	if (sendResponse(client_session) < 0) {
+		unregisterClientSession(client_session);
+		return;
+	}
+	if (client_session.getStatus() == SESSION_COMPLETE) {
+		finalizeSession(client_session);
+	}
+}
+
+void ServerManager::finalizeSession(ClientSession& client_session) {
+	clearFds(client_session.getSd());
+	client_session.sessionCleanup();
 }
 
 void ServerManager::setClientResponseStage(ClientSession& session) {

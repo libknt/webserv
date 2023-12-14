@@ -47,15 +47,17 @@ private:
 	int sendResponse(ClientSession& client_session);
 
 	void registerClientSession(int sd, sockaddr_in client_address, sockaddr_in server_address);
-	void closeClientSession(ClientSession& client_session);
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
-	int sendCgiBody(ClientSession& client_session);
 	int resolveClientSocket(const int sd);
 	void cleaning(ClientSession& client_sesion);
 
 	void readEvent(int client_sd);
 	void writeEvent(int client_sd);
+	void handleCgiBodySending(ClientSession& client_session);
+	int sendCgiBody(ClientSession& client_session);
+	void handleSendingResponse(ClientSession& client_session);
+	void finalizeSession(ClientSession& client_session);
 
 public:
 	ServerManager(const Configuration& configuration);
