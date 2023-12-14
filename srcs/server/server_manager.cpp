@@ -217,7 +217,7 @@ void ServerManager::processCgiPreparing(ClientSession& client_session) {
 }
 
 void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
-	if (client_session.getCgiResponse().readCgiReponse() < 0) {
+	if (client_session.getCgiResponse().readCgiResponse() < 0) {
 		cleaning(client_session);
 		createErrorResponse(client_session.getResponse(),
 			http_status_code::INTERNAL_SERVER_ERROR,

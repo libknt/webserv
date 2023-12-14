@@ -32,13 +32,17 @@ private:
 	void addCarriageReturn(std::string& str);
 	void advanceResponseProcessing(std::string const& value);
 
+	int handleRecvError(int recv_result);
+	bool processChildExit();
+	void parseHeaderLine(const std::string& line);
+
 public:
 	CgiResponse();
 	CgiResponse(const CgiResponse& other);
 	CgiResponse& operator=(const CgiResponse& other);
 	~CgiResponse();
 
-	int readCgiReponse();
+	int readCgiResponse();
 
 	CGI_RESPONSE_STAGE getStage() const;
 	void setStage(CGI_RESPONSE_STAGE const stage);

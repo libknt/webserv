@@ -29,10 +29,10 @@ CgiResponse::CgiResponse(const CgiResponse& other)
 CgiResponse& CgiResponse::operator=(const CgiResponse& other) {
 	if (this != &other) {
 		stage_ = other.stage_;
-		pid_ = other.pid_;
-		status_ = other.status_;
 		socket_vector_[0] = other.socket_vector_[0];
 		socket_vector_[1] = other.socket_vector_[1];
+		pid_ = other.pid_;
+		status_ = other.status_;
 		headers_stream_ = other.headers_stream_;
 		headers_ = other.headers_;
 		body_ = other.body_;
@@ -43,11 +43,12 @@ CgiResponse& CgiResponse::operator=(const CgiResponse& other) {
 
 CgiResponse::~CgiResponse() {}
 
-int CgiResponse::readCgiReponse() {
+int CgiResponse::readCgiResponse() {
 	if (stage_ == NOT_STARTED) {
-		std::cout << "cgi_response: NOT_STARTED" << std::endl;
+		std::cerr << "cgi_response: NOT_STARTED" << std::endl;
 		return -1;
 	}
+
 	int sd = socket_vector_[0];
 	char buffer[BUFFER_SIZE];
 	std::memset(buffer, '\0', sizeof(buffer));
@@ -55,31 +56,49 @@ int CgiResponse::readCgiReponse() {
 	int recv_result = recv(sd, buffer, BUFFER_SIZE - 1, 0);
 	if (recv_result > 0) {
 		advanceResponseProcessing(std::string(buffer));
-	} else if (recv_result < 0) {
+	} else {
+		return handleRecvError(recv_result);
+	}
+
+	return 0;
+}
+
+int CgiResponse::handleRecvError(int recv_result) {
+	if (recv_result < 0) {
 		std::cerr << "recv() failed: " << strerror(errno) << std::endl;
 		return -1;
-	} else if (recv_result == 0) {
-		std::cout << "  Connection closed" << std::endl;
-		if (waitpid(pid_, &status_, 0) > 0) {
-			if (WIFEXITED(status_)) {
-				std::cout << "\e[33m"
-						  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
-						  << std::endl;
-				if (WEXITSTATUS(status_) != 0) {
-					return -1;
-				}
-			} else if (WIFSIGNALED(status_)) {
-				std::cout << "\e[33m"
-						  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m"
-						  << std::endl;
-			}
-			stage_ = COMPLETE;
-		} else {
-			std::cerr << "waitpid failed" << std::endl;
-			return -1;
-		}
 	}
+
+	// recv_result == 0
+	std::cout << "  Connection closed" << std::endl;
+	if (processChildExit()) {
+		stage_ = COMPLETE;
+	} else {
+		return -1;
+	}
+
 	return 0;
+}
+
+bool CgiResponse::processChildExit() {
+	if (waitpid(pid_, &status_, 0) <= 0) {
+		std::cerr << "waitpid failed" << std::endl;
+		return false;
+	}
+
+	if (WIFEXITED(status_)) {
+		std::cout << "\e[33m"
+				  << "CGI process exited with status " << WEXITSTATUS(status_) << "\e[m"
+				  << std::endl;
+		return WEXITSTATUS(status_) == 0;
+	}
+
+	if (WIFSIGNALED(status_)) {
+		std::cout << "\e[33m"
+				  << "CGI process killed by signal " << WTERMSIG(status_) << "\e[m" << std::endl;
+	}
+
+	return true;
 }
 
 CGI_RESPONSE_STAGE CgiResponse::getStage() const {
@@ -152,33 +171,29 @@ static std::string toLower(const std::string& s) {
 	return result;
 }
 
+void CgiResponse::parseHeaderLine(const std::string& line) {
+	size_t pos = line.find(':');
+	if (pos != std::string::npos) {
+		std::string key = toLower(trim(line.substr(0, pos)));
+		std::string value = trim(line.substr(pos + 1));
+		if (!value.empty()) {
+			headers_.insert(std::make_pair(key, value));
+		}
+	}
+}
+
 void CgiResponse::parseHeaders() {
 	std::istringstream stream(headers_stream_);
-	std::string line;
-
 	headers_.clear();
-
+	std::string line;
 	while (std::getline(stream, line, '\n')) {
-		std::string::size_type pos = line.find("\r\n");
-		if (pos != std::string::npos) {
-			line.erase(pos);
-		}
-		pos = line.find('\n');
-		if (pos != std::string::npos) {
-			line.erase(pos);
-		}
 		if (line.empty()) {
 			break;
 		}
-
-		pos = line.find(':');
-		if (pos != std::string::npos) {
-			std::string key = toLower(trim(line.substr(0, pos)));
-			std::string value = trim(line.substr(pos + 1));
-			if (!value.empty()) {
-				headers_.insert(std::pair<std::string, std::string>(key, value));
-			}
+		if (line[line.size() - 1] == '\n') {
+			line.erase(line.size() - 1);
 		}
+		parseHeaderLine(line);
 	}
 	headers_stream_.clear();
 }
