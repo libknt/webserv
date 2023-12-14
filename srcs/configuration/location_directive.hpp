@@ -3,12 +3,12 @@
 
 #include "parser_utils.hpp"
 #include "webserv.hpp"
+#include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <fstream>
 
 class LocationDirective {
 private:
@@ -37,7 +37,6 @@ private:
 	int parseCgiDirective(std::vector<std::string>& tokens);
 	int parseCgiExtensionsDirective(std::vector<std::string>& tokens);
 	bool isStatusCode(const std::string& status_code);
-
 
 public:
 	LocationDirective();

@@ -257,7 +257,8 @@ std::map<std::string, std::string> LocationDirective::getErrorPages() const {
 	return error_pages_;
 }
 
-std::string const LocationDirective::findErrorPagePath(http_status_code::STATUS_CODE status_code) const {
+std::string const LocationDirective::findErrorPagePath(
+	http_status_code::STATUS_CODE status_code) const {
 	std::stringstream stringstream;
 	stringstream << status_code;
 	std::map<std::string, std::string>::const_iterator it = error_pages_.find(stringstream.str());
