@@ -188,7 +188,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getUriPath());
 	std::string file_extension = Utils::extructUriExtension(request.getUriPath());
-	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
+	std::string file_path = location_directive.getRoot() + "/" + request.getUri();
 
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {

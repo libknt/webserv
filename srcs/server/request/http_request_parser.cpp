@@ -73,8 +73,8 @@ int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& l
 					return (-1);
 				}
 				index = i + 1;
-				status = parse_request_line::REQUEST_PATH;
-			} else if (parse_request_line::REQUEST_PATH) {
+				status = parse_request_line::URI;
+			} else if (parse_request_line::URI) {
 				if (request.setRequestPath(line.substr(index, i - index)) < 0) {
 					return (-1);
 				}

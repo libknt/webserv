@@ -17,7 +17,7 @@ HttpRequest::~HttpRequest(){};
 HttpRequest::HttpRequest(HttpRequest const& other)
 	: status_(other.status_)
 	, method_(other.method_)
-	, request_path_(other.request_path_)
+	, uri_(other.uri_)
 	, version_(other.version_)
 	, header_(other.header_)
 	, body_message_type_(other.body_message_type_)
@@ -30,7 +30,7 @@ HttpRequest& HttpRequest::operator=(HttpRequest const& other) {
 	if (this != &other) {
 		status_ = other.status_;
 		method_ = other.method_;
-		request_path_ = other.request_path_;
+		uri_ = other.uri_;
 		version_ = other.version_;
 		header_ = other.header_;
 		body_message_type_ = other.body_message_type_;
@@ -87,8 +87,8 @@ std::string const HttpRequest::getVersion() const {
 	return protocol;
 }
 
-std::string const& HttpRequest::getRequestPath() const {
-	return request_path_;
+std::string const& HttpRequest::getUri() const {
+	return uri_;
 }
 
 std::string const HttpRequest::getHeaderValue(std::string const& key) const {
@@ -127,17 +127,17 @@ size_t HttpRequest::getBodySize() const {
 }
 
 std::string HttpRequest::getUriPath() const {
-	std::string::size_type query_index = request_path_.find("?");
+	std::string::size_type query_index = uri_.find("?");
 	if (query_index != std::string::npos) {
-		return (request_path_.substr(0, query_index));
+		return (uri_.substr(0, query_index));
 	}
-	return (request_path_);
+	return (uri_);
 }
 
 std::string HttpRequest::getUriQuery() const {
-	std::string::size_type query_index = request_path_.find("?");
-	if (query_index != std::string::npos && query_index + 1 <= request_path_.size()) {
-		return (request_path_.substr(query_index + 1));
+	std::string::size_type query_index = uri_.find("?");
+	if (query_index != std::string::npos && query_index + 1 <= uri_.size()) {
+		return (uri_.substr(query_index + 1));
 	}
 	return (std::string(""));
 }
@@ -176,12 +176,12 @@ int HttpRequest::setMethod(std::string const& method) {
 	return (0);
 }
 
-int HttpRequest::setRequestPath(std::string const& request_path) {
-	if (request_path.size() == 0) {
+int HttpRequest::setRequestPath(std::string const& uri) {
+	if (uri.size() == 0) {
 		setStatus(http_request_status::ERROR);
 		return (-1);
 	}
-	request_path_ = request_path;
+	uri_ = uri;
 	return (0);
 }
 
@@ -250,7 +250,7 @@ bool HttpRequest::isTokenCharacter(char chr) {
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 
 	out << "method: " << request.getMethod() << std::endl;
-	out << "request path: " << request.getRequestPath() << std::endl;
+	out << "request path: " << request.getUri() << std::endl;
 	out << "status: " << request.getStatus() << std::endl;
 	out << "version: " << request.getVersion() << std::endl;
 	out << "header" << std::endl;

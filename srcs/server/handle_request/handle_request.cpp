@@ -8,8 +8,7 @@ void handleRequest(ClientSession& client_session) {
 	HttpResponse& response = client_session.getResponse();
 
 	const ServerDirective& server_directive = client_session.getServerDirective();
-	const LocationDirective& location_directive =
-		server_directive.findLocation(request.getRequestPath());
+	const LocationDirective& location_directive = server_directive.findLocation(request.getUri());
 	std::string const method = request.getMethod();
 
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
@@ -30,7 +29,7 @@ void executeGet(const HttpRequest& request,
 
 	struct stat location_stat_info;
 	struct stat request_stat_info;
-	std::string file_path = location_directive.getRoot() + request.getRequestPath();
+	std::string file_path = location_directive.getRoot() + request.getUri();
 	std::string location_path =
 		location_directive.getRoot() + "/" + location_directive.getLocationPath();
 
@@ -73,7 +72,7 @@ void executePost(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
-	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
+	std::string file_path = location_directive.getRoot() + "/" + request.getUri();
 	if (stat(file_path.c_str(), &file_info) != 0) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 	}
@@ -102,9 +101,9 @@ void executeDelete(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
-	std::string request_path = location_directive.getRoot() + request.getRequestPath();
+	std::string uri = location_directive.getRoot() + request.getUri();
 
-	if (stat(request_path.c_str(), &file_info) != 0) {
+	if (stat(uri.c_str(), &file_info) != 0) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
 		return createErrorResponse(response, http_status_code::NOT_FOUND, location_directive);
 	}
@@ -114,7 +113,7 @@ void executeDelete(const HttpRequest& request,
 		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
 
-	if (std::remove(request_path.c_str()) != 0) {
+	if (std::remove(uri.c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
 		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
@@ -152,7 +151,7 @@ void createErrorResponse(HttpResponse& response,
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	std::string const root = location_directive.getRoot() + request.getRequestPath();
+	std::string const root = location_directive.getRoot() + request.getUri();
 	DIR* dir = opendir(root.c_str());
 	if (!dir) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
