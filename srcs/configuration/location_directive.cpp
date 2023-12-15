@@ -5,9 +5,9 @@ LocationDirective::LocationDirective()
 	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
-	, autoindex_("off")
-	, chunked_transfer_encoding_("off")
-	, cgi_("off") {
+	, autoindex_(false)
+	, chunked_transfer_encoding_(false)
+	, cgi_(false) {
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
@@ -18,9 +18,9 @@ LocationDirective::LocationDirective(const std::string& location_path)
 	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
-	, autoindex_("off")
-	, chunked_transfer_encoding_("off")
-	, cgi_("off") {
+	, autoindex_(false)
+	, chunked_transfer_encoding_(false)
+	, cgi_(false) {
 	std::vector<std::string> allow_methods;
 	allow_methods.push_back("GET");
 	allow_methods_ = allow_methods;
