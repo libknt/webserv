@@ -17,7 +17,6 @@ private:
 	std::map<std::string, std::string> error_pages_;
 	// std::set
 	std::vector<std::string> allow_methods_;
-	// int
 	int client_max_body_size_;
 	std::string root_;
 	std::string index_;
