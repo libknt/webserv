@@ -199,11 +199,14 @@ int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens)
 		std::cerr << "Parse Error: parseAutoindexDirective" << std::endl;
 		return -1;
 	}
-	if (tokens.front() != "on" && tokens.front() != "off") {
+	if (tokens.front() == "on") {
+		autoindex_ = true;
+	} else if (tokens.front() == "off") {
+		autoindex_ = false;
+	} else {
 		std::cerr << "Parse Error: parseAutoindexDirective" << std::endl;
 		return -1;
 	}
-	autoindex_ = tokens.front();
 	return 0;
 }
 
@@ -314,7 +317,7 @@ std::string LocationDirective::getIndex() const {
 	return index_;
 }
 
-std::string LocationDirective::getAutoindex() const {
+bool LocationDirective::getAutoindex() const {
 	return autoindex_;
 }
 

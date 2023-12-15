@@ -72,8 +72,9 @@ void executeGet(const HttpRequest& request,
 				return;
 			}
 		}
-		if (location_directive.getAutoindex() == "on")
-			return (makeAutoIndex(request, response, location_directive));
+		if (location_directive.getAutoindex()) {
+			return makeAutoIndex(request, response, location_directive);
+		}
 	}
 	return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 }

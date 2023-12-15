@@ -15,14 +15,21 @@ private:
 	const std::string location_path_;
 	std::string default_error_page_;
 	std::map<std::string, std::string> error_pages_;
+	// std::set
 	std::vector<std::string> allow_methods_;
+	// int
 	std::string client_max_body_size_;
 	std::string root_;
 	std::string index_;
-	std::string autoindex_;
+	// bool
+	bool autoindex_;
+	// std::string
 	std::vector<std::string> return_;
+	// bool
 	std::string chunked_transfer_encoding_;
+	// bool
 	std::string cgi_;
+	// std::set
 	std::vector<std::string> cgi_extensions_;
 
 	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
@@ -54,7 +61,7 @@ public:
 	std::string getClientMaxBodySize() const;
 	std::string getRoot() const;
 	std::string getIndex() const;
-	std::string getAutoindex() const;
+	bool getAutoindex() const;
 	std::vector<std::string> const& getReturn() const;
 	std::string getChunkedTransferEncoding() const;
 	std::string getCgi() const;
