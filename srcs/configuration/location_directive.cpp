@@ -2,7 +2,7 @@
 
 LocationDirective::LocationDirective()
 	: location_path_("/")
-	, client_max_body_size_("1M")
+	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
 	, autoindex_("off")
@@ -15,7 +15,7 @@ LocationDirective::LocationDirective()
 
 LocationDirective::LocationDirective(const std::string& location_path)
 	: location_path_(location_path)
-	, client_max_body_size_("1M")
+	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
 	, autoindex_("off")
@@ -168,11 +168,14 @@ int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>&
 			return -1;
 		}
 	}
-	if (token[token.size() - 1] != 'K' && token[token.size() - 1] != 'M') {
+	if (token[token.size() - 1] == 'K') {
+		client_max_body_size_ = std::stoi(token.substr(0, token.size() - 1)) * 1000;
+	} else if (token[token.size() - 1] == 'M') {
+		client_max_body_size_ = std::stoi(token.substr(0, token.size() - 1)) * 1000000;
+	} else {
 		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;
 	}
-	client_max_body_size_ = tokens.front();
 	return 0;
 }
 
@@ -311,7 +314,7 @@ std::vector<std::string> LocationDirective::getAllowMethods() const {
 	return allow_methods_;
 }
 
-std::string LocationDirective::getClientMaxBodySize() const {
+int LocationDirective::getClientMaxBodySize() const {
 	return client_max_body_size_;
 }
 

@@ -18,7 +18,7 @@ private:
 	// std::set
 	std::vector<std::string> allow_methods_;
 	// int
-	std::string client_max_body_size_;
+	int client_max_body_size_;
 	std::string root_;
 	std::string index_;
 	bool autoindex_;
@@ -55,7 +55,7 @@ public:
 	std::map<std::string, std::string> getErrorPages() const;
 	std::string const findErrorPagePath(http_status_code::STATUS_CODE status_code) const;
 	std::vector<std::string> getAllowMethods() const;
-	std::string getClientMaxBodySize() const;
+	int getClientMaxBodySize() const;
 	std::string getRoot() const;
 	std::string getIndex() const;
 	bool getAutoindex() const;
