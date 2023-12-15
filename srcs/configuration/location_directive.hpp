@@ -21,12 +21,11 @@ private:
 	std::string client_max_body_size_;
 	std::string root_;
 	std::string index_;
-	// bool
 	bool autoindex_;
 	// std::string
 	std::vector<std::string> return_;
 	// bool
-	std::string chunked_transfer_encoding_;
+	bool chunked_transfer_encoding_;
 	// bool
 	std::string cgi_;
 	// std::set
@@ -63,7 +62,7 @@ public:
 	std::string getIndex() const;
 	bool getAutoindex() const;
 	std::vector<std::string> const& getReturn() const;
-	std::string getChunkedTransferEncoding() const;
+	bool getChunkedTransferEncoding() const;
 	std::string getCgi() const;
 	bool isCgiExtension(const std::string& extension) const;
 	bool isCgiEnabled() const;

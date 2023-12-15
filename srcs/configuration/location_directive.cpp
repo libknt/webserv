@@ -244,11 +244,14 @@ int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::st
 		std::cerr << "Parse Error: parseChunkedTransferEncodingDirective" << std::endl;
 		return -1;
 	}
-	if (tokens.front() != "on" && tokens.front() != "off") {
+	if (tokens.front() == "on") {
+		chunked_transfer_encoding_ = true;
+	} else if (tokens.front() == "off") {
+		chunked_transfer_encoding_ = false;
+	} else {
 		std::cerr << "Parse Error: parseChunkedTransferEncodingDirective" << std::endl;
 		return -1;
 	}
-	chunked_transfer_encoding_ = tokens.front();
 	return 0;
 }
 
@@ -325,7 +328,7 @@ std::vector<std::string> const& LocationDirective::getReturn() const {
 	return return_;
 }
 
-std::string LocationDirective::getChunkedTransferEncoding() const {
+bool LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
 
