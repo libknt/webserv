@@ -276,11 +276,14 @@ int LocationDirective::parseCgiDirective(std::vector<std::string>& tokens) {
 		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
 		return -1;
 	}
-	if (tokens.front() != "on" && tokens.front() != "off") {
+	if (tokens.front() == "on") {
+		cgi_ = true;
+	} else if (tokens.front() == "off") {
+		cgi_ = false;
+	} else {
 		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
 		return -1;
 	}
-	cgi_ = tokens.front();
 	return 0;
 }
 
@@ -332,12 +335,8 @@ bool LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
 
-std::string LocationDirective::getCgi() const {
+bool LocationDirective::getCgi() const {
 	return cgi_;
-}
-
-bool LocationDirective::isCgiEnabled() const {
-	return cgi_ == "on";
 }
 
 bool LocationDirective::isCgiExtension(const std::string& extension) const {

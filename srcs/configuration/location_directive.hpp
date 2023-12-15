@@ -24,10 +24,8 @@ private:
 	bool autoindex_;
 	// std::string
 	std::vector<std::string> return_;
-	// bool
 	bool chunked_transfer_encoding_;
-	// bool
-	std::string cgi_;
+	bool cgi_;
 	// std::set
 	std::vector<std::string> cgi_extensions_;
 
@@ -63,9 +61,8 @@ public:
 	bool getAutoindex() const;
 	std::vector<std::string> const& getReturn() const;
 	bool getChunkedTransferEncoding() const;
-	std::string getCgi() const;
+	bool getCgi() const;
 	bool isCgiExtension(const std::string& extension) const;
-	bool isCgiEnabled() const;
 	const std::vector<std::string>& getCgiExtensions() const;
 	bool isValidCgiExtensions(const std::string& extension) const;
 	bool isAllowMethod(const std::string& method) const;
