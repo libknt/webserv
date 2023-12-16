@@ -21,7 +21,6 @@ private:
 	std::string root_;
 	std::string index_;
 	bool autoindex_;
-	// std::string
 	std::vector<std::string> return_;
 	bool chunked_transfer_encoding_;
 	bool cgi_;
