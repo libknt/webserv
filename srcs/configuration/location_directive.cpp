@@ -388,7 +388,8 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 
 	std::set<std::string> allow_methods = location_directive.getAllowMethods();
 	out << "HTTPMethods: " << std::endl;
-	for (std::set<std::string>::iterator it = allow_methods.begin(); it != allow_methods.end(); ++it) {
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != allow_methods.end();
+		 ++it) {
 		out << *it << ", ";
 	}
 	out << std::endl;
@@ -409,7 +410,8 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 
 	std::set<std::string> cgi_extensions = location_directive.getCgiExtensions();
 	out << "CGIExtensions: ";
-	for (std::set<std::string>::iterator it = allow_methods.begin(); it != cgi_extensions.end(); ++it) {
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != cgi_extensions.end();
+		 ++it) {
 		out << *it << ", ";
 	}
 	out << std::endl;
