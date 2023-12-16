@@ -113,7 +113,6 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 				return -1;
 			}
 		} else if (tokens.front() == "cgi_extensions") {
-			cgi_extensions_.clear();
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseCgiExtensionsDirective(args) == -1) {
 				return -1;
@@ -304,7 +303,7 @@ int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tok
 			std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
 			return -1;
 		}
-		cgi_extensions_.push_back(tokens[i]);
+		cgi_extensions_.insert(tokens[i]);
 	}
 	return 0;
 }
@@ -345,16 +344,7 @@ bool LocationDirective::getCgi() const {
 	return cgi_;
 }
 
-bool LocationDirective::isCgiExtension(const std::string& extension) const {
-	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
-		if (cgi_extensions_[i] == extension) {
-			return true;
-		}
-	}
-	return false;
-}
-
-const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
+const std::set<std::string>& LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
 }
 
@@ -365,11 +355,9 @@ bool LocationDirective::isAllowMethod(const std::string& method) const {
 	return false;
 }
 
-bool LocationDirective::isValidCgiExtensions(const std::string& extension) const {
-	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
-		if (extension == cgi_extensions_[i]) {
-			return true;
-		}
+bool LocationDirective::isCgiExtension(const std::string& extension) const {
+	if (cgi_extensions_.count(extension)) {
+		return true;
 	}
 	return false;
 }
@@ -400,7 +388,7 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 
 	std::set<std::string> allow_methods = location_directive.getAllowMethods();
 	out << "HTTPMethods: " << std::endl;
-	for (std::set<std::string>::iterator it = allow_methods.begin(); it != allow_methods.end(); it++) {
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != allow_methods.end(); ++it) {
 		out << *it << ", ";
 	}
 	out << std::endl;
@@ -419,10 +407,10 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 		<< std::endl;
 	out << "CGI: " << location_directive.getCgi() << std::endl;
 
-	std::vector<std::string> cgi_extensions = location_directive.getCgiExtensions();
+	std::set<std::string> cgi_extensions = location_directive.getCgiExtensions();
 	out << "CGIExtensions: ";
-	for (size_t i = 0; i < cgi_extensions.size(); ++i) {
-		out << cgi_extensions[i] << ", ";
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != cgi_extensions.end(); ++it) {
+		out << *it << ", ";
 	}
 	out << std::endl;
 

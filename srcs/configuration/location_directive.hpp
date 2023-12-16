@@ -16,7 +16,6 @@ private:
 	const std::string location_path_;
 	std::string default_error_page_;
 	std::map<std::string, std::string> error_pages_;
-	// std::set
 	std::set<std::string> allow_methods_;
 	int client_max_body_size_;
 	std::string root_;
@@ -26,8 +25,7 @@ private:
 	std::vector<std::string> return_;
 	bool chunked_transfer_encoding_;
 	bool cgi_;
-	// std::set
-	std::vector<std::string> cgi_extensions_;
+	std::set<std::string> cgi_extensions_;
 
 	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 	int parseErrorPageDirective(std::vector<std::string>& tokens);
@@ -63,8 +61,7 @@ public:
 	bool getChunkedTransferEncoding() const;
 	bool getCgi() const;
 	bool isCgiExtension(const std::string& extension) const;
-	const std::vector<std::string>& getCgiExtensions() const;
-	bool isValidCgiExtensions(const std::string& extension) const;
+	const std::set<std::string>& getCgiExtensions() const;
 	bool isAllowMethod(const std::string& method) const;
 };
 
