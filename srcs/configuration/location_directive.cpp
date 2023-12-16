@@ -8,8 +8,8 @@ LocationDirective::LocationDirective()
 	, autoindex_(false)
 	, chunked_transfer_encoding_(false)
 	, cgi_(false) {
-	std::vector<std::string> allow_methods;
-	allow_methods.push_back("GET");
+	std::set<std::string> allow_methods;
+	allow_methods.insert("GET");
 	allow_methods_ = allow_methods;
 }
 
@@ -21,8 +21,8 @@ LocationDirective::LocationDirective(const std::string& location_path)
 	, autoindex_(false)
 	, chunked_transfer_encoding_(false)
 	, cgi_(false) {
-	std::vector<std::string> allow_methods;
-	allow_methods.push_back("GET");
+	std::set<std::string> allow_methods;
+	allow_methods.insert("GET");
 	allow_methods_ = allow_methods;
 }
 
@@ -93,7 +93,6 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 				return -1;
 			}
 		} else if (tokens.front() == "allow_methods") {
-			allow_methods_.clear();
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseAllowMethodsDirective(args) == -1) {
 				return -1;
@@ -227,7 +226,7 @@ int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& toke
 			std::cerr << "Parse Error: parseAllowMethodsDirective" << std::endl;
 			return -1;
 		}
-		allow_methods_.push_back(tokens[i]);
+		allow_methods_.insert(tokens[i]);
 	}
 	return 0;
 }
@@ -314,7 +313,7 @@ std::string LocationDirective::getLocationPath() const {
 	return location_path_;
 }
 
-std::vector<std::string> LocationDirective::getAllowMethods() const {
+std::set<std::string> LocationDirective::getAllowMethods() const {
 	return allow_methods_;
 }
 
@@ -360,10 +359,8 @@ const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
 }
 
 bool LocationDirective::isAllowMethod(const std::string& method) const {
-	for (size_t i = 0; i < allow_methods_.size(); ++i) {
-		if (method == allow_methods_[i]) {
-			return true;
-		}
+	if (allow_methods_.count(method)) {
+		return true;
 	}
 	return false;
 }
@@ -401,10 +398,10 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	}
 	out << std::endl;
 
-	std::vector<std::string> allow_methods = location_directive.getAllowMethods();
+	std::set<std::string> allow_methods = location_directive.getAllowMethods();
 	out << "HTTPMethods: " << std::endl;
-	for (size_t i = 0; i < allow_methods.size(); ++i) {
-		out << allow_methods[i] << ", ";
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != allow_methods.end(); it++) {
+		out << *it << ", ";
 	}
 	out << std::endl;
 
