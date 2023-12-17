@@ -10,8 +10,18 @@ void handleRequest(ClientSession& client_session) {
 	const ServerDirective& server_directive = client_session.getServerDirective();
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getRequestPath());
-	std::string const method = request.getMethod();
 
+	// TODO: redirectURLのみの指定でもいいかも
+	// TODO: configurationを綺麗にするPRでStatusCode周りを変更する
+	const std::vector<std::string> return_directive = location_directive.getReturn();
+	if (!return_directive.empty()) {
+		response.setStatusCode(http_status_code::FOUND);
+		response.setHeaderValue("Location", return_directive.back());
+		response.concatenateComponents();
+		return;
+	}
+
+	std::string const method = request.getMethod();
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
 		executeGet(request, response, location_directive);
 	} else if (method == "POST" && location_directive.isAllowMethod(method)) {
@@ -27,7 +37,6 @@ void handleRequest(ClientSession& client_session) {
 void executeGet(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-
 	struct stat location_stat_info;
 	struct stat request_stat_info;
 	std::string file_path = location_directive.getRoot() + request.getRequestPath();
@@ -63,8 +72,9 @@ void executeGet(const HttpRequest& request,
 				return;
 			}
 		}
-		if (location_directive.getAutoindex() == "on")
-			return (makeAutoIndex(request, response, location_directive));
+		if (location_directive.getAutoindex()) {
+			return makeAutoIndex(request, response, location_directive);
+		}
 	}
 	return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 }
@@ -125,23 +135,23 @@ void executeDelete(const HttpRequest& request,
 void createErrorResponse(HttpResponse& response,
 	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
+	const std::string& error_page_path = location_directive.findErrorPagePath(status_code);
+	std::ifstream error_page(error_page_path.c_str());
+	std::ifstream default_error_page(location_directive.getDefaultErrorPage().c_str());
 
-	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
-
-	std::stringstream stringstream;
-	stringstream << status_code;
-	std::string error_page_path = error_pages[stringstream.str()];
-
-	std::ifstream file_stream(error_page_path.c_str());
 	std::string line, body_content;
-	if (file_stream.is_open()) {
-		while (getline(file_stream, line)) {
+	if (error_page.is_open()) {
+		while (getline(error_page, line)) {
+			body_content += line + "\n";
+		}
+	} else if (default_error_page.is_open()) {
+		while (getline(default_error_page, line)) {
 			body_content += line + "\n";
 		}
 	} else {
-		body_content =
-			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+		body_content = "<html><body><h1> setErrorResponse() </h1></body></html>";
 	}
+
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
 	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
