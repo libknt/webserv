@@ -321,7 +321,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
 		std::map<std::string, std::string> meta_variables;
-		server_cgi_utils::createCgiMetaVariables(meta_variables,
+		cgi_request_utils::createCgiMetaVariables(meta_variables,
 			session.getRequest(),
 			session.getClientAddress(),
 			session.getServerAddress(),

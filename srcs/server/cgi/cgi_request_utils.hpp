@@ -1,5 +1,5 @@
-#ifndef SERVER_CGI_UTILS_HPP
-#define SERVER_CGI_UTILS_HPP
+#ifndef CGI_REQUEST_UTILS_HPP
+#define CGI_REQUEST_UTILS_HPP
 
 #include "client_session.hpp"
 #include "http_request.hpp"
@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-namespace server_cgi_utils {
+namespace cgi_request_utils {
 
 void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	server::HttpRequest const& request,
@@ -15,6 +15,6 @@ void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	sockaddr_in const& server_address,
 	std::string const& root_path);
 
-} // namespace server_cgi_utils
+} // namespace cgi_request_utils
 
 #endif

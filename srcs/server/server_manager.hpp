@@ -2,11 +2,11 @@
 #define SERVER_MANAGER_HPP
 
 #include "cgi_handler.hpp"
+#include "cgi_request_utils.hpp"
 #include "client_session.hpp"
 #include "configuration.hpp"
 #include "handle_request.hpp"
 #include "http_request_parser.hpp"
-#include "server_cgi_utils.hpp"
 #include "tcp_socket.hpp"
 #include "utils.hpp"
 #include "webserv.hpp"

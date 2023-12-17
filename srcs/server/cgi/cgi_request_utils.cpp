@@ -1,6 +1,6 @@
-#include "server_cgi_utils.hpp"
+#include "cgi_request_utils.hpp"
 
-namespace server_cgi_utils {
+namespace cgi_request_utils {
 
 static std::string authTye(std::string const& value) {
 	std::string auth_type(value);
@@ -163,4 +163,4 @@ void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	meta_variables.insert(std::make_pair("SERVER_SOFTWARE", "webserv/1.0"));
 }
 
-} // namespace server_cgi_utils
+} // namespace cgi_request_utils
