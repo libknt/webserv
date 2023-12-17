@@ -190,7 +190,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	std::string file_extension = Utils::extructUriExtension(request.getUriPath());
 	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
 
-	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
+	if (location_directive.getCgi() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
 		session.setStatus(CGI_PREPARING);
 	} else {

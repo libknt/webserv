@@ -76,6 +76,7 @@ void HttpResponse::setBody(const std::string& body) {
 void HttpResponse::appendBody(const std::string& body) {
 	body_ += body;
 }
+
 http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 	return status_code_;
 }
