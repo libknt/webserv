@@ -130,7 +130,6 @@ void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
 }
 
 std::ostream& operator<<(std::ostream& out, const HttpResponse& response) {
-
 	out << "method: " << response.getStatusCode() << std::endl;
 	std::map<std::string, std::string> header = response.getHeader();
 
