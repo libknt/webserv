@@ -182,7 +182,9 @@ void ServerManager::recvEvent(int client_sd) {
 	}
 	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
 		processEvaluatingResponseType(client_session, client_sd);
-	} else if (client_session.getStatus() == CGI_RECEIVEING) {
+		return;
+	} 
+	if (client_session.getStatus() == CGI_RECEIVEING) {
 		handleCgiResponseReading(client_session);
 	}
 }
