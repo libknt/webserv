@@ -102,6 +102,7 @@ int CgiRequest::execute() {
 	char** environ = environ_;
 	std::string const method = findMetaVariable("REQUEST_METHOD");
 
+	std::cerr << "execute: " << argv[0] << " : " << argv[1] << std::endl;
 	pid_ = fork();
 	if (pid_ == -1) {
 		std::cerr << "fork() failed: " << strerror(errno) << std::endl;

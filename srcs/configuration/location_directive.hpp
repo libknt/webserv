@@ -51,7 +51,7 @@ public:
 	std::string getLocationPath() const;
 	std::string getDefaultErrorPage() const;
 	std::map<std::string, std::string> getErrorPages() const;
-	std::string const findErrorPagePath(server::http_status_code::STATUS_CODE status_code) const;
+	std::string const findErrorPagePath(http_status_code::STATUS_CODE status_code) const;
 	std::set<std::string> getAllowMethods() const;
 	int getClientMaxBodySize() const;
 	std::string getRoot() const;

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 print("Content-type: text/html")
 print("Location: http://127.0.0.1:8080/README.md")
