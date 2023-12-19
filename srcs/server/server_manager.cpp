@@ -149,7 +149,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 				return -1;
 			}
 		} else if (FD_ISSET(sd, &write_fds_)) {
-			writeEvent(client_sd);
+			handleWriteEvent(client_sd);
 		}
 
 		--ready_sds;
@@ -237,7 +237,7 @@ void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
 	}
 }
 
-void ServerManager::writeEvent(int client_sd) {
+void ServerManager::handleWriteEvent(int client_sd) {
 	ClientSession& client_session = getClientSession(client_sd);
 	handleCgiBodySending(client_session);
 	handleSendingResponse(client_session);
