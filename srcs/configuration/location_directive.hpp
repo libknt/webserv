@@ -2,8 +2,12 @@
 #define LOCATION_DIRECTIVE_HPP
 
 #include "parser_utils.hpp"
+#include "webserv.hpp"
+#include <fstream>
 #include <iostream>
 #include <map>
+#include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -12,15 +16,15 @@ private:
 	const std::string location_path_;
 	std::string default_error_page_;
 	std::map<std::string, std::string> error_pages_;
-	std::vector<std::string> allow_methods_;
-	std::string client_max_body_size_;
+	std::set<std::string> allow_methods_;
+	int client_max_body_size_;
 	std::string root_;
 	std::string index_;
-	std::string autoindex_;
+	bool autoindex_;
 	std::vector<std::string> return_;
-	std::string chunked_transfer_encoding_;
-	std::string cgi_;
-	std::vector<std::string> cgi_extensions_;
+	bool chunked_transfer_encoding_;
+	bool cgi_;
+	std::set<std::string> cgi_extensions_;
 
 	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 	int parseErrorPageDirective(std::vector<std::string>& tokens);
@@ -46,18 +50,17 @@ public:
 	std::string getLocationPath() const;
 	std::string getDefaultErrorPage() const;
 	std::map<std::string, std::string> getErrorPages() const;
-	std::vector<std::string> getAllowMethods() const;
-	std::string getClientMaxBodySize() const;
+	std::string const findErrorPagePath(http_status_code::STATUS_CODE status_code) const;
+	std::set<std::string> getAllowMethods() const;
+	int getClientMaxBodySize() const;
 	std::string getRoot() const;
 	std::string getIndex() const;
-	std::string getAutoindex() const;
+	bool getAutoindex() const;
 	std::vector<std::string> const& getReturn() const;
-	std::string getChunkedTransferEncoding() const;
-	std::string getCgi() const;
+	bool getChunkedTransferEncoding() const;
+	bool getCgi() const;
 	bool isCgiExtension(const std::string& extension) const;
-	bool isCgiEnabled() const;
-	const std::vector<std::string>& getCgiExtensions() const;
-	bool isValidCgiExtensions(const std::string& extension) const;
+	const std::set<std::string>& getCgiExtensions() const;
 	bool isAllowMethod(const std::string& method) const;
 };
 
