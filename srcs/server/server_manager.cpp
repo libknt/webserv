@@ -6,7 +6,7 @@ ServerManager::ServerManager(const Configuration& configuration)
 	: configuration_(configuration)
 	, sockets_(std::vector<server::TcpSocket>())
 	, highest_sd_(-1)
-	, is_running(false) {
+	, is_running_(false) {
 	FD_ZERO(&master_read_fds_);
 	FD_ZERO(&master_write_fds_);
 	FD_ZERO(&read_fds_);
@@ -25,7 +25,7 @@ ServerManager::ServerManager(const ServerManager& other)
 	, read_fds_(other.read_fds_)
 	, write_fds_(other.write_fds_)
 	, highest_sd_(other.highest_sd_)
-	, is_running(other.is_running)
+	, is_running_(other.is_running_)
 	, timeout_(other.timeout_) {}
 
 ServerManager& ServerManager::operator=(const ServerManager& other) {
@@ -36,7 +36,7 @@ ServerManager& ServerManager::operator=(const ServerManager& other) {
 		read_fds_ = other.read_fds_;
 		write_fds_ = other.write_fds_;
 		highest_sd_ = other.highest_sd_;
-		is_running = other.is_running;
+		is_running_ = other.is_running_;
 		timeout_ = other.timeout_;
 	}
 	return *this;
@@ -93,8 +93,8 @@ int ServerManager::setupSelectReadFds() {
 }
 
 int ServerManager::monitorSocketEvents() {
-	is_running = true;
-	while (is_running) {
+	is_running_ = true;
+	while (is_running_) {
 #ifdef FD_COPY
 		std::memset(&read_fds_, 0, sizeof(read_fds_));
 		std::memset(&write_fds_, 0, sizeof(write_fds_));
@@ -160,7 +160,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 int ServerManager::handleReadEvent(int sd, int client_sd) {
 	if (isListeningSocket(sd)) {
 		if (acceptIncomingConnection(sd) < 0) {
-			is_running = false;
+			is_running_ = false;
 			return -1;
 		}
 	} else {
@@ -559,7 +559,7 @@ int ServerManager::getHighestSd() const {
 }
 
 bool ServerManager::getIsRunning() const {
-	return is_running;
+	return is_running_;
 }
 
 void ServerManager::clearFds(int sd) {
@@ -620,7 +620,7 @@ std::ostream& operator<<(std::ostream& out, const ServerManager& server_manager)
 		}
 	}
 	out << "  highest_sd_: " << server_manager.getHighestSd() << std::endl;
-	out << "  is_running: " << server_manager.getIsRunning() << std::endl;
+	out << "  is_running_: " << server_manager.getIsRunning() << std::endl;
 	out << "  timeout_: " << server_manager.getTimeout().tv_sec << std::endl;
 	return out;
 }

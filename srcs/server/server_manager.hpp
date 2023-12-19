@@ -29,7 +29,7 @@ private:
 	fd_set read_fds_;
 	fd_set write_fds_;
 	int highest_sd_;
-	bool is_running;
+	bool is_running_;
 	struct timeval timeout_;
 
 	ServerManager();
