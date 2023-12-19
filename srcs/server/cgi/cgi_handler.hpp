@@ -21,6 +21,14 @@ void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 int createStatusCode(std::string const& status);
 void createHeaderFiled(cgi::CgiResponse const& cgi_response, HttpResponse& response);
 int locationAnalysis(std::string location, HttpResponse& response);
+int createDocumentResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const LocationDirective& location_directive);
+void createStatusCode(cgi::CgiResponse const& cgi_response, HttpResponse& response);
+void createContentType(cgi::CgiResponse const& cgi_response, HttpResponse& response);
+int createLocalRedirectResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const LocationDirective& location_directive);
 
 } // namespace cgi_handler
 

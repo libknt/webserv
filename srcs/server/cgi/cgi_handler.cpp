@@ -30,82 +30,82 @@ void handleCgiProcess(ClientSession& client_session) {
 }
 
 void handleCgiResponse(ClientSession& client_session) {
-	// cgi::CgiResponse const& cgi_response = client_session.getCgiResponse();
+	cgi::CgiResponse const& cgi_response = client_session.getCgiResponse();
 	HttpResponse& response = client_session.getResponse();
 	const LocationDirective& location_directive = client_session.findLocation();
-	// createResponseFromCgiResponse(cgi_response, response, location_directive);
-	createErrorResponse(response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
+	createResponseFromCgiResponse(cgi_response, response, location_directive);
+	// createErrorResponse(response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 	response.concatenateComponents();
 }
 
-// void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
-// 	HttpResponse& response,
-// 	const LocationDirective& location_directive) {
+void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {
 
-// 	if (cgi_response.getHeaders().empty()) {
-// 		createErrorResponse(response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
-// 		return;
-// 	}
-// 	createLocalRedirectResponse(cgi_response, response, location_directive);
-// 	createDocumentResponse(cgi_response, response, location_directive);
-// }
+	if (cgi_response.getHeaders().empty()) {
+		createErrorResponse(response, http_status_code::INTERNAL_SERVER_ERROR, location_directive);
+		return;
+	}
+	createLocalRedirectResponse(cgi_response, response, location_directive);
+	createDocumentResponse(cgi_response, response, location_directive);
+}
 
-// int createLocalRedirectResponse(cgi::CgiResponse const& cgi_response,
-// 	HttpResponse& response,
-// 	const LocationDirective& location_directive) {}
+int createLocalRedirectResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {}
 
-// int createDocumentResponse(cgi::CgiResponse const& cgi_response,
-// 	HttpResponse& response,
-// 	const LocationDirective& location_directive) {
+int createDocumentResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const LocationDirective& location_directive) {
+	(void)location_directive;
+	createStatusCode(cgi_response, response);
+	createContentType(cgi_response, response);
+	if (cgi_response.getContentLength() > 0) {
+		std::string body = cgi_response.getBody();
+		std::string new_body;
+		for (std::size_t i = 0; i < body.size(); i++) {
+			if (body[i] == '\n') {
+				new_body += "\r\n";
+			} else {
+				new_body += body[i];
+			}
+		}
+		response.setHeaderValue("content-length", Utils::toString(new_body.size()));
+		response.setBody(new_body);
+	}
+	return 0;
+}
 
-// 	createStatusCode(cgi_response, response);
-// 	createContentType(cgi_response, response);
-// 	if (cgi_response.getContentLength() > 0) {
-// 		std::string body = cgi_response.getBody();
-// 		std::string new_body;
-// 		for (std::size_t i = 0; i < body.size(); i++) {
-// 			if (body[i] == '\n') {
-// 				new_body += "\r\n";
-// 			} else {
-// 				new_body += body[i];
-// 			}
-// 		}
-// 		response.setHeaderValue("content-length", Utils::toString(new_body.size()));
-// 		response.setBody(new_body);
-// 	}
-// 	return 0;
-// }
+void createStatusCode(cgi::CgiResponse const& cgi_response, HttpResponse& response) {
+	std::string status = cgi_response.getHeaderValue("status");
+	http_status_code::STATUS_CODE status_code = http_status_code::OK;
+	if (status.empty()) {
+		response.setStatusCode(status_code);
+	} else {
+		int number = 200;
+		// todo error check
+		std::istringstream iss(status);
+		std::string tmp;
+		while (iss >> tmp) {
+			std::istringstream iss2(tmp);
+			if (iss2 >> number) {
+				break;
+			}
+		}
+		status_code = HttpResponse::numberToStatusCode(number);
+		response.setStatusCode(status_code);
+	}
+}
 
-// void createStatusCode(cgi::CgiResponse const& cgi_response, HttpResponse& response) {
-// 	std::string status = cgi_response.getHeaderValue("status");
-// 	http_status_code::STATUS_CODE status_code = http_status_code::OK;
-// 	if (status.empty()) {
-// 		response.setStatusCode(status_code);
-// 	} else {
-// 		int number = 200;
-// 		// todo error check
-// 		std::istringstream iss(status);
-// 		std::string tmp;
-// 		while (iss >> tmp) {
-// 			std::istringstream iss2(tmp);
-// 			if (iss2 >> number) {
-// 				break;
-// 			}
-// 		}
-// 		status_code = HttpResponse::numberToStatusCode(number);
-// 		response.setStatusCode(status_code);
-// 	}
-// }
-
-// void createContentType(cgi::CgiResponse const& cgi_response, HttpResponse& response) {
-// 	std::string content_type = cgi_response.getHeaderValue("content-type");
-// 	if (!content_type.empty()) {
-// 		response.setHeaderValue("content-type", content_type);
-// 	} else {
-// 		response.setHeaderValue("content-type", "text/plain");
-// 	}
-// }
+void createContentType(cgi::CgiResponse const& cgi_response, HttpResponse& response) {
+	std::string content_type = cgi_response.getHeaderValue("content-type");
+	if (!content_type.empty()) {
+		response.setHeaderValue("content-type", content_type);
+	} else {
+		response.setHeaderValue("content-type", "text/plain");
+	}
+}
 
 //########################
 
