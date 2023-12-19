@@ -46,7 +46,7 @@ public:
 
 	CGI_RESPONSE_STAGE getStage() const;
 	void setStage(CGI_RESPONSE_STAGE const stage);
-	int getSocketFd(int index) const;
+	int getSocketFd(const int index) const;
 	void setSocketFd(int index, int fd);
 	pid_t getPid() const;
 	void setPid(pid_t pid);

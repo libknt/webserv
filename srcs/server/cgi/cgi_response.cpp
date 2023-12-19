@@ -71,7 +71,7 @@ void CgiResponse::setStage(CGI_RESPONSE_STAGE const stage) {
 	stage_ = stage;
 }
 
-int CgiResponse::getSocketFd(int index) const {
+int CgiResponse::getSocketFd(const int index) const {
 	return socket_vector_[index];
 }
 
