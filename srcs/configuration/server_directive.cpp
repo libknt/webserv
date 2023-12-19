@@ -179,9 +179,9 @@ const std::map<std::string, LocationDirective>& ServerDirective::getLocations() 
 	return locations_;
 }
 
-LocationDirective const& ServerDirective::findLocation(std::string const& request_path) const {
-	std::string path = request_path;
-	for (size_t i = 0; i < request_path.size(); ++i) {
+LocationDirective const& ServerDirective::findLocation(std::string const& uri) const {
+	std::string path = uri;
+	for (size_t i = 0; i < uri.size(); ++i) {
 		if (locations_.count(path)) {
 			return locations_.at(path);
 		}
