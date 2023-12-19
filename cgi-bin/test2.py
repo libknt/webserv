@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 import cgi
 import cgitb
 cgitb.enable()
 
-# HTTPステータスコードの追加
 print("Status: 200 OK")
 print("Content-Type: text/html; charset=UTF-8")
 print("")

@@ -1,9 +1,8 @@
-#!/usr/bin/python3 
+#!/usr/bin/python
 
 print("Content-type: text/html")
-print("Status: 303 See Other")
 print("Location: http://127.0.0.1:8080/README.md")
-print()
+print("")
 
 print("<html>")
 print("<head>")

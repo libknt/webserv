@@ -52,6 +52,7 @@ public:
 	void setPid(pid_t pid);
 	int getStatus() const;
 	const std::map<std::string, std::string>& getHeaders() const;
+	bool isHeaderKeyPresent(const std::string& key) const;
 	std::string const getHeaderValue(std::string const& key) const;
 	const std::string& getBody() const;
 	std::size_t getContentLength() const;

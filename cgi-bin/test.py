@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 import cgi
 import cgitb
 cgitb.enable()
 
-# HTTPステータスコードの追加
 print("Status: 200 OK")
 print("Date: Wed, 09 Nov 2023 12:00:00 GMT")
 print("Server: MyServer")

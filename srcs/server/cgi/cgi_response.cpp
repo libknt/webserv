@@ -95,6 +95,14 @@ const std::map<std::string, std::string>& CgiResponse::getHeaders() const {
 	return headers_;
 }
 
+bool CgiResponse::isHeaderKeyPresent(const std::string& key) const {
+	std::map<std::string, std::string>::const_iterator it = headers_.find(key);
+	if (it == headers_.end()) {
+		return false;
+	}
+	return true;
+}
+
 std::string const CgiResponse::getHeaderValue(std::string const& key) const {
 	std::map<std::string, std::string>::const_iterator it = headers_.find(key);
 	if (it == headers_.end()) {
@@ -198,12 +206,12 @@ int CgiResponse::parseHeaderLine(const std::string& line) {
 	if (pos != std::string::npos) {
 		std::string key = toLower(trim(line.substr(0, pos)));
 		std::string value = trim(line.substr(pos + 1));
-		if (!value.empty()) {
-			if (headers_.find(key) != headers_.end()) {
-				return -1;
-			}
-			headers_.insert(std::make_pair(key, value));
+		// if (!value.empty()) {
+		if (headers_.find(key) != headers_.end()) {
+			return -1;
 		}
+		headers_.insert(std::make_pair(key, value));
+		// }
 	}
 	return 0;
 }

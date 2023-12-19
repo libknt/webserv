@@ -46,14 +46,22 @@ std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_
 			return "CREATED";
 		case http_status_code::NO_CONTENT:
 			return "NO_CONTENT";
+		case http_status_code::FOUND:
+			return "FOUND";
 		case http_status_code::SEE_OTHER:
 			return "SEE_OTHER";
 		case http_status_code::PERMANENT_REDIRECT:
 			return "PERMANENT_REDIRECT";
 		case http_status_code::BAD_REQUEST:
 			return "BAD_REQUEST";
+		case http_status_code::FORBIDDEN:
+			return "FORBIDDEN";
 		case http_status_code::NOT_FOUND:
 			return "NOT_FOUND";
+		case http_status_code::METHOD_NOT_ALLOWED:
+			return "METHOD_NOT_ALLOWED";
+		case http_status_code::INTERNAL_SERVER_ERROR:
+			return "INTERNAL_SERVER_ERROR";
 		default:
 			return "UNKNOWN";
 	}
@@ -67,6 +75,8 @@ http_status_code::STATUS_CODE HttpResponse::numberToStatusCode(const int code) {
 			return http_status_code::CREATED;
 		case 204:
 			return http_status_code::NO_CONTENT;
+		case 302:
+			return http_status_code::FOUND;
 		case 303:
 			return http_status_code::SEE_OTHER;
 		case 308:

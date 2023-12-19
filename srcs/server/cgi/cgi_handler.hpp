@@ -17,16 +17,22 @@ void handleCgiResponse(ClientSession& client_session);
 void handleCgiProcess(ClientSession& client_session);
 void createResponseFromCgiResponse(cgi::CgiResponse const& cgi_response,
 	HttpResponse& response,
+	const ServerDirective& server_directive,
 	const LocationDirective& location_directive);
-int createStatusCode(std::string const& status);
-void createHeaderFiled(cgi::CgiResponse const& cgi_response, HttpResponse& response);
-int locationAnalysis(std::string location, HttpResponse& response);
 int createDocumentResponse(cgi::CgiResponse const& cgi_response,
 	HttpResponse& response,
 	const LocationDirective& location_directive);
 void createStatusCode(cgi::CgiResponse const& cgi_response, HttpResponse& response);
 void createContentType(cgi::CgiResponse const& cgi_response, HttpResponse& response);
 int createLocalRedirectResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const ServerDirective& server_directive,
+	const LocationDirective& location_directive);
+int createClientRedirectResponse(cgi::CgiResponse const& cgi_response,
+	HttpResponse& response,
+	const LocationDirective& location_directive);
+bool isRedirectStatus(std::string status);
+int createClientRedirectResponseWithDocument(cgi::CgiResponse const& cgi_response,
 	HttpResponse& response,
 	const LocationDirective& location_directive);
 
