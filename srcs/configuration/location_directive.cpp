@@ -2,27 +2,27 @@
 
 LocationDirective::LocationDirective()
 	: location_path_("/")
-	, client_max_body_size_("1M")
+	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
-	, autoindex_("off")
-	, chunked_transfer_encoding_("off")
-	, cgi_("off") {
-	std::vector<std::string> allow_methods;
-	allow_methods.push_back("GET");
+	, autoindex_(false)
+	, chunked_transfer_encoding_(false)
+	, cgi_(false) {
+	std::set<std::string> allow_methods;
+	allow_methods.insert("GET");
 	allow_methods_ = allow_methods;
 }
 
 LocationDirective::LocationDirective(const std::string& location_path)
 	: location_path_(location_path)
-	, client_max_body_size_("1M")
+	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
-	, autoindex_("off")
-	, chunked_transfer_encoding_("off")
-	, cgi_("off") {
-	std::vector<std::string> allow_methods;
-	allow_methods.push_back("GET");
+	, autoindex_(false)
+	, chunked_transfer_encoding_(false)
+	, cgi_(false) {
+	std::set<std::string> allow_methods;
+	allow_methods.insert("GET");
 	allow_methods_ = allow_methods;
 }
 
@@ -30,6 +30,7 @@ LocationDirective::~LocationDirective() {}
 
 LocationDirective::LocationDirective(const LocationDirective& other)
 	: location_path_(other.location_path_)
+	, default_error_page_(other.default_error_page_)
 	, error_pages_(other.error_pages_)
 	, allow_methods_(other.allow_methods_)
 	, client_max_body_size_(other.client_max_body_size_)
@@ -43,6 +44,7 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 
 LocationDirective& LocationDirective::operator=(const LocationDirective& other) {
 	if (this != &other) {
+		default_error_page_ = other.default_error_page_;
 		error_pages_ = other.error_pages_;
 		allow_methods_ = other.allow_methods_;
 		client_max_body_size_ = other.client_max_body_size_;
@@ -91,7 +93,6 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 				return -1;
 			}
 		} else if (tokens.front() == "allow_methods") {
-			allow_methods_.clear();
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseAllowMethodsDirective(args) == -1) {
 				return -1;
@@ -112,7 +113,6 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 				return -1;
 			}
 		} else if (tokens.front() == "cgi_extensions") {
-			cgi_extensions_.clear();
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseCgiExtensionsDirective(args) == -1) {
 				return -1;
@@ -166,11 +166,18 @@ int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>&
 			return -1;
 		}
 	}
-	if (token[token.size() - 1] != 'K' && token[token.size() - 1] != 'M') {
+
+	std::stringstream stringstream(token.substr(0, token.size() - 1));
+	if (token[token.size() - 1] == 'K') {
+		stringstream >> client_max_body_size_;
+		client_max_body_size_ *= 1000;
+	} else if (token[token.size() - 1] == 'M') {
+		stringstream >> client_max_body_size_;
+		client_max_body_size_ *= 1000000;
+	} else {
 		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;
 	}
-	client_max_body_size_ = tokens.front();
 	return 0;
 }
 
@@ -197,11 +204,14 @@ int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens)
 		std::cerr << "Parse Error: parseAutoindexDirective" << std::endl;
 		return -1;
 	}
-	if (tokens.front() != "on" && tokens.front() != "off") {
+	if (tokens.front() == "on") {
+		autoindex_ = true;
+	} else if (tokens.front() == "off") {
+		autoindex_ = false;
+	} else {
 		std::cerr << "Parse Error: parseAutoindexDirective" << std::endl;
 		return -1;
 	}
-	autoindex_ = tokens.front();
 	return 0;
 }
 
@@ -215,7 +225,7 @@ int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& toke
 			std::cerr << "Parse Error: parseAllowMethodsDirective" << std::endl;
 			return -1;
 		}
-		allow_methods_.push_back(tokens[i]);
+		allow_methods_.insert(tokens[i]);
 	}
 	return 0;
 }
@@ -239,16 +249,31 @@ int LocationDirective::parseChunkedTransferEncodingDirective(std::vector<std::st
 		std::cerr << "Parse Error: parseChunkedTransferEncodingDirective" << std::endl;
 		return -1;
 	}
-	if (tokens.front() != "on" && tokens.front() != "off") {
+	if (tokens.front() == "on") {
+		chunked_transfer_encoding_ = true;
+	} else if (tokens.front() == "off") {
+		chunked_transfer_encoding_ = false;
+	} else {
 		std::cerr << "Parse Error: parseChunkedTransferEncodingDirective" << std::endl;
 		return -1;
 	}
-	chunked_transfer_encoding_ = tokens.front();
 	return 0;
+}
+
+std::string LocationDirective::getDefaultErrorPage() const {
+	return default_error_page_;
 }
 
 std::map<std::string, std::string> LocationDirective::getErrorPages() const {
 	return error_pages_;
+}
+
+std::string const LocationDirective::findErrorPagePath(
+	server::http_status_code::STATUS_CODE status_code) const {
+	std::stringstream stringstream;
+	stringstream << status_code;
+	std::map<std::string, std::string>::const_iterator it = error_pages_.find(stringstream.str());
+	return it != error_pages_.end() ? it->second : "";
 }
 
 int LocationDirective::parseCgiDirective(std::vector<std::string>& tokens) {
@@ -256,11 +281,14 @@ int LocationDirective::parseCgiDirective(std::vector<std::string>& tokens) {
 		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
 		return -1;
 	}
-	if (tokens.front() != "on" && tokens.front() != "off") {
+	if (tokens.front() == "on") {
+		cgi_ = true;
+	} else if (tokens.front() == "off") {
+		cgi_ = false;
+	} else {
 		std::cerr << "Parse Error: parseCgiDirective" << std::endl;
 		return -1;
 	}
-	cgi_ = tokens.front();
 	return 0;
 }
 
@@ -275,7 +303,7 @@ int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tok
 			std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
 			return -1;
 		}
-		cgi_extensions_.push_back(tokens[i]);
+		cgi_extensions_.insert(tokens[i]);
 	}
 	return 0;
 }
@@ -284,11 +312,11 @@ std::string LocationDirective::getLocationPath() const {
 	return location_path_;
 }
 
-std::vector<std::string> LocationDirective::getAllowMethods() const {
+std::set<std::string> LocationDirective::getAllowMethods() const {
 	return allow_methods_;
 }
 
-std::string LocationDirective::getClientMaxBodySize() const {
+int LocationDirective::getClientMaxBodySize() const {
 	return client_max_body_size_;
 }
 
@@ -300,7 +328,7 @@ std::string LocationDirective::getIndex() const {
 	return index_;
 }
 
-std::string LocationDirective::getAutoindex() const {
+bool LocationDirective::getAutoindex() const {
 	return autoindex_;
 }
 
@@ -308,45 +336,28 @@ std::vector<std::string> const& LocationDirective::getReturn() const {
 	return return_;
 }
 
-std::string LocationDirective::getChunkedTransferEncoding() const {
+bool LocationDirective::getChunkedTransferEncoding() const {
 	return chunked_transfer_encoding_;
 }
 
-std::string LocationDirective::getCgi() const {
+bool LocationDirective::getCgi() const {
 	return cgi_;
 }
 
-bool LocationDirective::isCgiEnabled() const {
-	return cgi_ == "on";
-}
-
-bool LocationDirective::isCgiExtension(const std::string& extension) const {
-	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
-		if (cgi_extensions_[i] == extension) {
-			return true;
-		}
-	}
-	return false;
-}
-
-const std::vector<std::string>& LocationDirective::getCgiExtensions() const {
+const std::set<std::string>& LocationDirective::getCgiExtensions() const {
 	return cgi_extensions_;
 }
 
 bool LocationDirective::isAllowMethod(const std::string& method) const {
-	for (size_t i = 0; i < allow_methods_.size(); ++i) {
-		if (method == allow_methods_[i]) {
-			return true;
-		}
+	if (allow_methods_.count(method)) {
+		return true;
 	}
 	return false;
 }
 
-bool LocationDirective::isValidCgiExtensions(const std::string& extension) const {
-	for (size_t i = 0; i < cgi_extensions_.size(); ++i) {
-		if (extension == cgi_extensions_[i]) {
-			return true;
-		}
+bool LocationDirective::isCgiExtension(const std::string& extension) const {
+	if (cgi_extensions_.count(extension)) {
+		return true;
 	}
 	return false;
 }
@@ -365,6 +376,7 @@ bool LocationDirective::isStatusCode(const std::string& status_code) {
 
 std::ostream& operator<<(std::ostream& out, const LocationDirective& location_directive) {
 	out << "LocationPath: " << location_directive.getLocationPath() << std::endl;
+	out << "DefaultErrorPage: " << location_directive.getDefaultErrorPage() << std::endl;
 	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
 	out << "ErrorPages: " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = error_pages.begin();
@@ -374,10 +386,11 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	}
 	out << std::endl;
 
-	std::vector<std::string> allow_methods = location_directive.getAllowMethods();
+	std::set<std::string> allow_methods = location_directive.getAllowMethods();
 	out << "HTTPMethods: " << std::endl;
-	for (size_t i = 0; i < allow_methods.size(); ++i) {
-		out << allow_methods[i] << ", ";
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != allow_methods.end();
+		 ++it) {
+		out << *it << ", ";
 	}
 	out << std::endl;
 
@@ -395,10 +408,11 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 		<< std::endl;
 	out << "CGI: " << location_directive.getCgi() << std::endl;
 
-	std::vector<std::string> cgi_extensions = location_directive.getCgiExtensions();
+	std::set<std::string> cgi_extensions = location_directive.getCgiExtensions();
 	out << "CGIExtensions: ";
-	for (size_t i = 0; i < cgi_extensions.size(); ++i) {
-		out << cgi_extensions[i] << ", ";
+	for (std::set<std::string>::iterator it = allow_methods.begin(); it != cgi_extensions.end();
+		 ++it) {
+		out << *it << ", ";
 	}
 	out << std::endl;
 

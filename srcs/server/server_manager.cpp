@@ -320,7 +320,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 		file_path = location_directive.getRoot() + path_info + request.getUriPath();
 		file_path = file_path.erase(file_path.size() - path_info.size(), file_path.size());
 	}
-	if (location_directive.isCgiEnabled() && location_directive.isCgiExtension(file_extension) &&
+	if (location_directive.getCgi() && location_directive.isCgiExtension(file_extension) &&
 		Utils::fileExists(file_path)) {
 		std::map<std::string, std::string> meta_variables;
 		cgi_request_utils::createCgiMetaVariables(meta_variables,
