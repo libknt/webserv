@@ -102,6 +102,7 @@ http_response_status::HTTP_RESPONSE_STATUS const& HttpResponse::getStatus() cons
 void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
 	stream_.read(buffer, buffer_size);
 	if (stream_.eof()) {
+		stream_.clear();
 		setStatus(http_response_status::FINISHED);
 	}
 }
