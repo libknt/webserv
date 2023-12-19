@@ -62,7 +62,7 @@ private:
 	int sendCgiBody(ClientSession& client_session);
 	void handleSendingResponse(ClientSession& client_session);
 	void finalizeSession(ClientSession& client_session);
-	int handleReadEvent(int sd, int client_sd);
+	int handleReadEvent(int client_sd);
 
 public:
 	ServerManager(const Configuration& configuration);

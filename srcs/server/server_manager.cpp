@@ -145,7 +145,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 		int client_sd = isListeningSocket(sd) ? sd : resolveClientSocket(sd);
 
 		if (FD_ISSET(sd, &read_fds_)) {
-			if (handleReadEvent(sd, client_sd) < 0) {
+			if (handleReadEvent(client_sd) < 0) {
 				return -1;
 			}
 		} else if (FD_ISSET(sd, &write_fds_)) {
@@ -157,9 +157,9 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 	return 0;
 }
 
-int ServerManager::handleReadEvent(int sd, int client_sd) {
-	if (isListeningSocket(sd)) {
-		if (acceptIncomingConnection(sd) < 0) {
+int ServerManager::handleReadEvent(int client_sd) {
+	if (isListeningSocket(client_sd)) {
+		if (acceptIncomingConnection(client_sd) < 0) {
 			is_running_ = false;
 			return -1;
 		}
