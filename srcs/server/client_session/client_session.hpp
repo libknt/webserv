@@ -1,12 +1,12 @@
 #ifndef CLIENT_SESSION_HPP
 #define CLIENT_SESSION_HPP
 
+#include "cgi_request.hpp"
 #include "cgi_response.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "server_directive.hpp"
 #include <arpa/inet.h>
-#include "cgi_request.hpp"
 #include <iostream>
 
 namespace server {
