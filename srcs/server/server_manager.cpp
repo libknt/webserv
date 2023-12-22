@@ -226,7 +226,7 @@ void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
 		client_session.getResponse().concatenateComponents();
 		client_session.setStatus(SENDING_RESPONSE);
 	} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
-			   client_session.getCgiResponse().getStage() == cgi::COMPLETE) {
+			   client_session.getCgiResponse().getStage() == cgi::COMPLETED) {
 		cgi_handler::handleCgiResponse(client_session);
 		cleaning(client_session);
 
@@ -267,7 +267,7 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 	std::string body = cgi_request.extractBodySegment(BUFFER_SIZE - 1);
 	if (body.empty()) {
 		std::cout << "\033[31m"
-				  << "  CGI BODY SENDING: complete"
+				  << "  CGI BODY SENDING: COMPLETED"
 				  << "\033[0m" << std::endl;
 		clearFds(client_session.getCgi().getSocketFd(0));
 		setReadFd(client_session.getCgi().getSocketFd(0));
@@ -296,7 +296,7 @@ void ServerManager::handleSendingResponse(ClientSession& client_session) {
 		unregisterClientSession(client_session);
 		return;
 	}
-	if (client_session.getStatus() == SESSION_COMPLETE) {
+	if (client_session.getStatus() == SESSION_COMPLETED) {
 		finalizeSession(client_session);
 	}
 }
@@ -477,10 +477,10 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	}
 	if (client_session.getStatus() == SENDING_RESPONSE) {
 		if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
-			client_session.setStatus(SESSION_COMPLETE);
+			client_session.setStatus(SESSION_COMPLETED);
 		}
 		std::cout << "\033[31m"
-				  << "  SENDING: complete"
+				  << "  SENDING: COMPLETED"
 				  << "\033[0m" << std::endl;
 	}
 	return 0;

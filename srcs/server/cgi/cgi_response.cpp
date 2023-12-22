@@ -219,13 +219,13 @@ int CgiResponse::parseHeaderLine(const std::string& line) {
 void CgiResponse::processBody(std::string& output) {
 	if (!body_.empty() && body_[body_.size() - 1] == '\n' && output[0] == '\n') {
 		body_ += output;
-		stage_ = COMPLETE;
+		stage_ = COMPLETED;
 		return;
 	}
 	const std::string bodyDelimiter = "\n\n";
 	std::string::size_type pos = output.find(bodyDelimiter);
 	if (pos != std::string::npos) {
-		stage_ = COMPLETE;
+		stage_ = COMPLETED;
 		body_ += output;
 		content_length_ = body_.size();
 	} else {
@@ -241,7 +241,7 @@ int CgiResponse::handleRecvError(int recv_result) {
 
 	std::cout << "  Connection closed" << std::endl;
 	if (processChildExit()) {
-		stage_ = COMPLETE;
+		stage_ = COMPLETED;
 	} else {
 		return -1;
 	}
