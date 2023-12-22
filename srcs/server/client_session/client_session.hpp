@@ -1,6 +1,8 @@
 #ifndef CLIENT_SESSION_HPP
 #define CLIENT_SESSION_HPP
 
+#include "cgi_request.hpp"
+#include "cgi_response.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "server_directive.hpp"
@@ -15,14 +17,17 @@ enum CLIENT_SESSION_STATUS {
 	EVALUATING_RESPONSE_TYPE,
 	RESPONSE_PREPARING,
 	CGI_PREPARING,
+	CGI_BODY_SENDING,
+	CGI_RECEIVEING,
 	SENDING_RESPONSE,
 	SENDING_CGI_RESPONSE,
-	SESSION_COMPLETE,
+	SESSION_COMPLETED,
 	ERROR_OCCURRED,
 	CLOSED,
 };
 
 class ClientSession {
+	// todo requestの数と時間によってcloseする
 private:
 	const int sd_;
 	const sockaddr_in client_address_;
@@ -30,6 +35,8 @@ private:
 	ServerDirective const& server_directive_;
 
 	HttpRequest request_;
+	cgi::CgiRequest cgi_;
+	cgi::CgiResponse cgi_response_;
 	HttpResponse response_;
 	CLIENT_SESSION_STATUS status_;
 
@@ -47,7 +54,10 @@ public:
 	ClientSession(const ClientSession& other);
 	ClientSession& operator=(const ClientSession& other);
 	int getSd() const;
+	HttpRequest const& getRequest() const;
 	HttpRequest& getRequest();
+	cgi::CgiRequest const& getCgi() const;
+	cgi::CgiRequest& getCgi();
 	HttpResponse& getResponse();
 	sockaddr_in const& getClientAddress() const;
 	sockaddr_in const& getServerAddress() const;
@@ -56,10 +66,12 @@ public:
 	std::string getClientPort() const;
 	std::string getServerPort() const;
 	ServerDirective const& getServerDirective() const;
+	LocationDirective const& findLocation() const;
 	void setStatus(CLIENT_SESSION_STATUS const& status);
 	CLIENT_SESSION_STATUS getStatus() const;
 	void setSessionStatusFromHttpRequest();
 	void sessionCleanup();
+	cgi::CgiResponse& getCgiResponse();
 };
 
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session);
