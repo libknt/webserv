@@ -43,7 +43,7 @@ docker:
 	@echo apt-get update
 	@echo apt install -y netbase g++ vim make
 
-f:
+format:
 	find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | xargs clang-format -i
 
 test:
