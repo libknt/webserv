@@ -31,9 +31,7 @@ ClientSession::ClientSession(int const sd,
 	, response_(HttpResponse())
 	, status_(status) {}
 
-ClientSession::~ClientSession() {
-	std::cout << "ClientSession destructor called" << std::endl;
-}
+ClientSession::~ClientSession() {}
 
 ClientSession::ClientSession(const ClientSession& other)
 	: sd_(other.sd_)
