@@ -275,7 +275,8 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 		return 0;
 	}
 	std::memcpy(buffer, body.c_str(), body.length());
-	int send_result = ::send(client_sd, buffer, sizeof(buffer), 0);
+	std::size_t body_length = std::strlen(buffer);
+	int send_result = ::send(client_sd, buffer, body_length, 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		return -1;
@@ -464,7 +465,8 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	std::cout << "\033[32m"
 			  << "[" << send_buffer << "]"
 			  << "\033[0m" << std::endl;
-	int send_result = send(client_sd, send_buffer, sizeof(send_buffer), 0);
+	std::size_t body_length = std::strlen(send_buffer);
+	int send_result = send(client_sd, send_buffer, body_length, 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		return -1;
