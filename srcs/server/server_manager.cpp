@@ -239,14 +239,13 @@ void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
 
 void ServerManager::handleWriteEvent(int client_sd) {
 	ClientSession& client_session = getClientSession(client_sd);
-	handleCgiBodySending(client_session);
+	if (client_session.getStatus() == CGI_BODY_SENDING) {
+		handleCgiBodySending(client_session);
+	}
 	handleSendingResponse(client_session);
 }
 
 void ServerManager::handleCgiBodySending(ClientSession& client_session) {
-	if (client_session.getStatus() != CGI_BODY_SENDING) {
-		return;
-	}
 	if (sendCgiBody(client_session) < 0) {
 		clearSessionSds(client_session);
 		createErrorResponse(client_session.getResponse(),
