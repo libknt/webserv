@@ -81,6 +81,23 @@ http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 	return status_code_;
 }
 
+const std::string HttpResponse::getFileContentType(std::string const& file_name) const {
+	std::string const& file_extention = file_name.substr(file_name.rfind("."));
+
+	if (file_extention == ".html")
+		return ("text/html");
+	else if (file_extention == ".css")
+		return ("text/css");
+	else if (file_extention == ".js")
+		return ("text/javascript");
+	else if (file_extention == ".pdf")
+		return ("application/pdf");
+	else if (file_extention == ".png")
+		return ("image/png");
+	else
+		return ("text/plain");
+}
+
 const std::string HttpResponse::getHeaderValue(const std::string& key) const {
 	std::map<std::string, std::string>::const_iterator it = header_.find(key);
 	if (it == header_.end())
@@ -96,6 +113,10 @@ const std::string& HttpResponse::getBody() const {
 	return body_;
 }
 
+std::string::size_type HttpResponse::getBodyLength() const {
+	return (body_.size());
+}
+
 http_response_status::HTTP_RESPONSE_STATUS const& HttpResponse::getStatus() const {
 	return status_;
 }
@@ -105,6 +126,20 @@ void HttpResponse::getStreamBuffer(char* buffer, size_t buffer_size) {
 	if (stream_.eof()) {
 		stream_.clear();
 		setStatus(http_response_status::FINISHED);
+		stream_.clear();
 	}
+}
+
+std::ostream& operator<<(std::ostream& out, const HttpResponse& response) {
+	out << "method: " << response.getStatusCode() << std::endl;
+	std::map<std::string, std::string> header = response.getHeader();
+
+	for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end();
+		 ++it) {
+		std::cout << "key: " << it->first << " value: " << it->second << std::endl;
+	}
+	std::cout << "-----body----" << std::endl;
+	std::cout << response.getBody() << std::endl;
+	return out;
 }
 } // namespace server
