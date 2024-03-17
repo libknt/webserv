@@ -302,8 +302,10 @@ void ServerManager::handleSendingResponse(ClientSession& client_session) {
 }
 
 void ServerManager::finalizeSession(ClientSession& client_session) {
-	clearFds(client_session.getSd());
 	client_session.sessionCleanup();
+	clearFds(client_session.getSd());
+	setReadFd(client_session.getSd());
+
 }
 
 void ServerManager::setClientResponseStage(ClientSession& session) {
@@ -506,9 +508,10 @@ int ServerManager::unregisterClientSession(ClientSession& client_session) {
 	if (cgi_socket_pairs_.find(socket_vector) != cgi_socket_pairs_.end()) {
 		cgi_socket_pairs_.erase(socket_vector);
 	}
+	// std::cout << socket_vector << std::endl;
 	clearFds(socket_vector);
-
 	int client_sd = client_session.getSd();
+	// std::cout << client_sd << std::endl;
 	clearFds(client_sd);
 
 	std::cout << "  Connection closed - " << client_sd << std::endl;
@@ -565,6 +568,9 @@ bool ServerManager::getIsRunning() const {
 }
 
 void ServerManager::clearFds(int sd) {
+	if (sd <= 0){
+		return;
+	}
 	if (FD_ISSET(sd, &master_read_fds_)) {
 		FD_CLR(sd, &master_read_fds_);
 	}

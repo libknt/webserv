@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 print("Status: 303 See Other")
 print("Location:")
