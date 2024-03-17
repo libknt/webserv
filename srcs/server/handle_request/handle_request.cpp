@@ -166,7 +166,8 @@ void createErrorResponse(HttpResponse& response,
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	std::string const root = location_directive.getRoot() + request.getRequestPath();
+	std::string const request_path = request.getRequestPath();
+	std::string const root = location_directive.getRoot() + request_path;
 	DIR* dir = opendir(root.c_str());
 	if (!dir) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
@@ -181,11 +182,13 @@ void makeAutoIndex(HttpRequest const& request,
 						   std::string(ent->d_name) + "</a>\n") +
 					   body;
 			else if (ent->d_type == DT_DIR)
-				body += ("<a href=\"" + request.getRequestPath() + "/" + std::string(ent->d_name) +
-						 "/\">" + std::string(ent->d_name) + "</a>\n");
+				body +=
+					("<a href=\"" + request.getRequestPath() + (request_path == "/" ? "" : "/") +
+						std::string(ent->d_name) + "/\">" + std::string(ent->d_name) + "</a>\n");
 			else
-				body += ("<a href=\"" + request.getRequestPath() + "/" + std::string(ent->d_name) +
-						 "\">" + std::string(ent->d_name) + "</a>\n");
+				body +=
+					("<a href=\"" + request.getRequestPath() + (request_path == "/" ? "" : "/") +
+						std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n");
 		}
 		body = "<html>\n<head>\n<title>Index of</title>\n</head>\n<body>\n<h1>Index of" +
 			   location_directive.getLocationPath() + "<h1>\n<hr>\n<pre>\n" + body;
