@@ -181,11 +181,11 @@ void makeAutoIndex(HttpRequest const& request,
 						   std::string(ent->d_name) + "</a>\n") +
 					   body;
 			else if (ent->d_type == DT_DIR)
-				body += ("<a href=\"" + std::string(ent->d_name) + "/\">" +
-						 std::string(ent->d_name) + "</a>\n");
+				body += ("<a href=\"" + request.getRequestPath() + "/" + std::string(ent->d_name) +
+						 "/\">" + std::string(ent->d_name) + "</a>\n");
 			else
-				body += ("<a href=\"" + std::string(ent->d_name) + "\">" +
-						 std::string(ent->d_name) + "</a>\n");
+				body += ("<a href=\"" + request.getRequestPath() + "/" + std::string(ent->d_name) +
+						 "\">" + std::string(ent->d_name) + "</a>\n");
 		}
 		body = "<html>\n<head>\n<title>Index of</title>\n</head>\n<body>\n<h1>Index of" +
 			   location_directive.getLocationPath() + "<h1>\n<hr>\n<pre>\n" + body;
