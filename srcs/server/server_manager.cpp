@@ -305,7 +305,6 @@ void ServerManager::finalizeSession(ClientSession& client_session) {
 	client_session.sessionCleanup();
 	clearFds(client_session.getSd());
 	setReadFd(client_session.getSd());
-
 }
 
 void ServerManager::setClientResponseStage(ClientSession& session) {
@@ -568,7 +567,7 @@ bool ServerManager::getIsRunning() const {
 }
 
 void ServerManager::clearFds(int sd) {
-	if (sd <= 0){
+	if (sd <= 0) {
 		return;
 	}
 	if (FD_ISSET(sd, &master_read_fds_)) {
