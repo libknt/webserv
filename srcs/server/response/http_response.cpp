@@ -182,17 +182,17 @@ std::ostream& operator<<(std::ostream& out, const HttpResponse& response) {
 	return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const HttpResponse& response) {
-	out << "status_code: " << response.getStatusCode() << std::endl;
-	out << "header: " << std::endl;
-	for (std::map<std::string, std::string>::const_iterator it = response.getHeader().begin();
-		 it != response.getHeader().end();
-		 ++it) {
-		out << it->first << ": " << it->second << std::endl;
-	}
-	out << "body: " << std::endl;
-	out << response.getBody() << std::endl;
-	return out;
-}
+// std::ostream& operator<<(std::ostream& out, const HttpResponse& response) {
+// 	out << "status_code: " << response.getStatusCode() << std::endl;
+// 	out << "header: " << std::endl;
+// 	for (std::map<std::string, std::string>::const_iterator it = response.getHeader().begin();
+// 		 it != response.getHeader().end();
+// 		 ++it) {
+// 		out << it->first << ": " << it->second << std::endl;
+// 	}
+// 	out << "body: " << std::endl;
+// 	out << response.getBody() << std::endl;
+// 	return out;
+// }
 
 } // namespace server
