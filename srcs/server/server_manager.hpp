@@ -50,7 +50,7 @@ private:
 	int unregisterClientSession(ClientSession& client_session);
 	ClientSession& getClientSession(int const sd);
 	int resolveClientSocket(const int sd);
-	void cleaning(ClientSession& client_sesion);
+	void clearSessionSds(ClientSession& client_sesion);
 
 	void recvEvent(int client_sd);
 	void handleCgiResponseReading(ClientSession& client_session);

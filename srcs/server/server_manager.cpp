@@ -219,7 +219,7 @@ void ServerManager::processCgiPreparing(ClientSession& client_session) {
 
 void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
 	if (client_session.getCgiResponse().readCgiResponse() < 0) {
-		cleaning(client_session);
+		clearSessionSds(client_session);
 		createErrorResponse(client_session.getResponse(),
 			http_status_code::INTERNAL_SERVER_ERROR,
 			client_session.findLocation());
@@ -228,7 +228,7 @@ void ServerManager::handleCgiResponseReading(ClientSession& client_session) {
 	} else if (client_session.getCgi().getStatus() == cgi::EXECUTED &&
 			   client_session.getCgiResponse().getStage() == cgi::COMPLETED) {
 		cgi_handler::handleCgiResponse(client_session);
-		cleaning(client_session);
+		clearSessionSds(client_session);
 
 		client_session.setStatus(SENDING_RESPONSE);
 	}
@@ -248,7 +248,7 @@ void ServerManager::handleCgiBodySending(ClientSession& client_session) {
 		return;
 	}
 	if (sendCgiBody(client_session) < 0) {
-		cleaning(client_session);
+		clearSessionSds(client_session);
 		createErrorResponse(client_session.getResponse(),
 			http_status_code::INTERNAL_SERVER_ERROR,
 			client_session.findLocation());
@@ -486,7 +486,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	return 0;
 }
 
-void ServerManager::cleaning(ClientSession& client_session) {
+void ServerManager::clearSessionSds(ClientSession& client_session) {
 	cgi::CgiRequest& cgi_request = client_session.getCgi();
 
 	int socket_vector = cgi_request.getSocketFd(0);
