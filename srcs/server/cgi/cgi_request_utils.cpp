@@ -42,7 +42,7 @@ static std::string remoteHost() {
 	return std::string("");
 }
 
-static std::string remoteIdet() {
+static std::string remoteIdent() {
 	// TODO 推奨されてないので空
 	return std::string("");
 }
@@ -151,7 +151,7 @@ void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	meta_variables.insert(std::make_pair("QUERY_STRING", request.getUriQuery()));
 	meta_variables.insert(std::make_pair("REMOTE_ADDR", remoteAddr(client_address)));
 	meta_variables.insert(std::make_pair("REMOTE_HOST", remoteHost()));
-	meta_variables.insert(std::make_pair("REMOTE_IDENT", remoteIdet()));
+	meta_variables.insert(std::make_pair("REMOTE_IDENT", remoteIdent()));
 	meta_variables.insert(
 		std::make_pair("REMOTE_USER", remoteUser(request.getHeaderValue("authorization"))));
 	meta_variables.insert(std::make_pair("REQUEST_METHOD", request.getMethod()));
