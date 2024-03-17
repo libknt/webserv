@@ -2,7 +2,7 @@
 
 namespace cgi_request_utils {
 
-static std::string authTye(std::string const& value) {
+static std::string authType(std::string const& value) {
 	std::string auth_type(value);
 	if (auth_type.compare("") != 0) {
 		auth_type = auth_type.substr(0, auth_type.find(' '));
@@ -42,7 +42,7 @@ static std::string remoteHost() {
 	return std::string("");
 }
 
-static std::string remoteIdet() {
+static std::string remoteIdent() {
 	// TODO 推奨されてないので空
 	return std::string("");
 }
@@ -140,7 +140,7 @@ void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 
 	meta_variables.clear();
 	meta_variables.insert(
-		std::make_pair("AUTH_TYPE", authTye(request.getHeaderValue("authorization"))));
+		std::make_pair("AUTH_TYPE", authType(request.getHeaderValue("authorization"))));
 	meta_variables.insert(
 		std::make_pair("CONTENT_LENGTH", request.getHeaderValue("content-length")));
 	meta_variables.insert(std::make_pair("CONTENT_TYPE", request.getHeaderValue("content-type")));
@@ -151,7 +151,7 @@ void createCgiMetaVariables(std::map<std::string, std::string>& meta_variables,
 	meta_variables.insert(std::make_pair("QUERY_STRING", request.getUriQuery()));
 	meta_variables.insert(std::make_pair("REMOTE_ADDR", remoteAddr(client_address)));
 	meta_variables.insert(std::make_pair("REMOTE_HOST", remoteHost()));
-	meta_variables.insert(std::make_pair("REMOTE_IDENT", remoteIdet()));
+	meta_variables.insert(std::make_pair("REMOTE_IDENT", remoteIdent()));
 	meta_variables.insert(
 		std::make_pair("REMOTE_USER", remoteUser(request.getHeaderValue("authorization"))));
 	meta_variables.insert(std::make_pair("REQUEST_METHOD", request.getMethod()));
