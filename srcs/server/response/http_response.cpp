@@ -121,7 +121,10 @@ http_status_code::STATUS_CODE HttpResponse::getStatusCode() const {
 }
 
 const std::string HttpResponse::getFileContentType(std::string const& file_name) const {
-	std::string const& file_extention = file_name.substr(file_name.rfind("."));
+	std::string::size_type dot_location = file_name.rfind(".");
+	std::string file_extention;
+	if (dot_location != std::string::npos)
+		file_extention = file_name.substr(file_name.rfind("."));
 
 	if (file_extention == ".html")
 		return ("text/html");
