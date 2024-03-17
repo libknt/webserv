@@ -2,7 +2,6 @@
 
 LocationDirective::LocationDirective()
 	: location_path_("/")
-	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
 	, autoindex_(false)
@@ -15,7 +14,6 @@ LocationDirective::LocationDirective()
 
 LocationDirective::LocationDirective(const std::string& location_path)
 	: location_path_(location_path)
-	, client_max_body_size_(1000000)
 	, root_("html")
 	, index_("index.html")
 	, autoindex_(false)
@@ -33,7 +31,6 @@ LocationDirective::LocationDirective(const LocationDirective& other)
 	, default_error_page_(other.default_error_page_)
 	, error_pages_(other.error_pages_)
 	, allow_methods_(other.allow_methods_)
-	, client_max_body_size_(other.client_max_body_size_)
 	, root_(other.root_)
 	, index_(other.index_)
 	, autoindex_(other.autoindex_)
@@ -47,7 +44,6 @@ LocationDirective& LocationDirective::operator=(const LocationDirective& other) 
 		default_error_page_ = other.default_error_page_;
 		error_pages_ = other.error_pages_;
 		allow_methods_ = other.allow_methods_;
-		client_max_body_size_ = other.client_max_body_size_;
 		root_ = other.root_;
 		index_ = other.index_;
 		autoindex_ = other.autoindex_;
@@ -70,11 +66,6 @@ int LocationDirective::parseLocationDirective(std::vector<std::string>& tokens) 
 		} else if (tokens.front() == "error_page") {
 			args = ParserUtils::extractTokensUntilSemicolon(tokens);
 			if (parseErrorPageDirective(args) == -1) {
-				return -1;
-			}
-		} else if (tokens.front() == "client_max_body_size") {
-			args = ParserUtils::extractTokensUntilSemicolon(tokens);
-			if (parseClientMaxBodySizeDirective(args) == -1) {
 				return -1;
 			}
 		} else if (tokens.front() == "root") {
@@ -146,37 +137,6 @@ int LocationDirective::parseErrorPageDirective(std::vector<std::string>& tokens)
 			return -1;
 		}
 		error_pages_.insert(std::make_pair(tokens[i], tokens[tokens.size() - 1]));
-	}
-	return 0;
-}
-
-int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>& tokens) {
-	if (tokens.size() != 1) {
-		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
-		return -1;
-	}
-	std::string token = tokens.front();
-	if (token.size() < 2) {
-		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
-		return -1;
-	}
-	for (size_t i = 0; i < token.size() - 1; ++i) {
-		if (!std::isdigit(token[i])) {
-			std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
-			return -1;
-		}
-	}
-
-	std::stringstream stringstream(token.substr(0, token.size() - 1));
-	if (token[token.size() - 1] == 'K') {
-		stringstream >> client_max_body_size_;
-		client_max_body_size_ *= 1000;
-	} else if (token[token.size() - 1] == 'M') {
-		stringstream >> client_max_body_size_;
-		client_max_body_size_ *= 1000000;
-	} else {
-		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
-		return -1;
 	}
 	return 0;
 }
@@ -316,10 +276,6 @@ std::set<std::string> LocationDirective::getAllowMethods() const {
 	return allow_methods_;
 }
 
-int LocationDirective::getClientMaxBodySize() const {
-	return client_max_body_size_;
-}
-
 std::string LocationDirective::getRoot() const {
 	return root_;
 }
@@ -394,7 +350,6 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 	}
 	out << std::endl;
 
-	out << "GetClientMaxBodySize: " << location_directive.getClientMaxBodySize() << std::endl;
 	out << "Root: " << location_directive.getRoot() << std::endl;
 	out << "Index: " << location_directive.getIndex() << std::endl;
 	out << "AutoIndex: " << location_directive.getAutoindex() << std::endl;
