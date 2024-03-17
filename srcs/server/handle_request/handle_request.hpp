@@ -29,10 +29,11 @@ void executeDelete(const HttpRequest& request,
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive);
+};
+
 void createErrorResponse(HttpResponse& response,
 	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive);
-};
 
 }
 

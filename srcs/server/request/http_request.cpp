@@ -72,6 +72,10 @@ std::string const HttpRequest::getMethod() const {
 	return method;
 }
 
+http_method::HTTP_METHOD HttpRequest::getHttpMethod() const {
+	return (method_);
+}
+
 std::string const HttpRequest::getVersion() const {
 	std::string protocol;
 	switch (version_) {
