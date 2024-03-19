@@ -410,7 +410,7 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 
 	std::set<std::string> cgi_extensions = location_directive.getCgiExtensions();
 	out << "CGIExtensions: ";
-	for (std::set<std::string>::iterator it = allow_methods.begin(); it != cgi_extensions.end();
+	for (std::set<std::string>::iterator it = cgi_extensions.begin(); it != cgi_extensions.end();
 		 ++it) {
 		out << *it << ", ";
 	}

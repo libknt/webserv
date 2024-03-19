@@ -87,7 +87,7 @@ int ServerDirective::parseListenDirective(std::vector<std::string>& tokens) {
 
 	port_ = token.substr(found + 1);
 	if (!isValidPort(port_)) {
-		std::cerr << "Parse Error:Invalid port" << std::endl;
+		std::cerr << "Parse Error: Invalid port" << std::endl;
 		return -1;
 	}
 	return 0;
