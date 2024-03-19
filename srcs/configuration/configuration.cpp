@@ -14,7 +14,6 @@ Configuration& Configuration::operator=(const Configuration& other) {
 	return *this;
 }
 
-// TODO: 関数切り分けか命名変更
 int Configuration::init(const std::string& path) {
 	if (path.size() < 5 || path.find(".conf", path.size() - 5) == std::string::npos) {
 		std::cerr << "File Error: The path contains an incorrect file extension" << std::endl;
@@ -74,7 +73,6 @@ bool Configuration::isSpecialCharacter(const char& c) {
 
 int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 	while (!tokens.empty()) {
-		// TODO: rename server_tokens
 		std::vector<std::string> server_tokens;
 		ServerDirective server_directive;
 
