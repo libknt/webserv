@@ -167,13 +167,11 @@ int LocationDirective::parseClientMaxBodySizeDirective(std::vector<std::string>&
 		}
 	}
 
-	std::stringstream stringstream(token.substr(0, token.size() - 1));
+	int num = Utils::toNumber(token.substr(0, token.size() - 1));
 	if (token[token.size() - 1] == 'K') {
-		stringstream >> client_max_body_size_;
-		client_max_body_size_ *= 1000;
+		client_max_body_size_ = num * 1000;
 	} else if (token[token.size() - 1] == 'M') {
-		stringstream >> client_max_body_size_;
-		client_max_body_size_ *= 1000000;
+		client_max_body_size_ = num * 1000000;
 	} else {
 		std::cerr << "Parse Error: parseClientMaxBodySizeDirective" << std::endl;
 		return -1;

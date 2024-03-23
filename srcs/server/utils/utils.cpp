@@ -1,7 +1,5 @@
 #include "utils.hpp"
 
-namespace server {
-
 Utils::Utils() {}
 
 Utils::~Utils() {}
@@ -35,5 +33,3 @@ int Utils::toNumber(const std::string& value) {
 	ss >> result;
 	return result;
 }
-
-} // namespace server
