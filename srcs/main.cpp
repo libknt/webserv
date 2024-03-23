@@ -21,7 +21,6 @@ int main(int argc, char** argv) {
 		default:
 			return 1;
 	}
-	std::cout << configuration << std::endl;
 
 	server::ServerManager server(configuration);
 	if (server.runServer() != -1) {

@@ -5,6 +5,8 @@
 #include <string>
 #include <sys/stat.h>
 
+namespace server {
+
 class Utils {
 private:
 	Utils();
@@ -20,5 +22,6 @@ public:
 	static int toNumber(const std::string& value);
 };
 #include "utils.tpp"
+} // namespace server
 
 #endif // UTILS_HPP
