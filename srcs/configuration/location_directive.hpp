@@ -4,7 +4,6 @@
 #include "http_response.hpp"
 #include "parser_utils.hpp"
 #include "webserv.hpp"
-#include "utils.hpp"
 #include <fstream>
 #include <iostream>
 #include <map>
