@@ -265,7 +265,9 @@ int ServerManager::sendCgiBody(ClientSession& client_session) {
 	std::memset(buffer, '\0', sizeof(buffer));
 	std::string body = cgi_request.extractBodySegment(BUFFER_SIZE - 1);
 	if (body.empty()) {
-		std::cout << "\033[31m" << "  CGI BODY SENDING: COMPLETED" << "\033[0m" << std::endl;
+		std::cout << "\033[31m"
+				  << "  CGI BODY SENDING: COMPLETED"
+				  << "\033[0m" << std::endl;
 		clearFds(client_session.getCgi().getSocketFd(0));
 		setReadFd(client_session.getCgi().getSocketFd(0));
 		client_session.setStatus(CGI_RECEIVEING);
@@ -460,7 +462,9 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
 	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE);
-	std::cout << "\033[32m" << "[" << send_buffer << "]" << "\033[0m" << std::endl;
+	std::cout << "\033[32m"
+			  << "[" << send_buffer << "]"
+			  << "\033[0m" << std::endl;
 	int send_result = send(client_sd, send_buffer, sizeof(send_buffer), 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
@@ -474,7 +478,9 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 		if (client_session.getResponse().getStatus() == http_response_status::FINISHED) {
 			client_session.setStatus(SESSION_COMPLETED);
 		}
-		std::cout << "\033[31m" << "  SENDING: COMPLETED" << "\033[0m" << std::endl;
+		std::cout << "\033[31m"
+				  << "  SENDING: COMPLETED"
+				  << "\033[0m" << std::endl;
 	}
 	return 0;
 }
