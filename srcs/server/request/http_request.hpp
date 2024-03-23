@@ -91,7 +91,7 @@ public:
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	int setMethod(std::string const& method);
-	int setRequestPath(std::string const& uri);
+	int setUri(std::string const& uri);
 	int setVersion(std::string const& version);
 	int setHeaderValue(std::string const& key, std::string const& value);
 	void setBodyMassageType(

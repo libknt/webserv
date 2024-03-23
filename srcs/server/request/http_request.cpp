@@ -214,7 +214,7 @@ int HttpRequest::setMethod(std::string const& method) {
 	return (0);
 }
 
-int HttpRequest::setRequestPath(std::string const& uri) {
+int HttpRequest::setUri(std::string const& uri) {
 	if (uri.size() == 0) {
 		setStatus(http_request_status::ERROR);
 		return (-1);
@@ -288,7 +288,7 @@ bool HttpRequest::isTokenCharacter(char chr) {
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request) {
 
 	out << "method: " << request.getMethod() << std::endl;
-	out << "request path: " << request.getUri() << std::endl;
+	out << "Uri: " << request.getUri() << std::endl;
 	out << "status: " << request.getStatus() << std::endl;
 	out << "version: " << request.getVersion() << std::endl;
 	out << "header" << std::endl;

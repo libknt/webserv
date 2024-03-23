@@ -75,7 +75,7 @@ int HttpRequestParser::parseStartLine(HttpRequest& request, std::string const& l
 				index = i + 1;
 				status = parse_request_line::URI;
 			} else if (parse_request_line::URI) {
-				if (request.setRequestPath(line.substr(index, i - index)) < 0) {
+				if (request.setUri(line.substr(index, i - index)) < 0) {
 					return (-1);
 				}
 				index = i + 1;
