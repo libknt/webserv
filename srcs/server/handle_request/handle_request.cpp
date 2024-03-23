@@ -32,6 +32,7 @@ void handleRequest(ClientSession& client_session) {
 		createErrorResponse(response, http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
 	response.concatenateComponents();
+	client_session.setStatus(SENDING_RESPONSE);
 }
 
 void executeGet(const HttpRequest& request,
@@ -49,25 +50,29 @@ void executeGet(const HttpRequest& request,
 	}
 	if (S_ISREG(request_stat_info.st_mode)) {
 		std::ifstream file_stream(file_path.c_str());
-		std::string body;
+		std::stringstream body_stream;
 		if (file_stream.is_open()) {
 			response.setStatusCode(http_status_code::OK);
-			std::getline(file_stream, body, static_cast<char>(EOF));
-			response.setHeaderValue("Content-Length", Utils::toString(body.size()));
-			response.setBody(body);
+			body_stream << file_stream.rdbuf();
+			response.setBody(body_stream.str());
+			response.setHeaderValue("Content-Length", Utils::toString(response.getBodyLength()));
+			response.setHeaderValue("Content-Type", response.getFileContentType(file_path));
 			response.setStatus(http_response_status::RESPONSE_SENDING);
 			return;
 		}
 	} else if (S_ISDIR(request_stat_info.st_mode)) {
 		if (location_stat_info.st_ino == request_stat_info.st_ino) {
-			std::ifstream default_file_stream(
-				std::string(location_path + "/" + location_directive.getIndex()).c_str());
+			std::string default_file_path = location_path + "/" + location_directive.getIndex();
+			std::ifstream default_file_stream(default_file_path.c_str());
 			if (default_file_stream.is_open()) {
-				std::string body;
+				std::stringstream body_stream;
 				response.setStatusCode(http_status_code::OK);
-				std::getline(default_file_stream, body, static_cast<char>(EOF));
-				response.setHeaderValue("Content-Length", Utils::toString(body.size()));
-				response.setBody(body);
+				body_stream << default_file_stream.rdbuf();
+				response.setBody(body_stream.str());
+				response.setHeaderValue(
+					"Content-Length", Utils::toString(response.getBodyLength()));
+				response.setHeaderValue(
+					"Content-Type", response.getFileContentType(default_file_path));
 				response.setStatus(http_response_status::RESPONSE_SENDING);
 				return;
 			}
@@ -132,37 +137,11 @@ void executeDelete(const HttpRequest& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-void createErrorResponse(HttpResponse& response,
-	http_status_code::STATUS_CODE status_code,
-	const LocationDirective& location_directive) {
-	const std::string& error_page_path = location_directive.findErrorPagePath(status_code);
-	std::ifstream error_page(error_page_path.c_str());
-	std::ifstream default_error_page(location_directive.getDefaultErrorPage().c_str());
-
-	std::string line, body_content;
-	if (error_page.is_open()) {
-		while (getline(error_page, line)) {
-			body_content += line + "\n";
-		}
-	} else if (default_error_page.is_open()) {
-		while (getline(default_error_page, line)) {
-			body_content += line + "\n";
-		}
-	} else {
-		body_content = "<html><body><h1> setErrorResponse() </h1></body></html>";
-	}
-
-	response.setStatusCode(status_code);
-	response.setHeaderValue("Content-Type", "text/html");
-	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
-	response.setBody(body_content);
-	response.setStatus(http_response_status::RESPONSE_SENDING);
-}
-
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	std::string const root = location_directive.getRoot() + request.getUriPath();
+	std::string const request_path = request.getUri();
+	std::string const root = location_directive.getRoot() + request_path;
 	DIR* dir = opendir(root.c_str());
 	if (!dir) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
@@ -177,21 +156,51 @@ void makeAutoIndex(HttpRequest const& request,
 						   std::string(ent->d_name) + "</a>\n") +
 					   body;
 			else if (ent->d_type == DT_DIR)
-				body += ("<a href=\"" + std::string(ent->d_name) + "/\">" +
-						 std::string(ent->d_name) + "</a>\n");
+				body +=
+					("<a href=\"" + request.getUri() + (request_path == "/" ? "" : "/") +
+						std::string(ent->d_name) + "/\">" + std::string(ent->d_name) + "</a>\n");
 			else
-				body += ("<a href=\"" + std::string(ent->d_name) + "\">" +
-						 std::string(ent->d_name) + "</a>\n");
+				body +=
+					("<a href=\"" + request.getUri() + (request_path == "/" ? "" : "/") +
+						std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n");
 		}
 		body = "<html>\n<head>\n<title>Index of</title>\n</head>\n<body>\n<h1>Index of" +
 			   location_directive.getLocationPath() + "<h1>\n<hr>\n<pre>\n" + body;
 		body += ("</pre>\n</hr>\n</body>\n</html>\n");
 		response.setStatusCode(http_status_code::OK);
 		response.setHeaderValue("Content-Length", Utils::toString(body.size()));
+		response.setHeaderValue("Content-Type", "text/html");
 		response.setBody(body);
 	}
 	closedir(dir);
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 };
+
+void createErrorResponse(HttpResponse& response,
+	http_status_code::STATUS_CODE status_code,
+	const LocationDirective& location_directive) {
+
+	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
+
+	std::stringstream stringstream;
+	stringstream << status_code;
+	std::string error_page_path = error_pages[stringstream.str()];
+
+	std::ifstream file_stream(error_page_path.c_str());
+	std::string line, body_content;
+	if (file_stream.is_open()) {
+		while (getline(file_stream, line)) {
+			body_content += line + "\n";
+		}
+	} else {
+		body_content =
+			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+	}
+	response.setStatusCode(status_code);
+	response.setHeaderValue("Content-Type", "text/html");
+	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
+	response.setBody(body_content);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
+}
 };
