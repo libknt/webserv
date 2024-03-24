@@ -68,7 +68,7 @@ ServerDirective const& ClientSession::getServerDirective() const {
 }
 
 LocationDirective const& ClientSession::findLocation() const {
-	return (server_directive_.findLocation(request_.getRequestPath()));
+	return (server_directive_.findLocation(request_.getUri()));
 }
 
 HttpRequest& ClientSession::getRequest() {

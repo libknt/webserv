@@ -14,7 +14,7 @@ namespace server {
 namespace parse_request_line {
 enum PARSE_REQUEST_LINE {
 	METHOD,
-	REQUEST_PATH,
+	URI,
 	VERSION,
 };
 }

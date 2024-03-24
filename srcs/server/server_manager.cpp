@@ -312,7 +312,7 @@ void ServerManager::setClientResponseStage(ClientSession& session) {
 	const LocationDirective& location_directive =
 		server_directive.findLocation(request.getUriPath());
 	std::string file_extension = Utils::extructUriExtension(request.getUriPath());
-	std::string file_path = location_directive.getRoot() + request.getUriPath();
+	std::string file_path = location_directive.getRoot() + "/" + request.getUriPath();
 
 	std::string::size_type pos = file_extension.find('/');
 	if (pos != std::string::npos) {
