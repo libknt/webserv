@@ -97,6 +97,9 @@ void executePost(const HttpRequest& request,
 		if (file_stream.is_open()) {
 			file_stream << request.getBody() << std::endl;
 			response.setStatusCode(http_status_code::CREATED);
+			response.setHeaderValue("Location", request.getUriPath());
+			response.setHeaderValue("Content-Length", Utils::toString(request.getBody().size()));
+			response.setBody(request.getBody());
 			response.setStatus(http_response_status::RESPONSE_SENDING);
 			return;
 		}
@@ -106,6 +109,9 @@ void executePost(const HttpRequest& request,
 		if (file_stream.is_open()) {
 			file_stream << request.getBody() << std::endl;
 			response.setStatusCode(http_status_code::CREATED);
+			response.setHeaderValue("Location", request.getUriPath() + Utils::toString(time_val));
+			response.setHeaderValue("Content-Length", Utils::toString(request.getBody().size()));
+			response.setBody(request.getBody());
 			response.setStatus(http_response_status::RESPONSE_SENDING);
 			return;
 		}
