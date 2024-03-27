@@ -20,7 +20,13 @@ void handleRequest(ClientSession& client_session) {
 		response.concatenateComponents();
 		return;
 	}
-
+	std::cout << request << std::endl;
+	if (request.getStatus() == http_request_status::ERROR) {
+		createErrorResponse(response, request.getHttpStatusCode(), location_directive);
+		response.concatenateComponents();
+		client_session.setStatus(SENDING_RESPONSE);
+		return ;
+	}
 	std::string const method = request.getMethod();
 	if (method == "GET" && location_directive.isAllowMethod(method)) {
 		executeGet(request, response, location_directive);
