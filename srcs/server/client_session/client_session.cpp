@@ -11,6 +11,8 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
+	, cgi_(cgi::CgiRequest())
+	, cgi_response_(cgi::CgiResponse())
 	, response_(HttpResponse())
 	, status_(AWAITING_REQUEST) {}
 
@@ -24,6 +26,8 @@ ClientSession::ClientSession(int const sd,
 	, server_address_(server_address)
 	, server_directive_(server_directive)
 	, request_(HttpRequest())
+	, cgi_(cgi::CgiRequest())
+	, cgi_response_(cgi::CgiResponse())
 	, response_(HttpResponse())
 	, status_(status) {}
 
@@ -35,12 +39,16 @@ ClientSession::ClientSession(const ClientSession& other)
 	, server_address_(other.server_address_)
 	, server_directive_(other.server_directive_)
 	, request_(other.request_)
+	, cgi_(other.cgi_)
+	, cgi_response_(other.cgi_response_)
 	, response_(other.response_)
 	, status_(other.status_) {}
 
 ClientSession& ClientSession::operator=(const ClientSession& other) {
 	if (this != &other) {
 		request_ = other.request_;
+		cgi_ = other.cgi_;
+		cgi_response_ = other.cgi_response_;
 		response_ = other.response_;
 		status_ = other.status_;
 	}
@@ -51,12 +59,28 @@ int ClientSession::getSd() const {
 	return sd_;
 }
 
+HttpRequest const& ClientSession::getRequest() const {
+	return request_;
+}
+
 ServerDirective const& ClientSession::getServerDirective() const {
 	return server_directive_;
 }
 
+LocationDirective const& ClientSession::findLocation() const {
+	return (server_directive_.findLocation(request_.getUri()));
+}
+
 HttpRequest& ClientSession::getRequest() {
 	return request_;
+}
+
+cgi::CgiRequest const& ClientSession::getCgi() const {
+	return cgi_;
+}
+
+cgi::CgiRequest& ClientSession::getCgi() {
+	return cgi_;
 }
 
 HttpResponse& ClientSession::getResponse() {
@@ -131,6 +155,14 @@ std::string ClientSession::getServerPort() const {
 void ClientSession::sessionCleanup() {
 	request_ = HttpRequest();
 	response_ = HttpResponse();
+	cgi_ = cgi::CgiRequest();
+	cgi_response_ = cgi::CgiResponse();
+	status_ = AWAITING_REQUEST;
+	std::cout << "  						Connection Cleanup" << std::endl;
+}
+
+cgi::CgiResponse& ClientSession::getCgiResponse() {
+	return cgi_response_;
 }
 
 std::ostream& operator<<(std::ostream& out, const ClientSession& client_session) {
@@ -141,10 +173,10 @@ std::ostream& operator<<(std::ostream& out, const ClientSession& client_session)
 	out << "  server_address: " << client_session.getServerIpAddress() << ":"
 		<< client_session.getServerPort() << std::endl;
 	out << "  status: " << client_session.getStatus() << std::endl;
-	// out << "  request: " << std::endl;
-	// out << client_session.getRequest() << std::endl;
-	// out << "  response: " << std::endl;
-	// out << client_session.getResponse();
+	std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	out << "  request: " << std::endl;
+	out << &client_session.getRequest() << std::endl;
+	std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	return out;
 }
 

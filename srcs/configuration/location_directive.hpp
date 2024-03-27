@@ -1,6 +1,7 @@
 #ifndef LOCATION_DIRECTIVE_HPP
 #define LOCATION_DIRECTIVE_HPP
 
+#include "http_response.hpp"
 #include "parser_utils.hpp"
 #include "webserv.hpp"
 #include <fstream>

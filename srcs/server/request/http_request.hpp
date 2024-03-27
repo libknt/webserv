@@ -67,7 +67,7 @@ private:
 	http_request_status::HTTP_REQUEST_STATUS status_;
 	http_error_status::HTTP_ERROR_STATUS error_status_;
 	http_method::HTTP_METHOD method_;
-	std::string request_path_;
+	std::string uri_;
 	http_version::HTTP_VERSION version_;
 	std::map<std::string, std::string> header_;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE body_message_type_;
@@ -91,7 +91,7 @@ public:
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
 	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
 	int setMethod(std::string const& method);
-	int setRequestPath(std::string const& request_path);
+	int setUri(std::string const& uri);
 	int setVersion(std::string const& version);
 	int setHeaderValue(std::string const& key, std::string const& value);
 	void setBodyMassageType(
@@ -105,8 +105,13 @@ public:
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
 	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;
 	std::string const getMethod() const;
+	http_method::HTTP_METHOD getHttpMethod() const;
 	std::string const getVersion() const;
-	std::string const& getRequestPath() const;
+	std::string const& getUri() const;
+	std::string getUriScheme() const;
+	std::string getUriAuthority() const;
+	std::string getUriPath() const;
+	std::string getUriQuery() const;
 	std::string const getHeaderValue(std::string const& key) const;
 	std::map<std::string, std::string> const& getHeader() const;
 	http_body_message_type::HTTP_BODY_MESSAGE_TYPE const& getBodyMessageType() const;
@@ -115,8 +120,6 @@ public:
 	size_t getChunkedSize() const;
 	std::string const& getBody() const;
 	size_t getBodySize() const;
-	std::string getUriPath() const;
-	std::string getUriQuery() const;
 };
 
 std::ostream& operator<<(std::ostream& out, const HttpRequest& request);

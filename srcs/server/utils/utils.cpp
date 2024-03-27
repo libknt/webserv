@@ -29,4 +29,11 @@ std::string Utils::extructUriExtension(const std::string& uri) {
 	return extension;
 }
 
+int Utils::toNumber(const std::string& value) {
+	std::stringstream ss(value);
+	int result;
+	ss >> result;
+	return result;
+}
+
 } // namespace server

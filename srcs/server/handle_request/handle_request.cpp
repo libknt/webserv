@@ -9,7 +9,7 @@ void handleRequest(ClientSession& client_session) {
 
 	const ServerDirective& server_directive = client_session.getServerDirective();
 	const LocationDirective& location_directive =
-		server_directive.findLocation(request.getRequestPath());
+		server_directive.findLocation(request.getUriPath());
 
 	// TODO: redirectURLのみの指定でもいいかも
 	// TODO: configurationを綺麗にするPRでStatusCode周りを変更する
@@ -32,6 +32,7 @@ void handleRequest(ClientSession& client_session) {
 		createErrorResponse(response, http_status_code::METHOD_NOT_ALLOWED, location_directive);
 	}
 	response.concatenateComponents();
+	client_session.setStatus(SENDING_RESPONSE);
 }
 
 void executeGet(const HttpRequest& request,
@@ -39,7 +40,7 @@ void executeGet(const HttpRequest& request,
 	const LocationDirective& location_directive) {
 	struct stat location_stat_info;
 	struct stat request_stat_info;
-	std::string file_path = location_directive.getRoot() + request.getRequestPath();
+	std::string file_path = location_directive.getRoot() + request.getUri();
 	std::string location_path =
 		location_directive.getRoot() + "/" + location_directive.getLocationPath();
 
@@ -87,7 +88,7 @@ void executePost(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
-	std::string file_path = location_directive.getRoot() + "/" + request.getRequestPath();
+	std::string file_path = location_directive.getRoot() + "/" + request.getUriPath();
 	if (stat(file_path.c_str(), &file_info) != 0) {
 		return (createErrorResponse(response, http_status_code::NOT_FOUND, location_directive));
 	}
@@ -116,9 +117,9 @@ void executeDelete(const HttpRequest& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
 	struct stat file_info;
-	std::string request_path = location_directive.getRoot() + request.getRequestPath();
+	std::string uri = location_directive.getRoot() + request.getUriPath();
 
-	if (stat(request_path.c_str(), &file_info) != 0) {
+	if (stat(uri.c_str(), &file_info) != 0) {
 		std::cerr << "DELETE Error: stat() failed" << std::endl;
 		return createErrorResponse(response, http_status_code::NOT_FOUND, location_directive);
 	}
@@ -128,7 +129,7 @@ void executeDelete(const HttpRequest& request,
 		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
 
-	if (std::remove(request_path.c_str()) != 0) {
+	if (std::remove(uri.c_str()) != 0) {
 		std::cerr << "DELETE Error: remove() falied" << std::endl;
 		return createErrorResponse(response, http_status_code::BAD_REQUEST, location_directive);
 	}
@@ -136,37 +137,10 @@ void executeDelete(const HttpRequest& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 
-void createErrorResponse(HttpResponse& response,
-	http_status_code::STATUS_CODE status_code,
-	const LocationDirective& location_directive) {
-	const std::string& error_page_path = location_directive.findErrorPagePath(status_code);
-	std::ifstream error_page(error_page_path.c_str());
-	std::ifstream default_error_page(location_directive.getDefaultErrorPage().c_str());
-
-	std::string line, body_content;
-	if (error_page.is_open()) {
-		while (getline(error_page, line)) {
-			body_content += line + "\n";
-		}
-	} else if (default_error_page.is_open()) {
-		while (getline(default_error_page, line)) {
-			body_content += line + "\n";
-		}
-	} else {
-		body_content = "<html><body><h1> setErrorResponse() </h1></body></html>";
-	}
-
-	response.setStatusCode(status_code);
-	response.setHeaderValue("Content-Type", "text/html");
-	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
-	response.setBody(body_content);
-	response.setStatus(http_response_status::RESPONSE_SENDING);
-}
-
 void makeAutoIndex(HttpRequest const& request,
 	HttpResponse& response,
 	const LocationDirective& location_directive) {
-	std::string const request_path = request.getRequestPath();
+	std::string const request_path = request.getUri();
 	std::string const root = location_directive.getRoot() + request_path;
 	DIR* dir = opendir(root.c_str());
 	if (!dir) {
@@ -182,13 +156,11 @@ void makeAutoIndex(HttpRequest const& request,
 						   std::string(ent->d_name) + "</a>\n") +
 					   body;
 			else if (ent->d_type == DT_DIR)
-				body +=
-					("<a href=\"" + request.getRequestPath() + (request_path == "/" ? "" : "/") +
-						std::string(ent->d_name) + "/\">" + std::string(ent->d_name) + "</a>\n");
+				body += ("<a href=\"" + request.getUri() + (request_path == "/" ? "" : "/") +
+						 std::string(ent->d_name) + "/\">" + std::string(ent->d_name) + "</a>\n");
 			else
-				body +=
-					("<a href=\"" + request.getRequestPath() + (request_path == "/" ? "" : "/") +
-						std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n");
+				body += ("<a href=\"" + request.getUri() + (request_path == "/" ? "" : "/") +
+						 std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a>\n");
 		}
 		body = "<html>\n<head>\n<title>Index of</title>\n</head>\n<body>\n<h1>Index of" +
 			   location_directive.getLocationPath() + "<h1>\n<hr>\n<pre>\n" + body;
@@ -202,4 +174,31 @@ void makeAutoIndex(HttpRequest const& request,
 	response.setStatus(http_response_status::RESPONSE_SENDING);
 }
 };
+
+void createErrorResponse(HttpResponse& response,
+	http_status_code::STATUS_CODE status_code,
+	const LocationDirective& location_directive) {
+
+	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
+
+	std::stringstream stringstream;
+	stringstream << status_code;
+	std::string error_page_path = error_pages[stringstream.str()];
+
+	std::ifstream file_stream(error_page_path.c_str());
+	std::string line, body_content;
+	if (file_stream.is_open()) {
+		while (getline(file_stream, line)) {
+			body_content += line + "\n";
+		}
+	} else {
+		body_content =
+			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+	}
+	response.setStatusCode(status_code);
+	response.setHeaderValue("Content-Type", "text/html");
+	response.setHeaderValue("Content-Length", Utils::toString(body_content.size()));
+	response.setBody(body_content);
+	response.setStatus(http_response_status::RESPONSE_SENDING);
+}
 };
