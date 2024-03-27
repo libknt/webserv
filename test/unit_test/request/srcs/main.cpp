@@ -1,5 +1,6 @@
 #include "http_request.hpp"
 #include "http_request_parser.hpp"
+#include "server_directive.hpp"
 #include "webserv.hpp"
 #include <fcntl.h>
 #include <iostream>
@@ -11,6 +12,7 @@
 // namespace server {
 int main(int argc, char* argv[]) {
 	server::HttpRequest requests[argc + 1];
+	ServerDirective server_directive;
 	std::vector<int> fd(argc);
 
 	bool is_all_read = false;
@@ -27,7 +29,7 @@ int main(int argc, char* argv[]) {
 			int size = read(fd[i], buffer, BUFFER_SIZE - 1);
 			if (0 < size) {
 				is_all_read = false;
-				server::HttpRequestParser::parse(requests[i], buffer);
+				server::HttpRequestParser::parse(requests[i], buffer, server_directive);
 			}
 		}
 	}

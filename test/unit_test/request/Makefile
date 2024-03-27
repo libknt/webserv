@@ -2,8 +2,8 @@ NAME       = Request_Unit_Test
 CXX        = c++
 CXXFLAGS   = -Wall -Werror -Wextra
 VERSION    = -std=c++14
-INCLUDES   = -I ./../../../includes -I ${TESTPATH}
-TESTPATH   = ../../../srcs/server/request
+INCLUDES   = -I ../../../includes $(addprefix -I, $(dir $(shell find ../../../srcs/ -name "*.hpp"))) -I ${TESTPATH}
+TESTPATH   = ../../../srcs/
 VPATH      = ${SRCSDIR}:${TESTPATH}
 SRCSDIR    = srcs
 OBJSDIR    = objs
@@ -18,6 +18,7 @@ BUFFER_SIZE = 16
 all: ${NAME}
 
 ${NAME}: ${OBJS}
+	cp -r ${TESTPATH} ${SRCSDIR}
 	${CXX} ${CXXFLAGS} ${VERSION} $^ -o $@
 
 ${OBJSDIR}/%.o:%.cpp
