@@ -15,7 +15,7 @@ private:
 	std::string port_;
 	std::string server_name_;
 	std::map<std::string, LocationDirective> locations_;
-	int client_max_body_size_;
+	size_t client_max_body_size_;
 
 	int parseListenDirective(std::vector<std::string>& tokens);
 	int parseServerNameDirective(std::vector<std::string>& tokens);
@@ -36,6 +36,7 @@ public:
 	std::string getIpAddress() const;
 	std::string getServerName() const;
 	const std::map<std::string, LocationDirective>& getLocations() const;
+	size_t getClientMaxBodySize() const;
 	LocationDirective const& findLocation(std::string const& path) const;
 };
 

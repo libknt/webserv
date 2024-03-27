@@ -214,6 +214,10 @@ const std::map<std::string, LocationDirective>& ServerDirective::getLocations() 
 	return locations_;
 }
 
+size_t ServerDirective::getClientMaxBodySize() const {
+	return client_max_body_size_;
+}
+
 LocationDirective const& ServerDirective::findLocation(std::string const& uri) const {
 	std::string path = uri;
 	for (size_t i = 0; i < uri.size(); ++i) {
