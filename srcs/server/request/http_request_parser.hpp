@@ -2,7 +2,6 @@
 #define PARSE_HTTP_REQUEST_HPP
 
 #include "http_request.hpp"
-#include "server_directive.hpp"
 #include "webserv.hpp"
 #include <cstdlib>
 #include <iostream>

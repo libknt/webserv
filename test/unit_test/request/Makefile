@@ -2,15 +2,14 @@ NAME       = Request_Unit_Test
 CXX        = c++
 CXXFLAGS   = -Wall -Werror -Wextra
 VERSION    = -std=c++14
-INCLUDES   = -I ../../../includes $(addprefix -I, $(dir $(shell find ../../../srcs/ -name "*.hpp"))) -I ${TESTPATH}
-TESTPATH   = ../../../srcs/
+INCLUDES   = -I ../../../includes $(addprefix -I, $(dir $(shell find ../../../srcs/server/request -name "*.hpp")))
+TESTPATH   = ../../../srcs/server/request
 VPATH      = ${SRCSDIR}:${TESTPATH}
 SRCSDIR    = srcs
 OBJSDIR    = objs
 TESTDIR    = test_case
 
 SRCS       = $(shell find ${SRCSDIR} -name "*.cpp" -type f)
-SRCS       += $(subst ${TESTPATH},${SRCSDIR},$(shell find ${TESTPATH} -name "*.cpp" -type f))
 OBJS       = $(subst ${SRCSDIR},${OBJSDIR},${SRCS:.cpp=.o})
 
 BUFFER_SIZE = 16
@@ -45,6 +44,7 @@ all_test:
 
 clean:
 	rm -rf ${OBJSDIR}
+	rm -rf ${SRCSDIR}/request
 
 fclean: clean
 	rm -rf ${NAME}
