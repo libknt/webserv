@@ -126,7 +126,7 @@ int HttpRequestParser::parseBody(HttpRequest& request, std::string const& line) 
 			return (parseContentLengthBody(request, line));
 		default:
 			request.setStatus(http_request_status::ERROR);
-			request.setErrorStatus(http_error_status::BAD_REQUEST);
+			request.setHttpStatusCode(http_status_code::BAD_REQUEST);
 			return (-1);
 	}
 }
@@ -137,7 +137,7 @@ int HttpRequestParser::parseContentLengthBody(HttpRequest& request, std::string 
 		request.setStatus(http_request_status::FINISHED);
 	else if (request.getContentLength() < request.getBodySize()) {
 		request.setStatus(http_request_status::ERROR);
-		request.setErrorStatus(http_error_status::BAD_REQUEST);
+		request.setHttpStatusCode(http_status_code::BAD_REQUEST);
 		return (-1);
 	}
 	return (0);
@@ -153,7 +153,7 @@ int HttpRequestParser::parseChunkedBody(HttpRequest& request, std::string const&
 	} else {
 		if (request.getChunkedSize() != line.size()) {
 			request.setStatus(http_request_status::ERROR);
-			request.setErrorStatus(http_error_status::BAD_REQUEST);
+			request.setHttpStatusCode(http_status_code::BAD_REQUEST);
 			return (-1);
 		}
 		request.appendBody(line);
@@ -180,7 +180,7 @@ int HttpRequestParser::checkHeaderValue(HttpRequest& request) {
 		request.setStatus(http_request_status::BODY);
 	} else {
 		request.setStatus(http_request_status::ERROR);
-		request.setErrorStatus(http_error_status::BAD_REQUEST);
+		request.setHttpStatusCode(http_status_code::BAD_REQUEST);
 		return (-1);
 	}
 	return (0);

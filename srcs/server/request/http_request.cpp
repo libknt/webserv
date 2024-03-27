@@ -50,8 +50,8 @@ http_request_status::HTTP_REQUEST_STATUS const& HttpRequest::getStatus() const {
 	return (status_);
 }
 
-http_error_status::HTTP_ERROR_STATUS const& HttpRequest::getErrorStatus() const {
-	return (error_status_);
+http_status_code::STATUS_CODE const& HttpRequest::getHttpStatusCode() const {
+	return (status_code_);
 }
 
 std::string const HttpRequest::getMethod() const {
@@ -196,8 +196,8 @@ void HttpRequest::setStatus(http_request_status::HTTP_REQUEST_STATUS const& stat
 	status_ = status;
 }
 
-void HttpRequest::setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status) {
-	error_status_ = error_status;
+void HttpRequest::setHttpStatusCode(http_status_code::STATUS_CODE const& status_code) {
+	status_code_ = status_code;
 }
 
 int HttpRequest::setMethod(std::string const& method) {

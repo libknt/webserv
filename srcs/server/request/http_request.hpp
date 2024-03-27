@@ -1,5 +1,6 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
+#include "webserv.hpp"
 #include <arpa/inet.h>
 #include <iostream>
 #include <map>
@@ -45,13 +46,6 @@ enum HTTP_VERSION {
 };
 }
 
-namespace http_error_status {
-enum HTTP_ERROR_STATUS {
-	BAD_REQUEST = 400,
-	UNDEFINED,
-};
-}
-
 namespace http_body_message_type {
 enum HTTP_BODY_MESSAGE_TYPE {
 	CONTENT_LENGTH,
@@ -65,7 +59,7 @@ class HttpRequest {
 private:
 	std::string stream_line_;
 	http_request_status::HTTP_REQUEST_STATUS status_;
-	http_error_status::HTTP_ERROR_STATUS error_status_;
+	http_status_code::STATUS_CODE status_code_;
 	http_method::HTTP_METHOD method_;
 	std::string uri_;
 	http_version::HTTP_VERSION version_;
@@ -89,7 +83,7 @@ public:
 	void setStreamLine(std::string const& stream_line);
 	void eraseStreamLine(std::string::size_type position, std::string::size_type n);
 	void setStatus(http_request_status::HTTP_REQUEST_STATUS const& status);
-	void setErrorStatus(http_error_status::HTTP_ERROR_STATUS const& error_status);
+	void setHttpStatusCode(http_status_code::STATUS_CODE const& status_code);
 	int setMethod(std::string const& method);
 	int setUri(std::string const& uri);
 	int setVersion(std::string const& version);
@@ -103,7 +97,7 @@ public:
 
 	std::string const& getStreamLine() const;
 	http_request_status::HTTP_REQUEST_STATUS const& getStatus() const;
-	http_error_status::HTTP_ERROR_STATUS const& getErrorStatus() const;
+	http_status_code::STATUS_CODE const& getHttpStatusCode() const;
 	std::string const getMethod() const;
 	http_method::HTTP_METHOD getHttpMethod() const;
 	std::string const getVersion() const;
