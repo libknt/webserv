@@ -44,7 +44,7 @@ private:
 	static int checkHeaderValue(HttpRequest& request);
 
 public:
-	static void parse(HttpRequest& request, const char* buf, const ServerDirective &server_directive);
+	static void parse(HttpRequest& request, const char* buf, const size_t client_max_body_size);
 };
 
 }

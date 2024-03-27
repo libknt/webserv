@@ -437,7 +437,7 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	}
 
 	HttpRequest& request = client_session.getRequest();
-	HttpRequestParser::parse(request, recv_buffer, client_session.getServerDirective());
+	HttpRequestParser::parse(request, recv_buffer, client_session.getServerDirective().getClientMaxBodySize());
 	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;
