@@ -17,7 +17,6 @@ BUFFER_SIZE = 16
 all: ${NAME}
 
 ${NAME}: ${OBJS}
-	cp -r ${TESTPATH} ${SRCSDIR}
 	${CXX} ${CXXFLAGS} ${VERSION} $^ -o $@
 
 ${OBJSDIR}/%.o:%.cpp
@@ -44,7 +43,6 @@ all_test:
 
 clean:
 	rm -rf ${OBJSDIR}
-	rm -rf ${SRCSDIR}/request
 
 fclean: clean
 	rm -rf ${NAME}
