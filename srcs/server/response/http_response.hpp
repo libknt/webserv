@@ -10,7 +10,6 @@
 
 namespace server {
 
-
 namespace http_response_status {
 enum HTTP_RESPONSE_STATUS {
 	RESPONSE_SENDING,

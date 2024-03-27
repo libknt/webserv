@@ -50,8 +50,8 @@
 //   | "503"  ; Section 10.5.4: Service Unavailable
 //   | "504"  ; Section 10.5.5: Gateway Time-out
 //   | "505"  ; Section 10.5.6: HTTP Version not supported
-//namespace http_status_code {
-//enum STATUS_CODE {
+// namespace http_status_code {
+// enum STATUS_CODE {
 //	OK = 200,
 //	CREATED = 201,
 //	NO_CONTENT = 204,

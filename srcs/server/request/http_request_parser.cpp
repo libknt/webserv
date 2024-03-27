@@ -14,7 +14,9 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 	return (*this);
 }
 
-void HttpRequestParser::parse(HttpRequest& request, const char* buf, const ServerDirective &server_directive) {
+void HttpRequestParser::parse(HttpRequest& request,
+	const char* buf,
+	const ServerDirective& server_directive) {
 
 	std::string buffer(buf);
 	std::string::size_type index;
@@ -23,7 +25,7 @@ void HttpRequestParser::parse(HttpRequest& request, const char* buf, const Serve
 	if (server_directive.getClientMaxBodySize() < request.getBody().size()) {
 		request.setHttpStatusCode(http_status_code::REQUEST_ENTITY_TOO_LARGE);
 		request.setStatus(http_request_status::ERROR);
-		return ;
+		return;
 	}
 	while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
 		if (request.getStatus() == http_request_status::BODY &&

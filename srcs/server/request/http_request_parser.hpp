@@ -1,9 +1,9 @@
 #ifndef PARSE_HTTP_REQUEST_HPP
 #define PARSE_HTTP_REQUEST_HPP
 
-#include "webserv.hpp"
 #include "http_request.hpp"
 #include "server_directive.hpp"
+#include "webserv.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -44,7 +44,9 @@ private:
 	static int checkHeaderValue(HttpRequest& request);
 
 public:
-	static void parse(HttpRequest& request, const char* buf, const ServerDirective &server_directive);
+	static void parse(HttpRequest& request,
+		const char* buf,
+		const ServerDirective& server_directive);
 };
 
 }
