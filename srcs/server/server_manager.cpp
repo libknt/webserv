@@ -150,7 +150,7 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 			if (handleReadEvent(client_sd) < 0) {
 				return -1;
 			}
-		} 
+		}
 
 		--ready_sds;
 	}
@@ -180,7 +180,8 @@ void ServerManager::recvEvent(int client_sd) {
 			return;
 		}
 	}
-	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE || client_session.getStatus() == ERROR_OCCURRED) {
+	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE ||
+		client_session.getStatus() == ERROR_OCCURRED) {
 		processEvaluatingResponseType(client_session, client_sd);
 		return;
 	}
