@@ -46,7 +46,6 @@ enum HTTP_VERSION {
 };
 }
 
-
 namespace http_body_message_type {
 enum HTTP_BODY_MESSAGE_TYPE {
 	CONTENT_LENGTH,
