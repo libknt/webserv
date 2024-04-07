@@ -144,12 +144,12 @@ int ServerManager::dispatchSocketEvents(int ready_sds) {
 
 		int client_sd = isListeningSocket(sd) ? sd : resolveClientSocket(sd);
 
-		if (FD_ISSET(sd, &read_fds_)) {
+		if (FD_ISSET(sd, &write_fds_)) {
+			handleWriteEvent(client_sd);
+		} else if (FD_ISSET(sd, &read_fds_)) {
 			if (handleReadEvent(client_sd) < 0) {
 				return -1;
 			}
-		} else if (FD_ISSET(sd, &write_fds_)) {
-			handleWriteEvent(client_sd);
 		}
 
 		--ready_sds;
@@ -180,7 +180,8 @@ void ServerManager::recvEvent(int client_sd) {
 			return;
 		}
 	}
-	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE) {
+	if (client_session.getStatus() == EVALUATING_RESPONSE_TYPE ||
+		client_session.getStatus() == ERROR_OCCURRED) {
 		processEvaluatingResponseType(client_session, client_sd);
 		return;
 	}
@@ -437,7 +438,8 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	}
 
 	HttpRequest& request = client_session.getRequest();
-	HttpRequestParser::parse(request, recv_buffer);
+	HttpRequestParser::parse(
+		request, recv_buffer, client_session.getServerDirective().getClientMaxBodySize());
 	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;
@@ -461,11 +463,11 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	int client_sd = client_session.getSd();
 	char send_buffer[BUFFER_SIZE];
 	std::memset(send_buffer, '\0', sizeof(send_buffer));
-	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE);
+	client_session.getResponse().getStreamBuffer(send_buffer, BUFFER_SIZE - 1);
 	std::cout << "\033[32m"
 			  << "[" << send_buffer << "]"
 			  << "\033[0m" << std::endl;
-	int send_result = send(client_sd, send_buffer, sizeof(send_buffer), 0);
+	int send_result = send(client_sd, send_buffer, sizeof(send_buffer) - 1, 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		return -1;

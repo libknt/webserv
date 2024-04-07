@@ -3,7 +3,8 @@
 ServerDirective::ServerDirective()
 	: ip_address_("127.0.0.1")
 	, port_("80")
-	, server_name_("localhost") {}
+	, server_name_("localhost")
+	, client_max_body_size_(1000000) {}
 
 ServerDirective::~ServerDirective() {}
 
@@ -11,7 +12,8 @@ ServerDirective::ServerDirective(const ServerDirective& other)
 	: ip_address_(other.ip_address_)
 	, port_(other.port_)
 	, server_name_(other.server_name_)
-	, locations_(other.locations_) {}
+	, locations_(other.locations_)
+	, client_max_body_size_(other.client_max_body_size_) {}
 
 ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 	if (this != &other) {
@@ -19,6 +21,7 @@ ServerDirective& ServerDirective::operator=(const ServerDirective& other) {
 		ip_address_ = other.ip_address_;
 		server_name_ = other.server_name_;
 		locations_ = other.locations_;
+		client_max_body_size_ = other.client_max_body_size_;
 	}
 	return *this;
 }
@@ -54,6 +57,11 @@ int ServerDirective::parseServerDirective(std::vector<std::string>& tokens) {
 			if (locations_.find(location_path) == locations_.end()) {
 				locations_.insert(std::make_pair(location_path, location_directive));
 			}
+		} else if (tokens.front() == "client_max_body_size") {
+			args = ParserUtils::extractTokensUntilSemicolon(tokens);
+			client_max_body_size_ = parseClientMaxBodySize(args);
+			if (client_max_body_size_ == 0)
+				return -1;
 		} else {
 			std::cerr << "Parse Error: serverDirective" << std::endl;
 			return -1;
@@ -162,6 +170,33 @@ std::string ServerDirective::parseLocationPath(std::vector<std::string>& tokens)
 	return location_path;
 }
 
+unsigned int ServerDirective::parseClientMaxBodySize(std::vector<std::string>& args) {
+
+	unsigned int num = 0;
+	if (args.size() != 1) {
+		std::cerr << "Parse Error: the arguments of client_max_body_size is invaid." << std::endl;
+		return 0;
+	}
+	for (size_t i = 0; i < args[0].size() - 1; i++) {
+		if (!std::isdigit(args[0][i])) {
+			std::cerr << "Parse Error: the arguments must be positive inteager." << std::endl;
+			return 0;
+		}
+		num = num * 10 + (args[0][i] - '0');
+	}
+	if (std::isdigit(args[0][args[0].size() - 1])) {
+		num = num * 10 + (args[0][args[0].size() - 1] - '0');
+	} else if (args[0][args[0].size() - 1] == 'K') {
+		num *= 1000;
+	} else if (args[0][args[0].size() - 1] == 'M') {
+		num *= 1000000;
+	} else {
+		std::cerr << "Parse Error: the arguments must be inteager." << std::endl;
+		return 0;
+	}
+	return (num);
+}
+
 std::string ServerDirective::getPort() const {
 	return port_;
 }
@@ -176,6 +211,10 @@ std::string ServerDirective::getServerName() const {
 
 const std::map<std::string, LocationDirective>& ServerDirective::getLocations() const {
 	return locations_;
+}
+
+size_t ServerDirective::getClientMaxBodySize() const {
+	return client_max_body_size_;
 }
 
 LocationDirective const& ServerDirective::findLocation(std::string const& uri) const {

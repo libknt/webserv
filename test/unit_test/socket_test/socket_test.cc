@@ -103,7 +103,7 @@ TEST(SocketParamsTest, ZeroPort) {
 
 	struct sockaddr_in sin;
 	socklen_t len = sizeof(sin);
-	int result = getsockname(server.getvectorenSd(), (struct sockaddr*)&sin, &len);
+	int result = getsockname(server.getListenSd(), (struct sockaddr*)&sin, &len);
 
 	ASSERT_NE(result, -1) << "Failed to get socket name.";
 	EXPECT_GT(ntohs(sin.sin_port), 0) << "Expected a valid port number after initialization";

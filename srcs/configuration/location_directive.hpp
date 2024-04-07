@@ -18,7 +18,6 @@ private:
 	std::string default_error_page_;
 	std::map<std::string, std::string> error_pages_;
 	std::set<std::string> allow_methods_;
-	int client_max_body_size_;
 	std::string root_;
 	std::string index_;
 	bool autoindex_;
@@ -53,7 +52,6 @@ public:
 	std::map<std::string, std::string> getErrorPages() const;
 	std::string const findErrorPagePath(http_status_code::STATUS_CODE status_code) const;
 	std::set<std::string> getAllowMethods() const;
-	int getClientMaxBodySize() const;
 	std::string getRoot() const;
 	std::string getIndex() const;
 	bool getAutoindex() const;
