@@ -1,4 +1,5 @@
 #include "http_response.hpp"
+#include "webserv.hpp"
 
 namespace server {
 
@@ -62,6 +63,8 @@ std::string HttpResponse::statusCodeToStatusText(const http_status_code::STATUS_
 			return "METHOD_NOT_ALLOWED";
 		case http_status_code::INTERNAL_SERVER_ERROR:
 			return "INTERNAL_SERVER_ERROR";
+		case http_status_code::LENGTH_REQUIRED:
+			return "LENGTH_REQUIRED";
 		default:
 			return "UNKNOWN";
 	}
