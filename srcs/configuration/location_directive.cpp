@@ -258,10 +258,21 @@ int LocationDirective::parseCgiExtensionsDirective(std::vector<std::string>& tok
 		return -1;
 	}
 	for (size_t i = 0; i < tokens.size(); ++i) {
-		if (tokens[i] != ".cgi" && tokens[i] != ".pl" && tokens[i] != ".py" &&
-			tokens[i] != ".php" && tokens[i] != ".sh") {
+		if (tokens[i].size() < 2) {
 			std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
 			return -1;
+		}
+		for (size_t j = 0; j < tokens[i].size(); ++j) {
+			if (j == 0) {
+				if (tokens[i][j] != '.') {
+					std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
+					return -1;
+				}
+			} else if (!std::isalnum(tokens[i][j])) {
+				std::cerr << "Parse Error: parseCgiExtensionsDirective" << std::endl;
+				std::cerr << tokens[i][j] << std::endl;
+				return -1;
+			}
 		}
 		cgi_extensions_.insert(tokens[i]);
 	}
@@ -365,7 +376,7 @@ std::ostream& operator<<(std::ostream& out, const LocationDirective& location_di
 
 	std::set<std::string> cgi_extensions = location_directive.getCgiExtensions();
 	out << "CGIExtensions: ";
-	for (std::set<std::string>::iterator it = allow_methods.begin(); it != cgi_extensions.end();
+	for (std::set<std::string>::iterator it = cgi_extensions.begin(); it != cgi_extensions.end();
 		 ++it) {
 		out << *it << ", ";
 	}
