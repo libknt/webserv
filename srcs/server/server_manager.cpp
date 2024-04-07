@@ -467,7 +467,7 @@ int ServerManager::sendResponse(ClientSession& client_session) {
 	std::cout << "\033[32m"
 			  << "[" << send_buffer << "]"
 			  << "\033[0m" << std::endl;
-	int send_result = send(client_sd, send_buffer, sizeof(send_buffer), 0);
+	int send_result = send(client_sd, send_buffer, sizeof(send_buffer) - 1, 0);
 	if (send_result < 0) {
 		std::cerr << "send() failed: " << strerror(errno) << std::endl;
 		return -1;

@@ -102,3 +102,4 @@ Tcp_Socket_Unit_Test
 marai.conf
 masahito.conf
 *.swp
+.cache
