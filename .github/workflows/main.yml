@@ -11,6 +11,24 @@ on:
       - develop
 
 jobs:
+  check-format:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Clang Format
+      run: sudo apt-get install clang-format
+
+    - name: Check clang-format
+      run: |
+        find . -name '*.cpp' -or -name '*.hpp' -or -name "*.cc" | while read file; do
+            clang-format $file > "$file.formatted"
+            diff $file "$file.formatted" || { echo "$file is not formatted correctly"; exit 1; }
+            rm "$file.formatted"
+        done
+
   clang-tools:
     runs-on: ubuntu-latest
 
@@ -23,8 +41,13 @@ jobs:
 
     - name: Run clang-tidy
       run: |
-        find . -name '*.cpp' -or -name '*.hpp' | while read file; do
-            clang-tidy $file -- -Wall -Wextra -Werror -std=c++98
+        dirs=$(find srcs/ -name "*.hpp" -exec dirname {} \; | sort -u)
+        INCLUDE="-I includes"
+        for dir in $dirs; do
+          INCLUDE="$INCLUDE -I $dir"
+        done
+        find ./srcs -name '*.cpp' -or -name '*.hpp' | while read file; do
+            clang-tidy $file -- -Wall -Wextra -Werror -std=c++98 $INCLUDE -Isrcs/server
         done
 
   cppcheck-analysis:
@@ -38,10 +61,62 @@ jobs:
       run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --error-exitcode=1 --inconclusive --force --suppress=ctuOneDefinitionRuleViolation --suppress=missingIncludeSystem --suppress=missingOverride --suppress=functionStatic:"./cpp-module04/*" --std=c++11 ./
+      run: |
+        dirs=$(find srcs/ -name "*.hpp" -exec dirname {} \; | sort -u)
+        INCLUDE="-I includes"
+        for dir in $dirs; do
+          INCLUDE="$INCLUDE -I $dir"
+        done
+        cppcheck --enable=all --check-config --error-exitcode=1 --inconclusive --force --suppress=missingIncludeSystem --std=c++11 $INCLUDE ./srcs/.
 
     - name: Upload cppcheck report
       uses: actions/upload-artifact@v2
       with:
         name: cppcheck-report
         path: cppcheck.txt
+
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install required packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ make
+    
+    - name: Run unit tests
+      run: |
+        cd test/unit_test/
+        make
+
+# google-test:
+#   runs-on: ubuntu-latest
+
+#   steps:
+#   - name: Checkout code
+#     uses: actions/checkout@v2
+
+#   - name: Install required packages
+#     run: |
+#       sudo apt-get update
+#       sudo apt-get install -y wget cmake
+
+#   - name: Build Google Test
+#     run: |
+#       cd test
+#       make action-build
+
+#   - name: Run Google Test
+#     run: |
+#       cd test
+#       make action
+
+#   - name: Upload test results
+#     if: always()
+#     uses: actions/upload-artifact@v2
+#     with:
+#       name: test-results
+#       path: test/log/results.log

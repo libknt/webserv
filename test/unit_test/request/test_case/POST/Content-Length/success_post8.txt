@@ -1,0 +1,5 @@
+POST /api/v1/comment HTTP/1.1
+Host: www.example.com
+Content-Length: 28
+
+{"postId":1, "text":"Nice!"}
