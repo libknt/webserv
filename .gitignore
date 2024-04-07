@@ -103,3 +103,10 @@ marai.conf
 masahito.conf
 *.swp
 .cache
+
+conf.conf
+sokuno.conf
+webserv.conf
+yoda-note.conf
+
+test_configuration/
