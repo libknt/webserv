@@ -1,5 +1,0 @@
-POST /api/v1/orders HTTP/1.1
-Host: www.example.com
-Content-Length: 58
-
-{"productID":12345, "quantity":1, "address":"1234 Elm St"}

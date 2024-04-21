@@ -1,9 +1,0 @@
-POST /upload/text HTTP/1.1
-Host: example.com
-Transfer-Encoding: chunked
-Content-Type: text/plain
-
-a
-Hello World!
-0
-

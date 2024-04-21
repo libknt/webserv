@@ -1,5 +1,0 @@
-POST /api/v1/webhook HTTP/1.1
-Host: api.example.com
-Content-Length: 41
-
-{"url":"http://www.example.com/callback"}

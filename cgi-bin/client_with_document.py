@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 print("Content-type: text/html")
-print("Location: http://127.0.0.1:8080/README.md")
+print("Location: http://127.0.0.1:8080/Makefile")
 print("")
 
 print("<html>")

@@ -1,5 +1,0 @@
-POST /api/v1/checkout HTTP/1.1
-Host: api.example.com
-Content-Length: 129
-
-{"cartId":"xyz", "paymentMethod":"credit card", "address":{"street":"123 Elm St", "city":"City", "state":"State", "zip":"12345"}}

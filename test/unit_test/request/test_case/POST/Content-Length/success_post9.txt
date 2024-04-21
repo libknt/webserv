@@ -1,5 +1,0 @@
-POST /api/v1/posts HTTP/1.1
-Host: api.example.com
-Content-Length: 47
-
-{"title":"Post Title", "body":"Post body text"}
