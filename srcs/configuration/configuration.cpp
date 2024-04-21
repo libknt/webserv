@@ -83,6 +83,14 @@ int Configuration::parseConfiguration(std::vector<std::string>& tokens) {
 			if (server_directive.parseServerDirective(server_tokens) == -1) {
 				return -1;
 			}
+
+			for (size_t i = 0; i < servers_.size(); ++i) {
+				if (server_directive.getIpAddress() == servers_[i].getIpAddress() &&
+					server_directive.getPort() == servers_[i].getPort()) {
+					std::cerr << "Parse Error: Duplicate port number" << std::endl;
+					return -1;
+				}
+			}
 			servers_.push_back(server_directive);
 		} else {
 			std::cerr << "Parse Error: Invalid main directive" << std::endl;
