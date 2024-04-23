@@ -209,6 +209,7 @@ int HttpRequest::setMethod(std::string const& method) {
 		method_ = http_method::DELETE;
 	else {
 		setStatus(http_request_status::ERROR);
+		setHttpStatusCode(http_status_code::METHOD_NOT_ALLOWED);
 		return (-1);
 	}
 	return (0);
