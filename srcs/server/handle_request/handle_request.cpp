@@ -18,6 +18,7 @@ void handleRequest(ClientSession& client_session) {
 		response.setStatusCode(http_status_code::FOUND);
 		response.setHeaderValue("Location", return_directive.back());
 		response.concatenateComponents();
+		client_session.setStatus(SENDING_RESPONSE);
 		return;
 	}
 	std::cout << request << std::endl;
