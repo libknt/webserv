@@ -21,14 +21,13 @@ private:
 	std::string root_;
 	std::string index_;
 	bool autoindex_;
-	std::vector<std::string> return_;
+	std::string return_;
 	bool chunked_transfer_encoding_;
 	bool cgi_;
 	std::set<std::string> cgi_extensions_;
 
 	int parseDefaultErrorPageDirective(std::vector<std::string>& tokens);
 	int parseErrorPageDirective(std::vector<std::string>& tokens);
-	int parseClientMaxBodySizeDirective(std::vector<std::string>& tokens);
 	int parseRootDirective(std::vector<std::string>& tokens);
 	int parseIndexDirective(std::vector<std::string>& tokens);
 	int parseAutoindexDirective(std::vector<std::string>& tokens);
@@ -55,7 +54,7 @@ public:
 	std::string getRoot() const;
 	std::string getIndex() const;
 	bool getAutoindex() const;
-	std::vector<std::string> const& getReturn() const;
+	std::string const& getReturn() const;
 	bool getChunkedTransferEncoding() const;
 	bool getCgi() const;
 	bool isCgiExtension(const std::string& extension) const;
