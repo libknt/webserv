@@ -17,13 +17,12 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 }
 
 void HttpRequestParser::parse(HttpRequest& request,
-	const char* buf,
+	std::string const &recv_buffer,
 	const size_t client_max_body_size) {
 
-	std::string buffer(buf);
 	std::string::size_type index;
 
-	request.appendStreamLine(buffer);
+	request.appendStreamLine(recv_buffer);
 	if (client_max_body_size < request.getBody().size()) {
 		request.setHttpStatusCode(http_status_code::REQUEST_ENTITY_TOO_LARGE);
 		request.setStatus(http_request_status::ERROR);
