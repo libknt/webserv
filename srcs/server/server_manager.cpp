@@ -438,8 +438,9 @@ int ServerManager::receiveAndParseHttpRequest(ClientSession& client_session) {
 	}
 
 	HttpRequest& request = client_session.getRequest();
-	HttpRequestParser::parse(
-		request, std::string(recv_buffer, recv_result), client_session.getServerDirective().getClientMaxBodySize());
+	HttpRequestParser::parse(request,
+		std::string(recv_buffer, recv_result),
+		client_session.getServerDirective().getClientMaxBodySize());
 	client_session.setSessionStatusFromHttpRequest();
 
 	return 0;

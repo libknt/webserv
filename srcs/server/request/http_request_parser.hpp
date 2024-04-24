@@ -43,7 +43,9 @@ private:
 	static int checkHeaderValue(HttpRequest& request);
 
 public:
-	static void parse(HttpRequest& request, std::string const &recv_buffer, const size_t client_max_body_size);
+	static void parse(HttpRequest& request,
+		std::string const& recv_buffer,
+		const size_t client_max_body_size);
 };
 
 }

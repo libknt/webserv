@@ -17,7 +17,7 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 }
 
 void HttpRequestParser::parse(HttpRequest& request,
-	std::string const &recv_buffer,
+	std::string const& recv_buffer,
 	const size_t client_max_body_size) {
 
 	std::string::size_type index;
