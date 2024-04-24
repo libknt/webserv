@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 			int size = read(fd[i], buffer, BUFFER_SIZE - 1);
 			if (0 < size) {
 				is_all_read = false;
-				server::HttpRequestParser::parse(requests[i], buffer, 10000);
+				server::HttpRequestParser::parse(requests[i], std::string(buffer, size), 10000);
 			}
 		}
 	}
