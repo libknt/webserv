@@ -515,6 +515,7 @@ int ServerManager::unregisterClientSession(ClientSession& client_session) {
 
 	std::cout << "  Connection closed - " << client_sd << std::endl;
 	active_client_sessions_.erase(client_sd);
+	close(client_sd);
 	return 0;
 }
 
