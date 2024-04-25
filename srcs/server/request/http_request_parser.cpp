@@ -17,13 +17,12 @@ HttpRequestParser& HttpRequestParser::operator=(HttpRequestParser& other) {
 }
 
 void HttpRequestParser::parse(HttpRequest& request,
-	const char* buf,
+	std::string const& recv_buffer,
 	const size_t client_max_body_size) {
 
-	std::string buffer(buf);
 	std::string::size_type index;
 
-	request.appendStreamLine(buffer);
+	request.appendStreamLine(recv_buffer);
 	while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
 		if (request.getStatus() == http_request_status::BODY &&
 			request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
