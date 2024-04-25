@@ -3,6 +3,7 @@
 #include "webserv.hpp"
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <errno.h>
 #include <fcntl.h>
 #include <fstream>
@@ -32,6 +33,7 @@ private:
 	char** environ_;
 	int status_;
 	std::string body_;
+	time_t start_time_;
 
 	int setupInterProcessCommunication();
 	int setNonBlocking(int sd);
@@ -52,11 +54,13 @@ public:
 	void setMetaVariable(std::map<std::string, std::string> const& meta_variables);
 	std::string findMetaVariable(std::string const& key) const;
 	pid_t getPid() const;
+	void setPid(pid_t pid);
 	int getSocketFd(int const index) const;
 	char const* const* getExecveArgv() const;
 	char const* const* getEnviron() const;
 	const std::string& getBody() const;
 	void setBody(std::string const& body);
+	void checkTimeout();
 };
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi);

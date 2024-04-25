@@ -136,6 +136,7 @@ int CgiRequest::execute() {
 	}
 	close(socket_vector_[1]);
 	cgi_status_ = EXECUTED;
+	start_time_ = time(0);
 	return 0;
 }
 
@@ -287,6 +288,9 @@ std::string CgiRequest::findMetaVariable(std::string const& key) const {
 pid_t CgiRequest::getPid() const {
 	return pid_;
 }
+void CgiRequest::setPid(pid_t pid) {
+	pid_ = pid;
+}
 
 int CgiRequest::getSocketFd(int const index) const {
 	return socket_vector_[index];
@@ -306,6 +310,19 @@ const std::string& CgiRequest::getBody() const {
 
 void CgiRequest::setBody(std::string const& body) {
 	body_ = body;
+}
+
+void CgiRequest::checkTimeout() {
+	if (pid_ != -1) {
+		time_t current_time = time(0);
+		double seconds_passed = difftime(current_time, start_time_);
+		if (seconds_passed >= 10.0) {
+			std::cout << "CGI Timeout" << std::endl;
+			std::cout << pid_ << std::endl;
+			kill(pid_, SIGKILL);
+			pid_ = -1;
+		}
+	}
 }
 
 std::ostream& operator<<(std::ostream& out, const CgiRequest& cgi) {
