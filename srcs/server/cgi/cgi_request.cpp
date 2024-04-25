@@ -109,6 +109,15 @@ int CgiRequest::execute() {
 		return -1;
 	}
 	if (pid_ == 0) {
+		std::string directory = argv[1];
+		size_t last_slash_pos = directory.find_last_of('/');
+		if (last_slash_pos != std::string::npos) {
+			directory = directory.substr(0, last_slash_pos);
+			if (chdir(directory.c_str()) != 0) {
+				std::cerr << "chdir() failed: " << strerror(errno) << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+		}
 		close(socket_vector_[0]);
 		if (dup2(socket_vector_[1], STDOUT_FILENO) < 0) {
 			std::cerr << "dup2() failed: " << strerror(errno) << std::endl;
