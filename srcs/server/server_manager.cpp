@@ -92,6 +92,19 @@ int ServerManager::setupSelectReadFds() {
 	return 0;
 }
 
+void ServerManager::kill_cgi() {
+	std::map<int, ClientSession>::iterator it;
+	std::cout << "aaaaaaaaaaaa" << std::endl;
+	for (it = active_client_sessions_.begin(); it != active_client_sessions_.end(); ++it) {
+		if (it->second.getCgi().getPid() != -1) {
+			std::cout << "kill(it->second.getCgi().getPid(), SIGKILL);"
+					  << it->second.getCgi().getPid() << std::endl;
+			kill(it->second.getCgi().getPid(), SIGKILL);
+			it->second.getCgi().setPid(-1);
+		}
+	}
+}
+
 int ServerManager::monitorSocketEvents() {
 	is_running_ = true;
 	while (is_running_) {
@@ -106,7 +119,6 @@ int ServerManager::monitorSocketEvents() {
 		std::memcpy(&read_fds_, &master_read_fds_, sizeof(master_read_fds_));
 		std::memcpy(&write_fds_, &master_write_fds_, sizeof(master_write_fds_));
 #endif
-		std::cout << "Waiting on select()!" << std::endl;
 		int select_result = select(highest_sd_ + 1, &read_fds_, &write_fds_, NULL, &timeout_);
 
 		if (select_result < 0) {
@@ -118,6 +130,7 @@ int ServerManager::monitorSocketEvents() {
 			std::cout << "select() timed out. continue" << std::endl;
 			timeout_.tv_sec = 30;
 			timeout_.tv_usec = 0;
+			kill_cgi();
 			continue;
 		}
 
@@ -186,6 +199,7 @@ void ServerManager::recvEvent(int client_sd) {
 		return;
 	}
 	if (client_session.getStatus() == CGI_RECEIVEING) {
+		client_session.getCgi().checkTimeout();
 		handleCgiResponseReading(client_session);
 	}
 }

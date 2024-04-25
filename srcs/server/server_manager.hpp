@@ -10,6 +10,7 @@
 #include "tcp_socket.hpp"
 #include "utils.hpp"
 #include "webserv.hpp"
+#include <csignal>
 #include <iostream>
 #include <map>
 #include <sys/stat.h>
@@ -63,6 +64,7 @@ private:
 	void handleSendingResponse(ClientSession& client_session);
 	void finalizeSession(ClientSession& client_session);
 	int handleReadEvent(int client_sd);
+	void kill_cgi();
 
 public:
 	ServerManager(const Configuration& configuration);
