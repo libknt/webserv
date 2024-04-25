@@ -14,7 +14,7 @@ def parse_post_data(data):
     return parsed_data
 
 print("Content-Type: text/html")
-print()
+print("")
 
 content_length = int(os.environ.get('CONTENT_LENGTH', 0))
 post_data = sys.stdin.read(content_length)

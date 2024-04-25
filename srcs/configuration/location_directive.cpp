@@ -176,6 +176,7 @@ int LocationDirective::parseAutoindexDirective(std::vector<std::string>& tokens)
 }
 
 int LocationDirective::parseAllowMethodsDirective(std::vector<std::string>& tokens) {
+	allow_methods_.clear();
 	if (tokens.empty()) {
 		std::cerr << "Parse Error: parseAllowMethodsDirective" << std::endl;
 		return -1;
