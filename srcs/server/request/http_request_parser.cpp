@@ -22,8 +22,7 @@ void HttpRequestParser::parse(HttpRequest& request,
 
 	std::string::size_type index;
 
-
-	request.appendStreamLine(buffer);
+	request.appendStreamLine(recv_buffer);
 	while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
 		if (request.getStatus() == http_request_status::BODY &&
 			request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
