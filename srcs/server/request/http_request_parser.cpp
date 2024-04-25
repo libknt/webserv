@@ -24,11 +24,6 @@ void HttpRequestParser::parse(HttpRequest& request,
 	std::string::size_type index;
 
 	request.appendStreamLine(buffer);
-	if (client_max_body_size < request.getBody().size()) {
-		request.setHttpStatusCode(http_status_code::REQUEST_ENTITY_TOO_LARGE);
-		request.setStatus(http_request_status::ERROR);
-		return;
-	}
 	while ((index = request.getStreamLine().find("\r\n")) != std::string::npos) {
 		if (request.getStatus() == http_request_status::BODY &&
 			request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH)
@@ -39,13 +34,17 @@ void HttpRequestParser::parse(HttpRequest& request,
 			return;
 		}
 	}
-
 	if (request.getStatus() == http_request_status::BODY &&
 		request.getBodyMessageType() == http_body_message_type::CONTENT_LENGTH) {
 		if (parseRequest(request, request.getStreamLine()) == -1) {
 			return;
 		}
 		request.setStreamLine("");
+	}
+	if (client_max_body_size < request.getBody().size()) {
+		request.setHttpStatusCode(http_status_code::REQUEST_ENTITY_TOO_LARGE);
+		request.setStatus(http_request_status::ERROR);
+		return;
 	}
 }
 
