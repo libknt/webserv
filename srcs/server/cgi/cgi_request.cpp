@@ -304,14 +304,15 @@ void CgiRequest::setBody(std::string const& body) {
 }
 
 void CgiRequest::checkTimeout() {
-	std::cout << "aaajgoisergfrajefo" << std::endl;
-	time_t current_time = time(0);
-	double seconds_passed = difftime(current_time, start_time_);
-	if (seconds_passed >= 10.0) {
-		std::cout << "Timeout" << std::endl;
-		std::cout << pid_ << std::endl;
-		kill(pid_, SIGKILL);
-		pid_ = -1;
+	if (pid_ != -1) {
+		time_t current_time = time(0);
+		double seconds_passed = difftime(current_time, start_time_);
+		if (seconds_passed >= 10.0) {
+			std::cout << "CGI Timeout" << std::endl;
+			std::cout << pid_ << std::endl;
+			kill(pid_, SIGKILL);
+			pid_ = -1;
+		}
 	}
 }
 

@@ -2,6 +2,6 @@
 
 # 無限ループの例
 while true; do
-# echo " Looping...ech"
+  echo " Looping...ech"
   sleep 1  # 1秒ごとに待機
 done

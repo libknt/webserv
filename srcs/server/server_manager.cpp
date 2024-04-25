@@ -94,11 +94,9 @@ int ServerManager::setupSelectReadFds() {
 
 void ServerManager::kill_cgi() {
 	std::map<int, ClientSession>::iterator it;
-	std::cout << "aaaaaaaaaaaa" << std::endl;
 	for (it = active_client_sessions_.begin(); it != active_client_sessions_.end(); ++it) {
 		if (it->second.getCgi().getPid() != -1) {
-			std::cout << "kill(it->second.getCgi().getPid(), SIGKILL);"
-					  << it->second.getCgi().getPid() << std::endl;
+			std::cout << "kill cgi" << it->second.getCgi().getPid() << std::endl;
 			kill(it->second.getCgi().getPid(), SIGKILL);
 			it->second.getCgi().setPid(-1);
 		}
