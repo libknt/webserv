@@ -92,7 +92,7 @@ int ServerManager::setupSelectReadFds() {
 	return 0;
 }
 
-void ServerManager::killCgiProcess {
+void ServerManager::killCgiProcess() {
 	std::map<int, ClientSession>::iterator it;
 	for (it = active_client_sessions_.begin(); it != active_client_sessions_.end(); ++it) {
 		if (it->second.getCgi().getPid() != -1) {
@@ -128,7 +128,7 @@ int ServerManager::monitorSocketEvents() {
 			std::cout << "select() timed out. continue" << std::endl;
 			timeout_.tv_sec = 30;
 			timeout_.tv_usec = 0;
-			killCgiProcess;
+			killCgiProcess();
 			continue;
 		}
 
