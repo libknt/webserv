@@ -189,22 +189,22 @@ void makeAutoIndex(HttpRequest const& request,
 void createErrorResponse(HttpResponse& response,
 	http_status_code::STATUS_CODE status_code,
 	const LocationDirective& location_directive) {
+	std::string file_path;
 
-	std::map<std::string, std::string> error_pages = location_directive.getErrorPages();
-
-	std::stringstream stringstream;
-	stringstream << status_code;
-	std::string error_page_path = error_pages[stringstream.str()];
-
-	std::ifstream file_stream(error_page_path.c_str());
+	if (location_directive.findErrorPagePath(status_code) != "")
+		file_path =
+			location_directive.getRoot() + "/" + location_directive.findErrorPagePath(status_code);
+	else
+		file_path = location_directive.getRoot() + location_directive.getDefaultErrorPage();
+	std::ifstream file_stream(file_path.c_str());
 	std::string line, body_content;
 	if (file_stream.is_open()) {
 		while (getline(file_stream, line)) {
 			body_content += line + "\n";
 		}
 	} else {
-		body_content =
-			"<html><body><h1> setErrorResponse(): " + stringstream.str() + "</h1></body></html>";
+		body_content = "<html><body><h1> setErrorResponse(): " + Utils::toString(status_code) +
+					   "</h1></body></html>";
 	}
 	response.setStatusCode(status_code);
 	response.setHeaderValue("Content-Type", "text/html");
