@@ -195,7 +195,7 @@ void createErrorResponse(HttpResponse& response,
 		file_path =
 			location_directive.getRoot() + "/" + location_directive.findErrorPagePath(status_code);
 	else
-		file_path = location_directive.getRoot() + location_directive.getDefaultErrorPage();
+		file_path = location_directive.getRoot() + "/" + location_directive.getDefaultErrorPage();
 	std::ifstream file_stream(file_path.c_str());
 	std::string line, body_content;
 	if (file_stream.is_open()) {
