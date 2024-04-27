@@ -2,7 +2,6 @@
 
 namespace cgi {
 
-
 static char** DeepCopy(char** src) {
 	if (!src)
 		return NULL;
