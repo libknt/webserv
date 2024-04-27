@@ -2,7 +2,33 @@
 
 namespace cgi {
 
-static char** DeepCopy(char** src);
+static char** DeepCopy(char** src) {
+	if (!src)
+		return NULL;
+
+	int count = 0;
+	while (src[count])
+		count++;
+
+	char** dst = new char*[count + 1];
+	if (!dst)
+		return NULL;
+
+	dst[count] = NULL;
+
+	for (int i = 0; i < count; ++i) {
+		int len = std::strlen(src[i]);
+		dst[i] = new char[len + 1];
+		if (!dst[i]) {
+			while (--i >= 0)
+				delete[] dst[i];
+			delete[] dst;
+			return NULL;
+		}
+		std::strcpy(dst[i], src[i]);
+	}
+	return dst;
+}
 
 CgiRequest::CgiRequest()
 	: cgi_status_(UNDIFINED)
@@ -19,65 +45,65 @@ CgiRequest::CgiRequest(const CgiRequest& other)
 	: cgi_status_(other.cgi_status_)
 	, meta_variables_(other.meta_variables_)
 	, pid_(other.pid_)
-	, execve_argv_(other.execve_argv_)
-	, environ_(other.environ_)
 	, status_(other.status_) {
+	execve_argv_ = DeepCopy(other.execve_argv_);
+	environ_ = DeepCopy(other.environ_);
 	socket_vector_[0] = other.socket_vector_[0];
 	socket_vector_[1] = other.socket_vector_[1];
 }
 
 CgiRequest& CgiRequest::operator=(const CgiRequest& other) {
 	if (this != &other) {
+		char** new_argv = DeepCopy(other.execve_argv_);
+		char** new_env = DeepCopy(other.environ_);
+
+		if (execve_argv_ != NULL) {
+			for (int i = 0; execve_argv_[i]; ++i) {
+				delete[] execve_argv_[i];
+			}
+			delete[] execve_argv_;
+		}
+		if (environ_ != NULL) {
+			for (int i = 0; environ_[i]; ++i) {
+				delete[] environ_[i];
+			}
+			delete[] environ_;
+		}
+
+		execve_argv_ = new_argv;
+		environ_ = new_env;
 		cgi_status_ = other.cgi_status_;
 		meta_variables_ = other.meta_variables_;
 		pid_ = other.pid_;
 		socket_vector_[0] = other.socket_vector_[0];
 		socket_vector_[1] = other.socket_vector_[1];
-		execve_argv_ = DeepCopy(other.execve_argv_);
-		environ_ = DeepCopy(other.environ_);
 		status_ = other.status_;
 	}
 	return *this;
-}
-
-static char** DeepCopy(char** src) {
-	if (!src) {
-		return NULL;
-	}
-	char** dst = new (std::nothrow) char*[sizeof(src)];
-	if (!dst) {
-		return NULL;
-	}
-	for (int i = 0; src[i]; ++i) {
-		dst[i] = new (std::nothrow) char[sizeof(src[i])];
-		if (!dst[i]) {
-			for (int j = 0; j < i; ++j) {
-				delete[] dst[j];
-			}
-			delete[] dst;
-			return NULL;
-		}
-		std::strcpy(dst[i], src[i]);
-	}
-	return dst;
 }
 
 CgiRequest::~CgiRequest() {
 	if (pid_ != -1) {
 		kill(pid_, SIGKILL);
 	}
-	if (execve_argv_) {
+
+	if (execve_argv_ != NULL) {
+		std::cout << execve_argv_[0] << std::endl;
+	}
+	if (execve_argv_ != NULL) {
 		for (int i = 0; execve_argv_[i]; ++i) {
 			delete[] execve_argv_[i];
 		}
 		delete[] execve_argv_;
+		execve_argv_ = NULL;
 	}
-	if (environ_) {
+	if (environ_ != NULL) {
 		for (int i = 0; environ_[i]; ++i) {
 			delete[] environ_[i];
 		}
 		delete[] environ_;
 	}
+	environ_ = NULL;
 	close(socket_vector_[0]);
 	close(socket_vector_[1]);
 }
